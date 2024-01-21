@@ -8,8 +8,8 @@ function App() {
   return (
       <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<VerletIntegration01 />} />
+      <Route path="/physics-playground/" element={<Layout />}>
+        <Route path="/physics-playground/" element={<VerletIntegration01 />} />
       </Route>
     </Routes>
   </BrowserRouter>

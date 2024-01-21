@@ -3,7 +3,7 @@ import p5Types from "p5";
 
 export const OBJECT_RADIUS = 10;
 export const GRAVITY = vec2.fromValues(0, 40);
-const CONSTRAINT_CENTER = vec2.fromValues(800, 450);
+const CONSTRAINT_CENTER = vec2.fromValues(800, 430);
 const CONSTRAINS_RADIUS = 400;
 const SUB_STEP_COUNT = 8;
 const DT = 60 / 1000;
@@ -52,6 +52,7 @@ const simulate = (objects: VerletObject[], dt: number) =>
     {
         applyGravity(objects);
         resolveConstraints(objects);
+        resolveCollisions(objects);
         updatePosition(objects, subStepDt);
     }
 }
@@ -94,6 +95,29 @@ const resolveConstraints = (objects: VerletObject[]) =>
             const scaledMove = vec2.scale(vec2.create(), moveDirection, distance - CONSTRAINS_RADIUS + OBJECT_RADIUS);
             vec2.add(o.position, o.position, scaledMove);
         }
+    })
+}
+
+const resolveCollisions = (objects: VerletObject[]) =>
+{
+    objects.forEach((o1, i1) =>
+    {
+        objects.forEach((o2, i2) =>
+        {
+            const v = vec2.sub(vec2.create(), o1.position, o2.position);
+            const distance = vec2.len(v);
+            const minDist = OBJECT_RADIUS * 2;
+
+            if (distance < minDist && i1 !== i2)
+            {
+                const vNorm = vec2.normalize(vec2.create(), v);
+                const moveDist = (minDist - distance) / 2;
+                const moveVec = vec2.scale(vec2.create(), vNorm, moveDist);
+
+                vec2.add(o1.position, o1.position, moveVec);
+                vec2.subtract(o2.position, o2.position, moveVec);
+            }
+        })
     })
 }
 

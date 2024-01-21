@@ -2,8 +2,15 @@ import {Renderer} from "../components/Renderer";
 import {createEngine} from "./Verlet01";
 import {vec2} from "gl-matrix";
 import p5Types from "p5";
-import {combineLatest, fromEvent, map, merge, switchMap, takeUntil, throttleTime, withLatestFrom, zip} from "rxjs";
-import {Simulate} from "react-dom/test-utils";
+import {
+    filter,
+    fromEvent,
+    map,
+    repeat,
+    switchMap,
+    takeUntil,
+    throttleTime,
+} from "rxjs";
 
 export const VerletIntegration01 = () =>
 {
@@ -25,23 +32,36 @@ export const VerletIntegration01 = () =>
             .pipe(map(e => transformEvent(e, canvas)));
 
         const mouseUp$ = fromEvent(canvas, 'mouseup');
-        const mouseMove$ = mouseDown$
-            .pipe(switchMap(() => fromEvent(document, 'mousemove').pipe(takeUntil(mouseUp$))))
-            .pipe(map(e => transformEvent(e, canvas)));
+        const mouseMove$ = fromEvent(document, 'mousemove')
+            .pipe(map(e => transformEvent(e, canvas)))
+            .pipe(throttleTime(40));
 
-        combineLatest([mouseDown$, mouseMove$])
-            .pipe(throttleTime(100))
-            .subscribe(e =>
+        mouseDown$
+            .pipe(
+                switchMap(downPos =>
+                {
+                    return mouseMove$.pipe(map(movePos =>
+                    {
+                        const velocity = vec2.distance(downPos, movePos);
+                        const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
+                        vec2.normalize(speedVec, speedVec);
+                        vec2.scale(speedVec, speedVec, 20 + velocity / 10);
+
+                        return {speed: speedVec, position: downPos};
+                    }))
+                }),
+                filter(v =>
+                {
+                    return vec2.len(v.speed) > 25;
+                }),
+                takeUntil(mouseUp$),
+                repeat() // Resubscribe to mouseDown$ after drag is completed
+            )
+            .subscribe(v =>
             {
-                const downPos = e[0];
-                const movePos = e[1];
-                const velocity = vec2.distance(downPos, movePos);
-                const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
-                vec2.normalize(speedVec, speedVec);
-                vec2.scale(speedVec, speedVec, velocity / 10);
 
-                const obj = engine.add(vec2.copy(vec2.create(), downPos));
-                engine.setVelocity(obj, speedVec);
+                const obj = engine.add(vec2.copy(vec2.create(), v.position));
+                engine.setVelocity(obj, v.speed);
             })
     }
 

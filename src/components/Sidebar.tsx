@@ -12,9 +12,10 @@ export const Sidebar = () =>
 
     const createLink = (url: string, name: string) =>
     {
+        const prefixUrl = "/physics-playground" + url;
         return (
-            <NavLink to={url}>
-                <ListItem selected={isSelected(url)}>
+            <NavLink to={prefixUrl}>
+                <ListItem selected={isSelected(prefixUrl)}>
                     {name}
                 </ListItem>
             </NavLink>
