@@ -3,9 +3,10 @@ import p5Types from "p5";
 
 export const OBJECT_RADIUS = 10;
 export const GRAVITY = vec2.fromValues(0, 40);
-const CONSTRAINT_CENTER = vec2.fromValues(250, 250);
-const CONSTRAINS_RADIUS = 250;
+const CONSTRAINT_CENTER = vec2.fromValues(800, 450);
+const CONSTRAINS_RADIUS = 400;
 const SUB_STEP_COUNT = 8;
+const DT = 60 / 1000;
 
 type VerletObject = {
     position: vec2;
@@ -15,7 +16,8 @@ type VerletObject = {
 
 interface Engine
 {
-    add: (position: vec2, acceleration: vec2) => void;
+    add: (position: vec2) => VerletObject;
+    setVelocity: (obj: VerletObject, velocity: vec2) => void;
     render: (p5: p5Types) => void;
 }
 export const createEngine = () =>
@@ -23,13 +25,20 @@ export const createEngine = () =>
     const objects: VerletObject[] = [];
 
     return {
-        add: (position: vec2, acceleration: vec2) =>
+        add: (position: vec2) =>
         {
-            objects.push({position: position, prevPosition: vec2.copy(vec2.create(), position), acceleration: acceleration});
+            const obj = {position: position, prevPosition: vec2.copy(vec2.create(), position), acceleration: vec2.create()} as VerletObject;
+            objects.push(obj);
+            return obj;
+        },
+        setVelocity:  (obj: VerletObject, velocity: vec2) =>
+        {
+            const s = vec2.scale(vec2.clone(velocity), velocity, DT);
+            vec2.subtract(obj.prevPosition, obj.position, s);
         },
         render: (p5: p5Types) =>
         {
-            simulate(objects, 60 / 1000)
+            simulate(objects, DT)
             render(p5, objects);
         },
     } as Engine
@@ -83,7 +92,7 @@ const resolveConstraints = (objects: VerletObject[]) =>
             const moveDirection = vec2.normalize(dist, dist);
 
             const scaledMove = vec2.scale(vec2.create(), moveDirection, distance - CONSTRAINS_RADIUS + OBJECT_RADIUS);
-            console.log(vec2.add(o.position, o.position, scaledMove));
+            vec2.add(o.position, o.position, scaledMove);
         }
     })
 }
@@ -101,4 +110,6 @@ const render = (p5: p5Types, objects: VerletObject[]) =>
         const object = objects[i];
         p5.ellipse(object.position[0], object.position[1], OBJECT_RADIUS * 2);
     }
+
+
 }

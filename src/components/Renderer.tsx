@@ -5,6 +5,7 @@ import {useState} from "react";
 interface Props
 {
     render: (p5: p5Types) => void;
+    setup: (p5: p5Types, canvas: HTMLCanvasElement) => void;
 }
 
 export const Renderer = (props: Props) =>
@@ -15,6 +16,7 @@ export const Renderer = (props: Props) =>
     {
         setParent(canvasParentRef);
         p5.createCanvas(10, 10).parent(canvasParentRef);
+        props.setup(p5, canvasParentRef.querySelector('canvas')!);
     };
 
 
