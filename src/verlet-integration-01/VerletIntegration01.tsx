@@ -3,15 +3,14 @@ import {createEngine} from "./Verlet01";
 import {vec2} from "gl-matrix";
 import p5Types from "p5";
 import {
-    audit, auditTime,
     combineLatest,
     filter,
-    fromEvent, interval,
+    fromEvent,
     map,
     repeat, startWith,
     switchMap,
     takeUntil,
-    throttleTime, timer, withLatestFrom,
+    throttleTime, timer,
 } from "rxjs";
 
 export const VerletIntegration01 = () =>
