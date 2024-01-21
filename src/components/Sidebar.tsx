@@ -24,7 +24,6 @@ export const Sidebar = () =>
     return (<Card id="sidebar" className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
         <List>
             {createLink("/", "Verlet Integration 01")}
-            {createLink("/verlet01", "Verlet Integration 01")}
         </List>
     </Card>);
 }

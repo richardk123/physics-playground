@@ -10,7 +10,6 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<VerletIntegration01 />} />
-        <Route path="verlet01" element={<VerletIntegration01 />} />
       </Route>
     </Routes>
   </BrowserRouter>

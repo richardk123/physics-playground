@@ -4,10 +4,10 @@ import {useState} from "react";
 
 interface Props
 {
-
+    render: (p5: p5Types) => void;
 }
 
-export const Renderer = () =>
+export const Renderer = (props: Props) =>
 {
     const [parent, setParent] = useState<Element>();
 
@@ -20,23 +20,17 @@ export const Renderer = () =>
 
     const resizeToFit = (p5: p5Types) =>
     {
-        if (!parent)
-        {
-            console.log("parent not found");
-            return;
-        }
-
-        const parentWidth = parent.clientWidth;
-        const parentHeight = parent.clientHeight;
+        const parentWidth = parent!.clientWidth;
+        const parentHeight = parent!.clientHeight;
 
         // Set the canvas dimensions
-        p5.resizeCanvas(parentWidth, parentHeight, false);
+        p5.resizeCanvas(parentWidth, parentHeight, true);
     }
 
     const draw = (p5: p5Types) => {
         resizeToFit(p5);
         p5.background(0);
-        p5.ellipse(100, 100, 70, 70);
+        props.render(p5);
     };
 
     return <Sketch setup={setup} draw={draw} className="w-full h-full" />;

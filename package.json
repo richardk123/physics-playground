@@ -1,7 +1,7 @@
 {
   "name": "physics-playground",
   "version": "0.1.0",
-  "homepage": "https://richard.kolisek.github.io/physics-playground",
+  "homepage": "https://richardk123.github.io/physics-playground",
   "private": true,
   "dependencies": {
     "@material-tailwind/react": "^2.1.0",
@@ -13,6 +13,7 @@
     "@types/react": "18.2.19",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.17",
+    "gl-matrix": "^3.4.3",
     "postcss-cli": "^11.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
