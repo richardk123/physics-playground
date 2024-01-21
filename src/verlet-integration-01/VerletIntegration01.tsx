@@ -3,13 +3,15 @@ import {createEngine} from "./Verlet01";
 import {vec2} from "gl-matrix";
 import p5Types from "p5";
 import {
+    audit, auditTime,
+    combineLatest,
     filter,
-    fromEvent,
+    fromEvent, interval,
     map,
-    repeat,
+    repeat, startWith,
     switchMap,
     takeUntil,
-    throttleTime,
+    throttleTime, timer, withLatestFrom,
 } from "rxjs";
 
 export const VerletIntegration01 = () =>
@@ -33,22 +35,35 @@ export const VerletIntegration01 = () =>
 
         const mouseUp$ = fromEvent(canvas, 'mouseup');
         const mouseMove$ = fromEvent(document, 'mousemove')
-            .pipe(map(e => transformEvent(e, canvas)))
-            .pipe(throttleTime(40));
+            .pipe(map(e => transformEvent(e, canvas)));
+
+        // Create a timer that emits values every 10 milliseconds
+        const timer$ = timer(0, 10);
+
+        // Combine the mouseMove$ and timer$ observables
+        const drag$ = combineLatest([mouseMove$, timer$]).pipe(
+            map(([event]) => event),
+            startWith(null),
+            throttleTime(100)
+        );
 
         mouseDown$
             .pipe(
                 switchMap(downPos =>
                 {
-                    return mouseMove$.pipe(map(movePos =>
-                    {
-                        const velocity = vec2.distance(downPos, movePos);
-                        const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
-                        vec2.normalize(speedVec, speedVec);
-                        vec2.scale(speedVec, speedVec, 20 + velocity / 10);
+                    return drag$.pipe(
+                        filter(movePos => movePos !== null),
+                        map(movePos =>  movePos!),
+                        map(movePos =>
+                        {
+                            const velocity = vec2.distance(downPos, movePos);
+                            const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
+                            vec2.normalize(speedVec, speedVec);
+                            vec2.scale(speedVec, speedVec, 20 + velocity / 10);
 
-                        return {speed: speedVec, position: downPos};
-                    }))
+                            return {speed: speedVec, position: downPos};
+                        }
+                    ))
                 }),
                 filter(v =>
                 {
