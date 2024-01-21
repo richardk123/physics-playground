@@ -123,6 +123,7 @@ const resolveCollisions = (objects: VerletObject[]) =>
 
 const render = (p5: p5Types, objects: VerletObject[]) =>
 {
+    p5.strokeWeight(1)
     p5.stroke(50, 50, 50);
     p5.fill(50, 50, 50);
     p5.ellipse(CONSTRAINT_CENTER[0], CONSTRAINT_CENTER[1], CONSTRAINS_RADIUS * 2);
