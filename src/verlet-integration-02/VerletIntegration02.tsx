@@ -68,7 +68,7 @@ export const VerletIntegration02 = () =>
                                 const velocity = vec2.distance(downPos, movePos);
                                 const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
                                 vec2.normalize(speedVec, speedVec);
-                                vec2.scale(speedVec, speedVec, 10 + velocity / 10);
+                                vec2.scale(speedVec, speedVec, 30 + velocity / 10);
 
                                 return {speed: speedVec,
                                     position: vec2.clone(downPos),
@@ -108,7 +108,7 @@ export const VerletIntegration02 = () =>
         createDrag$(canvas, 30)
             .subscribe(v =>
             {
-                const numberOfParticles = Math.floor(vec2.len(v.speed) / 10);
+                const numberOfParticles = Math.floor(vec2.len(v.speed) / 15);
 
                 for (let i = 0; i < numberOfParticles; i++)
                 {

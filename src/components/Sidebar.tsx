@@ -26,6 +26,7 @@ export const Sidebar = () =>
         <List>
             {createLink("/", "Verlet Integration naive")}
             {createLink("/verlet02", "Verlet Integration optimalized")}
+            {createLink("/xpdb", "XPDB")}
         </List>
     </Card>);
 }
