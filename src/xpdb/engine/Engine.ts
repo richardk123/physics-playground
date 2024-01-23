@@ -1,7 +1,8 @@
 import {PointMass} from "./PointMass";
 import {vec2} from "gl-matrix";
 import {GRAVITY} from "./PhysicsConstants";
-import {Constraint} from "./solver/Constraint";
+import {Constraint} from "./constraint/Constraint";
+import {Shapes} from "./Shape";
 
 export interface Engine
 {
@@ -15,7 +16,6 @@ export const createEngine = () =>
 {
     const pointMasses: PointMass[] = [];
     const constraints: Constraint[] = [];
-
     const preSolve = (dt: number) =>
     {
         pointMasses.forEach(pm =>

@@ -3,8 +3,10 @@ import p5Types from "p5";
 import {createEngine, Engine} from "./engine/Engine";
 import {renderEngine} from "./renderer/Renderer";
 import {Points} from "./engine/PointMass";
-import {Constraints} from "./engine/solver/Constraint";
+import {Constraints} from "./engine/constraint/Constraint";
 import {useEffect, useState} from "react";
+import {Shapes} from "./engine/Shape";
+import {vec2} from "gl-matrix";
 
 export const VisualizationXPDB = () =>
 {
@@ -50,6 +52,19 @@ export const VisualizationXPDB = () =>
         engine.addPoints(...springyPoints);
         engine.addConstraints(Constraints.distance(0.05, ...springyPoints));
 
+        const shapes = new Shapes(engine);
+
+        // shape 1
+        const s1 = shapes.createComplexRectangle(vec2.fromValues(10, 15), 10, 2, 10, 0.001);
+        s1.points[0].mass = Infinity;
+        s1.points[0].isStatic = true;
+
+        // shape 1
+        shapes.createComplexRectangle(vec2.fromValues(25, 15), 20, 2, 10, 0.001);
+
+        // volume constraint
+        engine.addConstraints(Constraints.volume(0, 5, 30, 5, 0, ...engine.points));
+        engine.addConstraints(Constraints.volume(40, 5, 30, 5, 0, ...engine.points));
         setEngine(engine);
 
     }, [])

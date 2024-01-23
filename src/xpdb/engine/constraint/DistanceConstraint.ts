@@ -17,12 +17,13 @@ export const createDistanceConstraint = (points: PointMass[], compliance: number
 
     const solve = (dt: number) =>
     {
+        const alpha = compliance / dt /dt;
+
         for (let i = 1; i < points.length; i++)
         {
             const p1 = points[i - 1];
             const p2 = points[i - 0];
 
-            const alpha = compliance / dt /dt;
             const w1 = 1 / p1.mass;
             const w2 = 1 / p2.mass;
             const w = w1 + w2;
@@ -42,6 +43,6 @@ export const createDistanceConstraint = (points: PointMass[], compliance: number
     return {
         points: points,
         solve: solve,
-        type: "distance"
+        type: "distance",
     } as DistanceConstraint;
 }
