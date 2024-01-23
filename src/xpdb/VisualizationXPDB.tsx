@@ -60,7 +60,7 @@ export const VisualizationXPDB = () =>
         s1.points[0].isStatic = true;
 
         // shape 1
-        shapes.createComplexRectangle(vec2.fromValues(25, 15), 20, 2, 10, 0.001);
+        shapes.createComplexRectangle(vec2.fromValues(25, 15), 20, 2, 10, 0.0);
 
         // volume constraint
         engine.addConstraints(Constraints.volume(0, 5, 30, 5, 0, ...engine.points));
