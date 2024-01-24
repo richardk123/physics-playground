@@ -15,7 +15,8 @@ export class Points
     {
         const position = vec2.fromValues(x, y);
         const previousPosition = vec2.clone(position);
-        return {position: position,
+        return {
+            position: position,
             previousPosition: previousPosition,
             mass: mass || 1,
             velocity: vec2.create(),

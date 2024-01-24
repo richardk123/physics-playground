@@ -1,68 +1,100 @@
 import p5Types from "p5";
 import {Engine} from "../engine/Engine";
-import {PointMass} from "../engine/PointMass";
 import {DistanceConstraint} from "../engine/constraint/DistanceConstraint";
-import {canvasTransform} from "./CanvasUtils";
+import {createTransform, Transform} from "./CanvasUtils";
 import {ShapeCollisionConstraint} from "../engine/constraint/ShapeCollisionConstraint";
 import {aggregatePointsToConnectedLines} from "../engine/CollisionUtils";
+import {vec2} from "gl-matrix";
 
-export const renderEngine = (p5: p5Types, canvas: HTMLCanvasElement, engine: Engine) =>
+export interface Renderer
 {
-    const transform = canvasTransform(canvas);
+    render: (p5: p5Types) => void;
+    transform: () => Transform;
+    lookAt: (x: number, y: number) => void;
+    setSimulatorMinWidth: (width: number) => void;
+}
 
-    const transformCoordinates = (p: PointMass) =>
+export const createRenderer = (engine: Engine) =>
+{
+    let transform = createTransform();
+    let lookAtPos = vec2.create();
+    let simulatorMinWidth = 40;
+
+    const render = (p5: p5Types) =>
     {
-        return transform.toScreen(p.position[0], p.position[1]);
-    }
+        transform = createTransform(p5.width, p5.height, lookAtPos, simulatorMinWidth);
 
-    engine.points.forEach(p =>
-    {
-        p5.strokeWeight(1)
-        p5.stroke(255, 255, 255);
-        p5.fill(255, 255, 255);
+        engine.points.forEach(p =>
+        {
+            p5.strokeWeight(1);
+            p5.stroke(25, 25, 25);
+            p5.fill(25, 25, 25);
 
-        const position = transformCoordinates(p);
-        p5.ellipse(position.x, position.y, 10 * p.mass);
-    });
+            const position = transform.toScreen(p.position[0], p.position[1]);
+            p5.ellipse(position.x, position.y, 5 * p.mass);
 
-    const renderDistanceConstraint = (c : DistanceConstraint) =>
-    {
-        for (let i = 0; i < c.points.length - 1; i++)
+            // if (!p.isStatic)
+            // {
+            //     const test = vec2.clone(p.velocity);
+            //     vec2.scale(test, test, 2);
+            //     vec2.add(test, p.position, test);
+            //
+            //     const prevPos = transform.toScreen(test[0], test[1]);
+            //     p5.strokeWeight(1);
+            //     p5.stroke(50, 50, 50);
+            //     p5.fill(50, 50, 50);
+            //     p5.line(position.x, position.y, prevPos.x, prevPos.y,);
+            // }
+        });
+
+        const renderDistanceConstraint = (c : DistanceConstraint) =>
+        {
+            for (let i = 0; i < c.points.length - 1; i++)
+            {
+                p5.strokeWeight(1)
+                p5.stroke(100, 200, 100);
+                p5.fill(100, 200, 100);
+                const pv1 = c.points[i].position;
+                const pv2 = c.points[i + 1].position;
+                const p1 = transform.toScreen(pv1[0], pv1[1]);
+                const p2 = transform.toScreen(pv2[0], pv2[1]);
+
+                p5.line(p1.x, p1.y, p2.x, p2.y);
+            }
+        }
+
+        const renderStaticShapeCollision = (c: ShapeCollisionConstraint) =>
         {
             p5.strokeWeight(1)
-            p5.stroke(0, 255, 0);
-            p5.fill(0, 255, 0);
-            const p1 = transformCoordinates(c.points[i]);
-            const p2 = transformCoordinates(c.points[i + 1]);
+            p5.stroke(255, 0, 0);
+            p5.fill(255, 0, 0);
 
-            p5.line(p1.x, p1.y, p2.x, p2.y);
+            if (c.shape.isStatic)
+            {
+                aggregatePointsToConnectedLines(c.shape.points)
+                    .forEach(l =>
+                    {
+                        const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
+                        const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
+                        p5.line(p1.x, p1.y, p2.x, p2.y);
+                    })
+            }
         }
+
+        engine.constraints.forEach(c =>
+        {
+            switch (c.type)
+            {
+                case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
+                case "shape-collision": renderStaticShapeCollision(c as ShapeCollisionConstraint); break;
+            }
+        });
     }
 
-    const renderStaticShapeCollision = (c: ShapeCollisionConstraint) =>
-    {
-        p5.strokeWeight(1)
-        p5.stroke(255, 0, 0);
-        p5.fill(255, 0, 0);
-
-        if (c.shape.isStatic)
-        {
-            aggregatePointsToConnectedLines(c.shape.points)
-                .forEach(l =>
-                {
-                    const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
-                    const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
-                    p5.line(p1.x, p1.y, p2.x, p2.y);
-                })
-        }
-    }
-
-    engine.constraints.forEach(c =>
-    {
-        switch (c.type)
-        {
-            case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
-            case "shape-collision": renderStaticShapeCollision(c as ShapeCollisionConstraint); break;
-        }
-    });
+    return {
+        render: render,
+        transform: () => transform,
+        lookAt: (x: number, y: number) => vec2.set(lookAtPos, x, y),
+        setSimulatorMinWidth: (width: number) => simulatorMinWidth = width,
+    } as Renderer;
 }

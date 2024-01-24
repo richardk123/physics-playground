@@ -1,19 +1,17 @@
 import {Renderer} from "../components/Renderer";
 import p5Types from "p5";
 import {createEngine, Engine} from "./engine/Engine";
-import {renderEngine} from "./renderer/Renderer";
-import {Constraints} from "./engine/constraint/Constraint";
-import {useEffect, useState} from "react";
+import {createRenderer} from "./renderer/Renderer";
 import {Shapes} from "./engine/Shape";
-import {canvasTransform, shoot$} from "./renderer/CanvasUtils";
+import {createTransform, shoot$} from "./renderer/CanvasUtils";
 import {vec2} from "gl-matrix";
 
 export const VisualizationXPDB = () =>
 {
     const engine = createEngine();
+    const renderer = createRenderer(engine);
 
     // boxes
-
     engine.addShapes(
         // bottom line
         Shapes.createRectangle(45 + 0, 11, 5, 5, 0),
@@ -26,6 +24,11 @@ export const VisualizationXPDB = () =>
         Shapes.createRectangle(45 + 5, 23, 5, 5, 0),
     );
 
+    // engine.addShapes(
+    //     Shapes.createRectangle(45, 10, 5, 5, 0),
+    //     Shapes.createRectangle(45, 16, 5, 5, 0),
+    // );
+
     // floor
     engine.addShapes(
         Shapes.createRectangle(0, 5, 30, 5, 0, true),
@@ -35,17 +38,19 @@ export const VisualizationXPDB = () =>
 
     const registerShooting = (canvas: HTMLCanvasElement) =>
     {
-        shoot$(canvas).subscribe(downUp =>
+        const t = shoot$(canvas).subscribe(downUp =>
         {
             const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
+            const angle = vec2.angle(direction, vec2.fromValues(1, 0)) * (180 / Math.PI);
+
             const distance = vec2.len(direction);
             vec2.normalize(direction, direction);
             vec2.scale(direction, direction, distance / 10);
 
-            const transform = canvasTransform(canvas);
 
-            const position = transform.toSimulation(downUp[0][0], downUp[0][1]);
-            const bullet = Shapes.createRectangle(position.x, position.y, 5, 5, 0);
+            const position = renderer.transform().toSimulation(downUp[0][0], downUp[0][1]);
+            const bullet = Shapes.createRectangle(position.x -2.5, position.y-2.5, 5, 5, 0);
+            Shapes.rotate(bullet, angle);
 
             // y must be inversed
             Shapes.setVelocity(bullet, vec2.fromValues(direction[0], -direction[1]));
@@ -56,14 +61,15 @@ export const VisualizationXPDB = () =>
         });
     }
 
-    const render = (p5: p5Types, canvas: HTMLCanvasElement) =>
+    const render = (p5: p5Types) =>
     {
         engine.simulate(1 / 60);
-        renderEngine(p5, canvas, engine);
+        renderer.render(p5);
     }
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
+        renderer.render(p5);
         registerShooting(canvas);
     }
 

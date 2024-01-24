@@ -22,28 +22,47 @@ export const shoot$ = (canvas: HTMLCanvasElement) =>
     return zip(mouseDown$, mouseUp$);
 }
 
-export const canvasTransform = (canvas: HTMLCanvasElement) =>
+export interface Point
 {
-    const simMinWidth = 50;
-    const cScale = Math.min(canvas.clientWidth, canvas.clientHeight) / simMinWidth;
-    const simWidth = canvas.clientWidth / cScale;
-    const simHeight = canvas.clientHeight / cScale;
+    x: number;
+    y: number;
+}
+
+export interface Transform
+{
+    toSimulation: (x: number, y: number) => Point,
+    toScreen: (x: number, y: number) => Point,
+    simulatorWidth: number,
+    simulatorHeight: number,
+}
+
+export const createTransform = (width = 800,
+                                height= 600,
+                                lookAtPos = vec2.create(),
+                                simulatorMinWidth = 40) =>
+{
+    const cScale = Math.min(width, height) / simulatorMinWidth;
+    const simWidth = width / cScale;
+    const simHeight = height / cScale;
 
     const toScreen = (x: number, y: number) =>
     {
         const xn = x * cScale;
-        const yn = canvas.clientHeight - y * cScale;
-        return {x: xn, y: yn};
+        const yn = height - y * cScale;
+        return {x: xn, y: yn} as Point;
     }
 
     const toSimulation = (x: number, y: number) => {
         const xn = x / cScale;
-        const yn = (canvas.clientHeight - y) / cScale;
-        return { x: xn, y: yn };
+        const yn = (height - y) / cScale;
+        return { x: xn, y: yn } as Point;
     }
+
 
     return {
         toSimulation: toSimulation,
         toScreen: toScreen,
-    }
+        simulatorWidth: simWidth,
+        simulatorHeight: simHeight,
+    } as Transform;
 }
