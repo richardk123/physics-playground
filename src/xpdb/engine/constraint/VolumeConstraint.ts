@@ -1,6 +1,7 @@
 import {vec2} from "gl-matrix";
 import {Constraint} from "./Constraint";
 import {PointMass} from "../PointMass";
+import {findClosestPointOnLine} from "../CollisionUtils";
 
 interface Line {
     x1: number,
@@ -33,16 +34,6 @@ export const createVolumeConstraint = (topLeftX: number,
         return px >= topLeftX && px <= topLeftX + width &&
             py <= topLeftY && py >= topLeftY - height;
 
-    }
-
-    const findClosestPointOnLine = (point: vec2, start: vec2, end: vec2): vec2 =>
-    {
-        const lineDirection = vec2.subtract(vec2.create(), end, start);
-        const pointToStart = vec2.subtract(vec2.create(), point, start);
-        const t = vec2.dot(pointToStart, lineDirection) / vec2.squaredLength(lineDirection);
-        const tClamped = Math.max(0, Math.min(1, t)); // Clamp t to [0, 1] to ensure it's within the line segment
-
-        return vec2.scaleAndAdd(vec2.create(), start, lineDirection, tClamped);
     }
 
     const findClosestPoint = (p: PointMass) =>

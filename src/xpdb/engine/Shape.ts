@@ -1,40 +1,72 @@
 import {PointMass, Points} from "./PointMass";
-import {vec2} from "gl-matrix";
-import {Engine} from "./Engine";
 import {Constraint, Constraints} from "./constraint/Constraint";
+import {mat2, vec2} from "gl-matrix";
 
 export type Shape =
 {
-    index?: number;
-    points: PointMass[];
+    center: vec2;
+    constraints: Constraint[];
     isStatic: boolean;
+    points: PointMass[];
+    name?: string;
 }
+ const findGeometricCenter = (points: PointMass[]): vec2 =>
+{
+    if (!points.length) {
+        throw new Error("no points found");
+    }
 
+    const avgX = points.reduce((sum, point) => sum + point.position[0], 0) / points.length;
+    const avgY = points.reduce((sum, point) => sum + point.position[1], 0) / points.length;
+
+    return vec2.fromValues(avgX, avgY);
+}
 
 export class Shapes
 {
-    private _engine: Engine;
-
-    constructor(engine: Engine)
+    static rotate = (shape: Shape, angleInDegrees: number) =>
     {
-        this._engine = engine;
+        const angleInRadians = (angleInDegrees * Math.PI) / 180;
+
+        // Create a 2D rotation matrix
+        const rotationMatrix = mat2.create();
+        mat2.fromRotation(rotationMatrix, angleInRadians);
+
+        return shape.points.map(p =>
+        {
+            const x = p.position[0];
+            const y = p.position[1];
+
+            const translatedPoint = vec2.fromValues(x - shape.center[0], y - shape.center[1]);
+            const rotatedPoint = vec2.create();
+
+            // Multiply the translation vector by the rotation matrix
+            vec2.transformMat2(rotatedPoint, translatedPoint, rotationMatrix);
+
+            // Translate the point back to its original position
+            const finalX = rotatedPoint[0] + shape.center[0];
+            const finalY = rotatedPoint[1] + shape.center[1];
+
+            return vec2.set(p.position, finalX, finalY);
+        });
     }
-    create(points: PointMass[], constraints: Constraint[], isStatic?: boolean)
-    {
-        this._engine.addConstraints(...constraints);
-        this._engine.addPoints(...points);
 
-        return {points: points, constraints: constraints, isStatic: isStatic} as Shape;
+    static create(points: PointMass[], constraints: Constraint[], isStatic?: boolean, name?: string)
+    {
+        const center = findGeometricCenter(points);
+        return {points: points, constraints: constraints, center: center, isStatic: isStatic, name: name} as Shape;
     }
 
-    createRectangle(topLeft: vec2,
-                    width: number,
-                    height: number,
-                    compliance: number,
-                    isStatic?: boolean): Shape
+    static createRectangle(topLeftX: number,
+                           topLeftY: number,
+                           width: number,
+                           height: number,
+                           compliance: number,
+                           isStatic?: boolean,
+                           name?: string): Shape
     {
-        const x = topLeft[0];
-        const y = topLeft[1];
+        const x = topLeftX;
+        const y = topLeftY;
 
         const p1 = Points.create(x + 0, y + 0, 1, isStatic);
         const p2 = Points.create(x + width, y + 0, 1, isStatic);
@@ -54,18 +86,19 @@ export class Shapes
             constraints.push(Constraints.distance(compliance, p2, p4));
         }
 
-        return this.create(points, constraints, isStatic);
+        return this.create(points, constraints, isStatic, name);
     }
 
-    createComplexRectangle(topLeft: vec2, 
-                           width: number, 
-                           height: number, 
-                           divisions: number,
-                           compliance: number)
+    static createComplexRectangle(topLeftX: number,
+                                  topLeftY: number,
+                                  width: number,
+                                  height: number,
+                                  divisions: number,
+                                  compliance: number)
     {
         const part = width / divisions;
-        const x = topLeft[0];
-        const y = topLeft[1];
+        const x = topLeftX;
+        const y = topLeftY;
         const constraints: Constraint[] = [];
         const points: PointMass[] = [];
 

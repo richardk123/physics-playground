@@ -1,13 +1,14 @@
 import {PointMass} from "./PointMass";
 import {vec2} from "gl-matrix";
-import {GRAVITY} from "./PhysicsConstants";
+import {GRAVITY, SUB_STEPS} from "./PhysicsConstants";
 import {Constraint} from "./constraint/Constraint";
-import {Shapes} from "./Shape";
+import {Shape, Shapes} from "./Shape";
 
 export interface Engine
 {
     addPoints: (...points: PointMass[]) => void;
     addConstraints: (...constraints: Constraint[]) => void,
+    addShapes: (...shapes: Shape[]) => void;
     simulate: (dt: number) => void;
     points: PointMass[];
     constraints: Constraint[];
@@ -57,10 +58,8 @@ export const createEngine = () =>
 
     const simulate = (dt: number) =>
     {
-        const subSteps = 8;
-        const ddt = dt / subSteps;
-
-        for (let i = 0; i < subSteps; i++)
+        const ddt = dt / SUB_STEPS;
+        for (let i = 0; i < SUB_STEPS; i++)
         {
             preSolve(ddt);
             solve(ddt);
@@ -71,6 +70,11 @@ export const createEngine = () =>
     return {
         addPoints: (...points: PointMass[]) => pointMasses.push(...points),
         addConstraints: (...cs: Constraint[]) => constraints.push(...cs),
+        addShapes: (...shapes: Shape[]) =>
+        {
+            pointMasses.push(...shapes.flatMap(s => s.points));
+            constraints.push(...shapes.flatMap(s => s.constraints));
+        },
         simulate: simulate,
         points: pointMasses,
         constraints: constraints,
