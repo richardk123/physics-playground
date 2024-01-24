@@ -5,87 +5,69 @@ import {renderEngine} from "./renderer/Renderer";
 import {Constraints} from "./engine/constraint/Constraint";
 import {useEffect, useState} from "react";
 import {Shapes} from "./engine/Shape";
+import {canvasTransform, shoot$} from "./renderer/CanvasUtils";
+import {vec2} from "gl-matrix";
 
 export const VisualizationXPDB = () =>
 {
-    const [engine, setEngine] = useState<Engine | undefined>(undefined);
+    const engine = createEngine();
 
-    useEffect(() =>
+    // boxes
+
+    engine.addShapes(
+        // bottom line
+        Shapes.createRectangle(45 + 0, 11, 5, 5, 0),
+        Shapes.createRectangle(45 + 6, 11, 5, 5, 0),
+        Shapes.createRectangle(45 + 12, 11, 5, 5, 0),
+        // middle line
+        Shapes.createRectangle(45 + 3, 17, 5, 5, 0),
+        Shapes.createRectangle(45 + 9, 17, 5, 5, 0),
+        // top line
+        Shapes.createRectangle(45 + 5, 23, 5, 5, 0),
+    );
+
+    // floor
+    engine.addShapes(
+        Shapes.createRectangle(0, 5, 30, 5, 0, true),
+        Shapes.createRectangle(40, 5, 50, 5, 0, true),
+    );
+    engine.addShapes();
+
+    const registerShooting = (canvas: HTMLCanvasElement) =>
     {
-        const engine = createEngine();
-        //
-        // // stiff
-        // const twoPointsStiff = [
-        //     Points.create(5, 15, Infinity, true),
-        //     Points.create(6, 17)
-        // ]
-        // engine.addPoints(...twoPointsStiff);
-        // engine.addConstraints(Constraints.distance(0, ...twoPointsStiff));
-        //
-        // // stiff
-        // const twoPointsSpringy = [
-        //     Points.create(5, 7, Infinity, true),
-        //     Points.create(6, 9)
-        // ]
-        // engine.addPoints(...twoPointsSpringy);
-        // engine.addConstraints(Constraints.distance(0.1, ...twoPointsSpringy));
-        //
-        // // pendulum stiff
-        // const stiffPoints = [
-        //     Points.create(15, 10, Infinity, true),
-        //     Points.create(16, 12, .1),
-        //     Points.create(16, 13, 1),
-        //     Points.create(16, 14, .1)
-        // ];
-        // engine.addPoints(...stiffPoints);
-        // engine.addConstraints(Constraints.distance(0, ...stiffPoints));
-        //
-        // // pendulum stiff
-        // const springyPoints = [
-        //     Points.create(20, 10, Infinity, true),
-        //     Points.create(21, 12, .1),
-        //     Points.create(21, 13, 1),
-        //     Points.create(21, 14, .1)
-        // ];
-        // engine.addPoints(...springyPoints);
-        // engine.addConstraints(Constraints.distance(0.05, ...springyPoints));
-
-
-        // // shape 1
-        // const s1 = shapes.createComplexRectangle(vec2.fromValues(10, 15), 10, 2, 10, 0.001);
-        // s1.points[0].mass = Infinity;
-        // s1.points[0].isStatic = true;
-
-        // shape 1
-        const box1 = Shapes.createRectangle(41, 10, 5, 5, 0, false, "bottom-box");
-        // Shapes.rotate(box1, 50);
-        const box2 = Shapes.createRectangle(47, 10, 5, 5, 0, false, "top-box");
-        const box3 = Shapes.createRectangle(43, 20, 5, 5, 0, false, "top-box");
-        // const s2 = Shapes.createComplexRectangle(25, 40, 20, 2, 10, 0.0005);
-        // Shapes.rotate(s2, 50);
-
-        engine.addShapes(box1, box2, box3);
-        engine.addConstraints(...Constraints.shapeCollision(box1, box2, 0));
-        engine.addConstraints(...Constraints.shapeCollision(box2, box3, 0));
-        engine.addConstraints(...Constraints.shapeCollision(box1, box3, 0));
-
-        // volume constraint
-        engine.addConstraints(Constraints.volume(0, 5, 30, 5, 0, ...engine.points));
-        engine.addConstraints(Constraints.volume(40, 5, 50, 5, 0, ...engine.points));
-        setEngine(engine);
-
-    }, [])
-
-    const render = (p5: p5Types) =>
-    {
-        if (engine)
+        shoot$(canvas).subscribe(downUp =>
         {
-            engine.simulate(1 / 60);
-            renderEngine(p5, engine);
-        }
+            const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
+            const distance = vec2.len(direction);
+            vec2.normalize(direction, direction);
+            vec2.scale(direction, direction, distance / 10);
+
+            const transform = canvasTransform(canvas);
+
+            const position = transform.toSimulation(downUp[0][0], downUp[0][1]);
+            const bullet = Shapes.createRectangle(position.x, position.y, 5, 5, 0);
+
+            // y must be inversed
+            Shapes.setVelocity(bullet, vec2.fromValues(direction[0], -direction[1]));
+            if (engine)
+            {
+                engine.addShapes(bullet);
+            }
+        });
+    }
+
+    const render = (p5: p5Types, canvas: HTMLCanvasElement) =>
+    {
+        engine.simulate(1 / 60);
+        renderEngine(p5, canvas, engine);
+    }
+
+    const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
+    {
+        registerShooting(canvas);
     }
 
     return <>
-        <Renderer render={render} setup={() => {}}/>
+        <Renderer render={render} setup={setup}/>
     </>
 }

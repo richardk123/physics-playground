@@ -41,7 +41,7 @@ interface LineSegment {
     end: PointMass;
 }
 
-const aggregatePointsToConnectedLines = (points: PointMass[]): LineSegment[] =>
+export const aggregatePointsToConnectedLines = (points: PointMass[]): LineSegment[] =>
 {
     const lines: LineSegment[] = [];
 
@@ -70,7 +70,6 @@ interface ClosestPoint
 
 export const findClosestPointOnShape = (point: PointMass, shape: Shape): ClosestPoint =>
 {
-    //TODO: write test
     const lines = aggregatePointsToConnectedLines(shape.points);
 
     const test = lines

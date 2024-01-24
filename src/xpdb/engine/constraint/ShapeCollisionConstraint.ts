@@ -6,6 +6,7 @@ import {vec2} from "gl-matrix";
 
 export interface ShapeCollisionConstraint extends Constraint
 {
+    shape: Shape;
 }
 
 export const createShapeCollisionConstraint = (point: PointMass, shape: Shape, compliance: number) =>
@@ -46,5 +47,6 @@ export const createShapeCollisionConstraint = (point: PointMass, shape: Shape, c
     return {
         solve: solve,
         type: "shape-collision",
+        shape: shape,
     } as ShapeCollisionConstraint
 }

@@ -51,6 +51,14 @@ export class Shapes
         });
     }
 
+    static setVelocity = (shape: Shape, velocity: vec2) =>
+    {
+        shape.points.forEach(p =>
+        {
+            vec2.set(p.velocity, velocity[0], velocity[1]);
+        })
+    }
+
     static create(points: PointMass[], constraints: Constraint[], isStatic?: boolean, name?: string)
     {
         const center = findGeometricCenter(points);
@@ -68,10 +76,12 @@ export class Shapes
         const x = topLeftX;
         const y = topLeftY;
 
-        const p1 = Points.create(x + 0, y + 0, 1, isStatic);
-        const p2 = Points.create(x + width, y + 0, 1, isStatic);
-        const p3 = Points.create(x + width, y + height, 1, isStatic);
-        const p4 = Points.create(x + 0, y + height, 1, isStatic);
+        const mass = isStatic === true ? Infinity : 1;
+
+        const p1 = Points.create(x + 0, y + 0, mass, isStatic);
+        const p2 = Points.create(x + width, y + 0, mass, isStatic);
+        const p3 = Points.create(x + width, y + height, mass, isStatic);
+        const p4 = Points.create(x + 0, y + height, mass, isStatic);
 
         const points = [p1, p2, p3, p4];
         const constraints: Constraint[] = [];

@@ -1,10 +1,9 @@
 import {PointMass, Points} from "../PointMass";
 import {createDistanceConstraint} from "./DistanceConstraint";
-import {createVolumeConstraint} from "./VolumeConstraint";
 import {createShapeCollisionConstraint, ShapeCollisionConstraint} from "./ShapeCollisionConstraint";
 import {Shape, Shapes} from "../Shape";
 
-export type ConstraintType = "distance" | "volume" | "shape-collision";
+export type ConstraintType = "distance" | "shape-collision";
 
 export interface Constraint
 {
@@ -18,16 +17,6 @@ export class Constraints
     static distance(compliance: number, ...points: PointMass[])
     {
         return createDistanceConstraint(points, compliance);
-    }
-
-    static volume(topLeftX: number,
-                  topLeftY: number,
-                  width: number,
-                  height: number,
-                  compliance: number,
-                  ...points: PointMass[])
-    {
-        return createVolumeConstraint(topLeftX, topLeftY, width, height, compliance, points);
     }
 
     static shapeCollision(shape1: Shape,
