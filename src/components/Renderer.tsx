@@ -20,6 +20,12 @@ export const Renderer = (props: Props) =>
         const c = canvasParentRef.querySelector('canvas');
         setCanvas(c);
         props.setup(p5, c!);
+
+        c!.oncontextmenu = e =>
+        {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     };
 
     const resizeToFit = (p5: p5Types) =>

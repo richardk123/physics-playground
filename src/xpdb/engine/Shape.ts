@@ -9,6 +9,7 @@ export type Shape =
     isStatic: boolean;
     points: PointMass[];
     name?: string;
+    index?: number,
 }
  const findGeometricCenter = (points: PointMass[]): vec2 =>
 {
@@ -65,13 +66,13 @@ export class Shapes
         return {points: points, constraints: constraints, center: center, isStatic: isStatic, name: name} as Shape;
     }
 
-    static createRectangle(topLeftX: number,
-                           topLeftY: number,
-                           width: number,
-                           height: number,
-                           compliance: number,
-                           isStatic?: boolean,
-                           name?: string): Shape
+    static rectangle(topLeftX: number,
+                     topLeftY: number,
+                     width: number,
+                     height: number,
+                     compliance: number,
+                     isStatic?: boolean,
+                     name?: string): Shape
     {
         const x = topLeftX;
         const y = topLeftY;
@@ -96,15 +97,15 @@ export class Shapes
             constraints.push(Constraints.distance(compliance, p2, p4));
         }
 
-        return this.create(points, constraints, isStatic, name);
+        return this.create(points, constraints, isStatic, name || "rectangle");
     }
 
-    static createComplexRectangle(topLeftX: number,
-                                  topLeftY: number,
-                                  width: number,
-                                  height: number,
-                                  divisions: number,
-                                  compliance: number)
+    static complexRectangle(topLeftX: number,
+                            topLeftY: number,
+                            width: number,
+                            height: number,
+                            divisions: number,
+                            compliance: number)
     {
         const part = width / divisions;
         const x = topLeftX;
@@ -140,7 +141,7 @@ export class Shapes
             constraints.push(Constraints.distance(compliance, p4, p3));
         }
 
-        return this.create(points, constraints, false);
+        return this.create(points, constraints, false, "rectangle-complex");
     }
 
 }

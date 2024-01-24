@@ -6,19 +6,28 @@ import {ShapeCollisionConstraint} from "../engine/constraint/ShapeCollisionConst
 import {aggregatePointsToConnectedLines} from "../engine/CollisionUtils";
 import {vec2} from "gl-matrix";
 
+interface CustomRenderer
+{
+    render: (p5: p5Types) => void,
+    name: string,
+}
+
 export interface Renderer
 {
     render: (p5: p5Types) => void;
     transform: () => Transform;
     lookAt: (x: number, y: number) => void;
     setSimulatorMinWidth: (width: number) => void;
+    addCustomRender: (renderer: CustomRenderer) => void;
+    removeCustomRenderer: (name: string) => void;
 }
 
-export const createRenderer = (engine: Engine) =>
+export const createRenderer = (engine: Engine): Renderer =>
 {
     let transform = createTransform();
     let lookAtPos = vec2.create();
-    let simulatorMinWidth = 40;
+    let simulatorMinWidth = 60;
+    const customRenderers = new Map<string, CustomRenderer>();
 
     const render = (p5: p5Types) =>
     {
@@ -89,6 +98,11 @@ export const createRenderer = (engine: Engine) =>
                 case "shape-collision": renderStaticShapeCollision(c as ShapeCollisionConstraint); break;
             }
         });
+
+        customRenderers.forEach((value, key) =>
+        {
+            value.render(p5);
+        })
     }
 
     return {
@@ -96,5 +110,7 @@ export const createRenderer = (engine: Engine) =>
         transform: () => transform,
         lookAt: (x: number, y: number) => vec2.set(lookAtPos, x, y),
         setSimulatorMinWidth: (width: number) => simulatorMinWidth = width,
+        addCustomRender: (r) => customRenderers.set(r.name, r),
+        removeCustomRenderer: (name) => customRenderers.delete(name),
     } as Renderer;
 }

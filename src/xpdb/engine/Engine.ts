@@ -103,6 +103,11 @@ export const createEngine = () =>
                 addConstraints(...Constraints.shapeCollision(shape, addedShape, 0));
             });
         });
+        // set name and index
+        addedShapes.forEach((s, i) =>
+        {
+            s.index = shapes.length + i;
+        })
 
         pointMasses.push(...addedShapes.flatMap(s => s.points));
         addConstraints(...addedShapes.flatMap(s => s.constraints));
