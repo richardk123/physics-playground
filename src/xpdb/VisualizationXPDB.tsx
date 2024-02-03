@@ -1,22 +1,33 @@
 import {Renderer} from "../components/Renderer";
 import p5Types from "p5";
 import {createEngine} from "./engine/Engine";
-import {createRenderer} from "./renderer/Renderer";
+import {createRenderer, EngineRenderer} from "./renderer/Renderer";
 import {Shape, Shapes} from "./engine/Shape";
-import {drag$, mouseDown$, shoot$} from "./renderer/CanvasUtils";
+import {drag$, mouseDown$, shoot$, Transform} from "./renderer/CanvasUtils";
 import {vec2} from "gl-matrix";
 import {delay, fromEvent, timer} from "rxjs";
 import React, {useEffect, useState} from "react";
 import {SettingsSidebar} from "./SettingsSidebar";
+import {Points} from "./engine/PointMass";
 
 export const VisualizationXPDB = () =>
 {
-    const [shapes, setShapes] = useState<Shape[]>([]);
     const engine = createEngine();
     const renderer = createRenderer(engine);
 
+    // floor
+    engine.addShapes2(
+        Shapes.rectangle(0, 5, 30, 5, 0, true),
+        Shapes.rectangle(40, 5, 50, 5, 0, true),
+    );
+
+    // bridge
+    engine.addShapes2(
+        Shapes.complexRectangle(5, 20, 30, 5, 7, 0.01)
+    )
+
     // boxes
-    engine.addShapes(
+    engine.addShapes2(
         // bottom line
         Shapes.rectangle(45 + 0, 11, 5, 5, 0),
         Shapes.rectangle(45 + 6, 11, 5, 5, 0),
@@ -27,56 +38,32 @@ export const VisualizationXPDB = () =>
         // top line
         Shapes.rectangle(45 + 5, 23, 5, 5, 0),
     );
+    //
+    // const s1 = Shapes.rectangle(45.001, 11.001, 5, 5, 0);
+    // const s2 = Shapes.rectangle(45, 17, 5, 5, 0);
+    // engine.addShapes2(s1, s2);
 
-    // engine.addShapes(
-    //     Shapes.createRectangle(45, 10, 5, 5, 0),
-    //     Shapes.createRectangle(45, 16, 5, 5, 0),
-    // );
-
-    // floor
-    engine.addShapes(
-        Shapes.rectangle(0, 5, 30, 5, 0, true),
-        Shapes.rectangle(40, 5, 50, 5, 0, true),
-    );
-    engine.addShapes();
-
-    useEffect(() =>
-    {
-        const sub = timer(1000).subscribe(() =>
-        {
-            setShapes(engine.shapes);
-        });
-
-        return () => sub.unsubscribe();
-    }, [])
+    // const p1 = Points.create(40, 6);
+    // engine.addPoints(p1);
 
     const registerShooting = (canvas: HTMLCanvasElement) =>
     {
-        mouseDown$(canvas, 2)
-            .subscribe(p =>
-            {
-                const position = renderer.transform().toSimulation(p[0], p[1]);
-                const box = Shapes.rectangle(position.x -2.5, position.y-2.5, 5, 5, 0);
-                engine.addShapes(box);
-            });
-
         shoot$(canvas).subscribe(downUp =>
         {
-            //TODO: wtf?
             const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
-            const angle = vec2.angle(direction, vec2.fromValues(1, 0)) * (180 / Math.PI);
-
+            const angle = -Math.atan2(downUp[1][1] - downUp[0][1], downUp[1][0] - downUp[0][0]);
+            console.log(angle);
             const distance = vec2.len(direction);
             vec2.normalize(direction, direction);
-            vec2.scale(direction, direction, distance / 10);
+            vec2.scale(direction, direction, distance / 2);
 
             const position = renderer.transform().toSimulation(downUp[0][0], downUp[0][1]);
-            const bullet = Shapes.rectangle(position.x -2.5, position.y-2.5, 5, 5, 0);
+            const bullet = Shapes.rectangle(position.x, position.y, 5, 5, 0);
             Shapes.rotate(bullet, angle);
 
             // y must be inversed
             Shapes.setVelocity(bullet, vec2.fromValues(direction[0], -direction[1]));
-            engine.addShapes(bullet);
+            engine.addShapes2(bullet);
         });
 
         drag$(canvas, 0)
@@ -104,6 +91,10 @@ export const VisualizationXPDB = () =>
 
     const render = (p5: p5Types) =>
     {
+        // renderer.lookAt(s2.points[1].position[0], s2.points[1].position[1]);
+        renderer.lookAt(40, 10);
+        renderer.setSimulatorMinWidth(50);
+
         engine.simulate(1 / 60);
         renderer.render(p5);
     }
@@ -123,7 +114,7 @@ export const VisualizationXPDB = () =>
         </div>
 
         <div className="w-64 text-white">
-            <SettingsSidebar shapes={shapes} renderer={renderer} />
+            <SettingsSidebar engine={engine} renderer={renderer} />
         </div>
     </div>
 }

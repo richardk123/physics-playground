@@ -9,6 +9,7 @@ export interface Engine
     addPoints: (...points: PointMass[]) => void;
     addConstraints: (...constraints: Constraint[]) => void,
     addShapes: (...shapes: Shape[]) => void;
+    addShapes2: (...shapes: Shape[]) => void;
     simulate: (dt: number) => void;
     points: PointMass[];
     constraints: Constraint[];
@@ -61,6 +62,7 @@ export const createEngine = () =>
 
     const simulate = (dt: number) =>
     {
+        console.log(dt);
         const ddt = dt / SUB_STEPS;
         for (let i = 0; i < SUB_STEPS; i++)
         {
@@ -114,10 +116,47 @@ export const createEngine = () =>
         shapes.push(...addedShapes);
     }
 
+    const addShapes2 = (...addedShapes: Shape[]) =>
+    {
+
+        if (addedShapes.length > 1)
+        {
+            for (let i = 0; i < addedShapes.length - 1; i++)
+            {
+                const cur = addedShapes[i];
+                for (let j = i + 1; j < addedShapes.length; j++)
+                {
+                    const next = addedShapes[j];
+                    addConstraints(Constraints.shapeCollision2(cur, next, 0));
+                }
+            }
+            addConstraints(Constraints.shapeCollision2(addedShapes[0], addedShapes[addedShapes.length - 1], 0));
+        }
+
+        shapes.forEach(shape =>
+        {
+            addedShapes.forEach(addedShape =>
+            {
+                addConstraints(Constraints.shapeCollision2(shape, addedShape, 0));
+            });
+        });
+
+        // set name and index
+        addedShapes.forEach((s, i) =>
+        {
+            s.index = shapes.length + i;
+        })
+
+        pointMasses.push(...addedShapes.flatMap(s => s.points));
+        addConstraints(...addedShapes.flatMap(s => s.constraints));
+        shapes.push(...addedShapes);
+    }
+
     return {
         addPoints: addPoints,
         addConstraints: addConstraints,
         addShapes: addShapes,
+        addShapes2: addShapes2,
         simulate: simulate,
         points: pointMasses,
         constraints: constraints,

@@ -127,16 +127,16 @@ export const createTransform = (width = 800,
 
     const toScreen = (x: number, y: number) =>
     {
-        const xn = (x - lookAtPos[0] / 2) * cScale;
-        const yn = (height - lookAtPos[1] / 2) - y * cScale;
+        const xn = (x - lookAtPos[0]) * cScale + width / 2;
+        const yn = height / 2 - (y - lookAtPos[1]) * cScale;
         return {x: xn, y: yn} as Point;
     }
 
     const toSimulation = (x: number, y: number) => {
-        const xn = (x / cScale) + lookAtPos[0];
-        const yn = ((height - y) / cScale) + lookAtPos[0];
+        const xn = (x - width / 2) / cScale + lookAtPos[0];
+        const yn = (height / 2 - y) / cScale + lookAtPos[1];
         return { x: xn, y: yn } as Point;
-    }
+    };
 
     return {
         toSimulation: toSimulation,

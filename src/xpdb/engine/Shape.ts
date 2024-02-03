@@ -1,54 +1,42 @@
 import {PointMass, Points} from "./PointMass";
 import {Constraint, Constraints} from "./constraint/Constraint";
 import {mat2, vec2} from "gl-matrix";
+import {findGeometricCenter} from "./CollisionUtils2";
 
 export type Shape =
 {
-    center: vec2;
     constraints: Constraint[];
     isStatic: boolean;
     points: PointMass[];
     name?: string;
     index?: number,
 }
- const findGeometricCenter = (points: PointMass[]): vec2 =>
-{
-    if (!points.length) {
-        throw new Error("no points found");
-    }
-
-    const avgX = points.reduce((sum, point) => sum + point.position[0], 0) / points.length;
-    const avgY = points.reduce((sum, point) => sum + point.position[1], 0) / points.length;
-
-    return vec2.fromValues(avgX, avgY);
-}
 
 export class Shapes
 {
-    static rotate = (shape: Shape, angleInDegrees: number) =>
+    static rotate = (shape: Shape, angleInRadians: number) =>
     {
-        const angleInRadians = (angleInDegrees * Math.PI) / 180;
-
         // Create a 2D rotation matrix
         const rotationMatrix = mat2.create();
         mat2.fromRotation(rotationMatrix, angleInRadians);
+        const center = findGeometricCenter(shape.points.map(p => p.position));
 
-        return shape.points.map(p =>
-        {
-            const x = p.position[0];
-            const y = p.position[1];
+        return shape.points.map(p => {
+            const position = vec2.fromValues(p.position[0], p.position[1]);
 
-            const translatedPoint = vec2.fromValues(x - shape.center[0], y - shape.center[1]);
-            const rotatedPoint = vec2.create();
+            // Translate the point to the origin
+            vec2.sub(position, position, center);
 
             // Multiply the translation vector by the rotation matrix
-            vec2.transformMat2(rotatedPoint, translatedPoint, rotationMatrix);
+            vec2.transformMat2(position, position, rotationMatrix);
 
             // Translate the point back to its original position
-            const finalX = rotatedPoint[0] + shape.center[0];
-            const finalY = rotatedPoint[1] + shape.center[1];
+            vec2.add(position, position, center);
 
-            return vec2.set(p.position, finalX, finalY);
+            // Update the point position
+            vec2.set(p.position, position[0], position[1]);
+
+            return p;
         });
     }
 
@@ -62,8 +50,7 @@ export class Shapes
 
     static create(points: PointMass[], constraints: Constraint[], isStatic?: boolean, name?: string)
     {
-        const center = findGeometricCenter(points);
-        return {points: points, constraints: constraints, center: center, isStatic: isStatic, name: name} as Shape;
+        return {points: points, constraints: constraints, isStatic: isStatic, name: name} as Shape;
     }
 
     static rectangle(topLeftX: number,
@@ -81,8 +68,8 @@ export class Shapes
 
         const p1 = Points.create(x + 0, y + 0, mass, isStatic);
         const p2 = Points.create(x + width, y + 0, mass, isStatic);
-        const p3 = Points.create(x + width, y + height, mass, isStatic);
-        const p4 = Points.create(x + 0, y + height, mass, isStatic);
+        const p3 = Points.create(x + width, y - height, mass, isStatic);
+        const p4 = Points.create(x + 0, y - height, mass, isStatic);
 
         const points = [p1, p2, p3, p4];
         const constraints: Constraint[] = [];
@@ -123,7 +110,7 @@ export class Shapes
         for (let i = divisions; i >= 0; i--)
         {
             const startX = part * i;
-            points.push(Points.create(x + startX, y + height));
+            points.push(Points.create(x + startX, y - height));
         }
 
         for (let i = 0; i < divisions; i += 1)

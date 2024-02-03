@@ -2,8 +2,9 @@ import {PointMass, Points} from "../PointMass";
 import {createDistanceConstraint} from "./DistanceConstraint";
 import {createShapeCollisionConstraint, ShapeCollisionConstraint} from "./ShapeCollisionConstraint";
 import {Shape, Shapes} from "../Shape";
+import {createShapeCollisionConstraint2, ShapeCollisionConstraint2} from "./ShapeCollisionConstraint2";
 
-export type ConstraintType = "distance" | "shape-collision";
+export type ConstraintType = "distance" | "shape-collision" | "shape-collision2";
 
 export interface Constraint
 {
@@ -36,6 +37,13 @@ export class Constraints
             });
 
         return [...c1, ...c2];
+    }
+
+    static shapeCollision2(shape1: Shape,
+                           shape2: Shape,
+                           compliance: number): ShapeCollisionConstraint2
+    {
+        return createShapeCollisionConstraint2(shape1, shape2, compliance);
     }
 
 }

@@ -30,16 +30,24 @@ export const createShapeCollisionConstraint = (point: PointMass, shape: Shape, c
             vec2.add(point.position, point.position, pMove);
 
             // distance from itersection point to line points
-            const dl1 = 1 / vec2.distance(line.start.position, intersectionPoint);
-            const dl2 = 1 / vec2.distance(line.end.position, intersectionPoint);
-            const dl = dl1 + dl2;
+            // let dl1 = vec2.distance(line.start.position, intersectionPoint);
+            // let dl2 = vec2.distance(line.end.position, intersectionPoint);
+            //
+            // // situation when intersection point is on line point
+            // if (dl1 < 10e-6 || dl2 < 10e-6)
+            // {
+            //     dl1 = 1;
+            //     dl2 = 1;
+            // }
+
+            // const dl = dl1 + dl2;
             const lineSumMoveDist = vec2.scale(vec2.create(), dx, -lambda * w2);
 
             // move line
-            const l1Move = vec2.scale(vec2.create(), lineSumMoveDist, dl / dl);
+            const l1Move = vec2.scale(vec2.create(), lineSumMoveDist, 0.5);
             vec2.add(line.start.position, line.start.position, l1Move);
 
-            const l2Move = vec2.scale(vec2.create(), lineSumMoveDist, dl2 / dl);
+            const l2Move = vec2.scale(vec2.create(), lineSumMoveDist, 0.5);
             vec2.add(line.end.position, line.end.position, l2Move);
         }
     }
