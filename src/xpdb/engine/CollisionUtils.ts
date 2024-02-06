@@ -191,17 +191,11 @@ export const aggregatePointsToConnectedLines = (points: PointMass[]): LineSegmen
 {
     const lines: LineSegment[] = [];
 
-    for (let i = 0; i < points.length - 1; i++) {
+    for (let i = 0; i < points.length; i++) 
+    {
         const lineStart = points[i];
-        const lineEnd = points[i + 1];
+        const lineEnd = points[(i + 1) % points.length];
         lines.push({ start: lineStart, end: lineEnd});
-    }
-
-    // Connect the last line's end to the first line's start to close the loop
-    if (points.length > 1) {
-        const firstPoint = points[0];
-        const lastPoint = points[points.length - 1];
-        lines.push({ start: lastPoint, end: firstPoint});
     }
 
     return lines;

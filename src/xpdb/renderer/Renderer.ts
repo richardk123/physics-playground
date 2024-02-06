@@ -6,6 +6,7 @@ import {ShapeCollisionConstraint} from "../engine/constraint/ShapeCollisionConst
 import {aggregatePointsToConnectedLines} from "../engine/CollisionUtils";
 import {vec2} from "gl-matrix";
 import {ShapeCollisionConstraint2} from "../engine/constraint/ShapeCollisionConstraint2";
+import { Shape } from "../engine/Shape";
 
 interface CustomRenderer
 {
@@ -71,67 +72,44 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
             }
         }
 
-        const renderStaticShapeCollision = (c: ShapeCollisionConstraint) =>
+        const renderShape = (shape: Shape) =>
         {
-            p5.strokeWeight(1)
-            p5.stroke(255, 0, 0);
-            p5.fill(255, 0, 0);
+            const lines = aggregatePointsToConnectedLines(shape.points);
+            p5.strokeWeight(1);
 
-            if (c.shape.isStatic)
+            if (shape.isStatic)
             {
-                aggregatePointsToConnectedLines(c.shape.points)
-                    .forEach(l =>
-                    {
-                        const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
-                        const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
-                        p5.line(p1.x, p1.y, p2.x, p2.y);
-                    })
+                p5.stroke(255, 0, 0);
             }
+            else
+            {
+                p5.stroke(0, 0, 255);
+            }
+
+            lines
+                .forEach(l =>
+                {
+                    const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
+                    const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
+                    p5.line(p1.x, p1.y, p2.x, p2.y);
+                });
         }
 
-        const renderStaticShapeCollision2 = (c: ShapeCollisionConstraint2) =>
-        {
-            p5.strokeWeight(1)
-            p5.stroke(255, 0, 0);
-            p5.fill(255, 0, 0);
-
-            if (c.shape1.isStatic)
-            {
-                aggregatePointsToConnectedLines(c.shape1.points)
-                    .forEach(l =>
-                    {
-                        const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
-                        const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
-                        p5.line(p1.x, p1.y, p2.x, p2.y);
-                    })
-            }
-
-            if (c.shape2.isStatic)
-            {
-                aggregatePointsToConnectedLines(c.shape1.points)
-                    .forEach(l =>
-                    {
-                        const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
-                        const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
-                        p5.line(p1.x, p1.y, p2.x, p2.y);
-                    })
-            }
-        }
 
         engine.constraints.forEach(c =>
         {
             switch (c.type)
             {
                 case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
-                case "shape-collision": renderStaticShapeCollision(c as ShapeCollisionConstraint); break;
-                case "shape-collision2": renderStaticShapeCollision2(c as ShapeCollisionConstraint2); break;
             }
         });
 
         customRenderers.forEach((value, key) =>
         {
             value.render(p5);
-        })
+        });
+
+        engine.shapes.forEach(shape => renderShape(shape));
     }
 
     return {

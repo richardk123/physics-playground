@@ -22,22 +22,22 @@ export const VisualizationXPDB = () =>
     );
 
     // bridge
-    engine.addShapes2(
-        Shapes.complexRectangle(5, 20, 30, 5, 7, 0.01)
-    )
+    // engine.addShapes2(
+    //     Shapes.complexRectangle(5, 20, 30, 5, 7, 0.01)
+    // )
 
     // boxes
-    engine.addShapes2(
-        // bottom line
-        Shapes.rectangle(45 + 0, 11, 5, 5, 0),
-        Shapes.rectangle(45 + 6, 11, 5, 5, 0),
-        Shapes.rectangle(45 + 12, 11, 5, 5, 0),
-        // middle line
-        Shapes.rectangle(45 + 3, 17, 5, 5, 0),
-        Shapes.rectangle(45 + 9, 17, 5, 5, 0),
-        // top line
-        Shapes.rectangle(45 + 5, 23, 5, 5, 0),
-    );
+    // engine.addShapes2(
+    //     // bottom line
+    //     Shapes.rectangle(45 + 0, 11, 5, 5, 0),
+    //     Shapes.rectangle(45 + 6, 11, 5, 5, 0),
+    //     Shapes.rectangle(45 + 12, 11, 5, 5, 0),
+    //     // middle line
+    //     Shapes.rectangle(45 + 3, 17, 5, 5, 0),
+    //     Shapes.rectangle(45 + 9, 17, 5, 5, 0),
+    //     // top line
+    //     Shapes.rectangle(45 + 5, 23, 5, 5, 0),
+    // );
     //
     // const s1 = Shapes.rectangle(45.001, 11.001, 5, 5, 0);
     // const s2 = Shapes.rectangle(45, 17, 5, 5, 0);
@@ -92,8 +92,8 @@ export const VisualizationXPDB = () =>
     const render = (p5: p5Types) =>
     {
         // renderer.lookAt(s2.points[1].position[0], s2.points[1].position[1]);
-        renderer.lookAt(40, 10);
-        renderer.setSimulatorMinWidth(50);
+        renderer.lookAt(45, 20);
+        renderer.setSimulatorMinWidth(60);
 
         engine.simulate(1 / 60);
         renderer.render(p5);

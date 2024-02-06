@@ -5,6 +5,8 @@ import {TreeItem, TreeView} from "@mui/x-tree-view";
 import {EngineRenderer} from "./renderer/Renderer";
 import {Engine} from "./engine/Engine";
 import {timer} from "rxjs";
+import { Constraint } from "./engine/constraint/Constraint";
+import { PointMass } from "./engine/PointMass";
 
 interface Props
 {
@@ -14,12 +16,16 @@ interface Props
 export const SettingsSidebar = (props: Props) =>
 {
     const [shapes, setShapes] = useState<Shape[]>([]);
+    const [constraints, setConstraints] = useState<Constraint[]>([]);
+    const [points, setPoints] = useState<PointMass[]>([]);
 
     useEffect(() =>
     {
         const sub = timer(100).subscribe(() =>
         {
             setShapes([...props.engine.shapes]);
+            setConstraints([...props.engine.constraints]);
+            setPoints([...props.engine.points]);
         });
 
         return () => sub.unsubscribe();
@@ -58,6 +64,9 @@ export const SettingsSidebar = (props: Props) =>
             aria-label="file system navigator"
             sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
         >
+            <p>Shapes count: {shapes.length}</p>
+            <p>Constraints count: {constraints.length}</p>
+            <p>Points count: {points.length}</p>
             {renderShapes()}
         </TreeView>
         <button>ass</button>

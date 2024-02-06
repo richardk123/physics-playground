@@ -130,7 +130,6 @@ export const createEngine = () =>
                     addConstraints(Constraints.shapeCollision2(cur, next, 0));
                 }
             }
-            addConstraints(Constraints.shapeCollision2(addedShapes[0], addedShapes[addedShapes.length - 1], 0));
         }
 
         shapes.forEach(shape =>
