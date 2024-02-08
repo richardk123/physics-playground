@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/physics-playground/static/css/main.86053126.css",
-    "main.js": "/physics-playground/static/js/main.33a58583.js",
+    "main.css": "/physics-playground/static/css/main.6c19edf4.css",
+    "main.js": "/physics-playground/static/js/main.f7aa1a5a.js",
     "static/js/787.786c7edf.chunk.js": "/physics-playground/static/js/787.786c7edf.chunk.js",
     "index.html": "/physics-playground/index.html",
-    "main.86053126.css.map": "/physics-playground/static/css/main.86053126.css.map",
-    "main.33a58583.js.map": "/physics-playground/static/js/main.33a58583.js.map",
+    "main.6c19edf4.css.map": "/physics-playground/static/css/main.6c19edf4.css.map",
+    "main.f7aa1a5a.js.map": "/physics-playground/static/js/main.f7aa1a5a.js.map",
     "787.786c7edf.chunk.js.map": "/physics-playground/static/js/787.786c7edf.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.86053126.css",
-    "static/js/main.33a58583.js"
+    "static/css/main.6c19edf4.css",
+    "static/js/main.f7aa1a5a.js"
   ]
 }
