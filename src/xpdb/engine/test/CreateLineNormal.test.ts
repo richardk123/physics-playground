@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {createLineNormal} from "../CollisionUtils2";
+import {createLineNormal} from "../utils/CollisionUtils2";
 import {expectVecEquivalence} from "./TestUtils";
 
 test('line normal horizontal', () =>

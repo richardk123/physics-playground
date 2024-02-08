@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {projectVerticesToAxis} from "../CollisionUtils2";
+import {projectVerticesToAxis} from "../utils/CollisionUtils2";
 
 test('geometric center', () =>
 {

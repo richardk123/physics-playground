@@ -1,5 +1,8 @@
 import {vec2} from "gl-matrix";
-import {isPointOnLineSegment} from "./CollisionUtils";
+import {
+    findClosestPointOnLine,
+} from "./CollisionUtils";
+import {PointMass} from "../entity/PointMass";
 
 
 export const createLineNormal = (p1: vec2, p2: vec2) =>
@@ -176,8 +179,63 @@ const findVerticalIntersection = (verticalSegment: { start: vec2, end: vec2 }, n
     }
 }
 
-function isBetween(number: number, a: number, b: number): boolean {
-    const min = Math.min(a, b);
-    const max = Math.max(a, b);
-    return number >= min && number <= max;
+export const isPointInsidePolygon = (point: PointMass, polygon: vec2[]): boolean =>
+{
+    const numVertices = polygon.length;
+    let inside = false;
+
+    for (let i = 0, j = numVertices - 1; i < numVertices; j = i++) {
+        const xi = polygon[i][0];
+        const yi = polygon[i][1];
+        const xj = polygon[j][0];
+        const yj = polygon[j][1];
+
+        const intersect =
+            (yi >= point.position[1]) !== (yj >= point.position[1]) &&
+            point.position[0] <= ((xj - xi) * (point.position[1] - yi)) / (yj - yi) + xi;
+
+        if (intersect) {
+            inside = !inside;
+        }
+    }
+
+    return inside;
+};
+
+export const findPolygonLines = (points: vec2[]): { start: vec2, end: vec2 }[] =>
+{
+    const lines: { start: vec2, end: vec2 }[] = [];
+
+    for (let i = 0; i < points.length; i++)
+    {
+        const lineStart = points[i];
+        const lineEnd = points[(i + 1) % points.length];
+        lines.push({ start: lineStart, end: lineEnd});
+    }
+
+    return lines;
+}
+
+export const findClosestPointOnPolygon = (point: PointMass, polygon: vec2[]) =>
+{
+    const lines = findPolygonLines(polygon);
+
+    const result = lines
+        .map(line =>
+        {
+            const lineVec = {start: line.start, end: line.end};
+            const result = findClosestPointOnLine(point.position, lineVec);
+
+            const distance = vec2.distance(result, point.position);
+            return {intersectionPoint: result, distance: distance};
+        });
+
+    return result.reduce((a, b) =>
+    {
+        if (a.distance < b.distance)
+        {
+            return a;
+        }
+        return b;
+    });
 }

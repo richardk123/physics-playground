@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {intersectPolygons} from "../CollisionUtils2";
+import {intersectPolygons} from "../utils/CollisionUtils2";
 import {expectVecEquivalence} from "./TestUtils";
 
 test('polygons does not intersect', () =>

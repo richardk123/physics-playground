@@ -1,12 +1,11 @@
 import {Card} from "@material-tailwind/react";
 import React, {useEffect, useState} from "react";
-import {Shape} from "./engine/Shape";
 import {TreeItem, TreeView} from "@mui/x-tree-view";
 import {EngineRenderer} from "./renderer/Renderer";
 import {Engine} from "./engine/Engine";
 import {timer} from "rxjs";
 import { Constraint } from "./engine/constraint/Constraint";
-import { PointMass } from "./engine/PointMass";
+import { PointMass } from "./engine/entity/PointMass";
 
 interface Props
 {
@@ -15,7 +14,6 @@ interface Props
 }
 export const SettingsSidebar = (props: Props) =>
 {
-    const [shapes, setShapes] = useState<Shape[]>([]);
     const [constraints, setConstraints] = useState<Constraint[]>([]);
     const [points, setPoints] = useState<PointMass[]>([]);
 
@@ -23,38 +21,23 @@ export const SettingsSidebar = (props: Props) =>
     {
         const sub = timer(100).subscribe(() =>
         {
-            setShapes([...props.engine.shapes]);
             setConstraints([...props.engine.constraints]);
             setPoints([...props.engine.points]);
         });
 
         return () => sub.unsubscribe();
-    }, [shapes]);
+    }, [points]);
 
-    const renderPoints = (s: Shape, si: number) =>
+    const renderPoints = () =>
     {
         return <ul className="list-none pl-4">
-            {s.points.map((p, i) =>
+            {points.map((p, i) =>
             {
                 const label = `${i} - point`;
-                const nodeId = `${si}point${i}`;
+                const nodeId = `point${i}`;
                 return <TreeItem key={i} nodeId={nodeId} label={label} onClick={() => props.renderer.lookAt(p.position[0], p.position[1])} />
             })}
         </ul>;
-    }
-
-    const renderShapes = () =>
-    {
-        return <>
-            {shapes.map((s, i) =>
-            {
-                const label = `${s.index} - ${s.name}`;
-                const nodeId = `${i}shape`;
-                return <TreeItem key={i} nodeId={nodeId} onClick={() => props.renderer.lookAt(s.points[0].position[0], s.points[0].position[1])} label={label}>
-                    {renderPoints(s, i)}
-                </TreeItem>;
-            })}
-        </>;
     }
 
     //TODO: sem tlacitko zoom in a zoom out
@@ -64,10 +47,9 @@ export const SettingsSidebar = (props: Props) =>
             aria-label="file system navigator"
             sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
         >
-            <p>Shapes count: {shapes.length}</p>
             <p>Constraints count: {constraints.length}</p>
             <p>Points count: {points.length}</p>
-            {renderShapes()}
+            {renderPoints()}
         </TreeView>
         <button>ass</button>
     </Card>

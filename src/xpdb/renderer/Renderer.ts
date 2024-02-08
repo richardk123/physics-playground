@@ -2,11 +2,11 @@ import p5Types from "p5";
 import {Engine} from "../engine/Engine";
 import {DistanceConstraint} from "../engine/constraint/DistanceConstraint";
 import {createTransform, Transform} from "./CanvasUtils";
-import {ShapeCollisionConstraint} from "../engine/constraint/ShapeCollisionConstraint";
-import {aggregatePointsToConnectedLines} from "../engine/CollisionUtils";
 import {vec2} from "gl-matrix";
-import {ShapeCollisionConstraint2} from "../engine/constraint/ShapeCollisionConstraint2";
-import { Shape } from "../engine/Shape";
+import {PolygonCollisionConstraint} from "../engine/constraint/PolygonCollisionConstraint";
+import {findPolygonLines} from "../engine/utils/CollisionUtils2";
+import {POINT_DIAMETER} from "../engine/PhysicsConstants";
+import {BodyConstraint} from "../engine/constraint/BodyConstraint";
 
 interface CustomRenderer
 {
@@ -40,20 +40,16 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
         {
             p5.strokeWeight(1);
             p5.stroke(25, 25, 25);
-            p5.fill(25, 25, 25);
+            p5.fill(255);
 
             const position = transform.toScreen(p.position[0], p.position[1]);
-            p5.ellipse(position.x, position.y, 5 * p.mass);
+            p5.ellipse(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
 
-            if (!p.isStatic)
-            {
-
-                const prevPos = transform.toScreen(p.previousPosition[0], p.previousPosition[1]);
-                p5.strokeWeight(1);
-                p5.stroke(50, 50, 50);
-                p5.fill(50, 50, 50);
-                p5.line(position.x, position.y, prevPos.x, prevPos.y,);
-            }
+            const prevPos = transform.toScreen(p.previousPosition[0], p.previousPosition[1]);
+            p5.strokeWeight(1);
+            p5.stroke(50, 50, 50);
+            p5.fill(50, 50, 50);
+            p5.line(position.x, position.y, prevPos.x, prevPos.y);
         });
 
         const renderDistanceConstraint = (c : DistanceConstraint) =>
@@ -62,7 +58,6 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
             {
                 p5.strokeWeight(1)
                 p5.stroke(100, 200, 100);
-                p5.fill(100, 200, 100);
                 const pv1 = c.points[i].position;
                 const pv2 = c.points[i + 1].position;
                 const p1 = transform.toScreen(pv1[0], pv1[1]);
@@ -72,25 +67,17 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
             }
         }
 
-        const renderShape = (shape: Shape) =>
+        const renderPolygonConstraint = (c: PolygonCollisionConstraint) =>
         {
-            const lines = aggregatePointsToConnectedLines(shape.points);
+            const lines = findPolygonLines(c.polygon);
             p5.strokeWeight(1);
-
-            if (shape.isStatic)
-            {
-                p5.stroke(255, 0, 0);
-            }
-            else
-            {
-                p5.stroke(0, 0, 255);
-            }
+            p5.stroke(255, 0, 0);
 
             lines
                 .forEach(l =>
                 {
-                    const p1 = transform.toScreen(l.start.position[0], l.start.position[1]);
-                    const p2 = transform.toScreen(l.end.position[0], l.end.position[1]);
+                    const p1 = transform.toScreen(l.start[0], l.start[1]);
+                    const p2 = transform.toScreen(l.end[0], l.end[1]);
                     p5.line(p1.x, p1.y, p2.x, p2.y);
                 });
         }
@@ -101,6 +88,8 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
             switch (c.type)
             {
                 case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
+                case "polygon-collision": renderPolygonConstraint(c as PolygonCollisionConstraint); break;
+                case "body-constraint": (c as BodyConstraint).distanceConstraints.forEach(c => renderDistanceConstraint(c)); break;
             }
         });
 
@@ -108,8 +97,6 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
         {
             value.render(p5);
         });
-
-        engine.shapes.forEach(shape => renderShape(shape));
     }
 
     return {

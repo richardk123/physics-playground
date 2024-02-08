@@ -1,4 +1,4 @@
-import {isPointOnLineSegment} from "../CollisionUtils";
+import {isPointOnLineSegment} from "../utils/CollisionUtils";
 import {vec2} from "gl-matrix";
 
 test('point on start', () =>

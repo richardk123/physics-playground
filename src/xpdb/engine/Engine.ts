@@ -1,25 +1,24 @@
-import {PointMass} from "./PointMass";
+import {PointMass} from "./entity/PointMass";
 import {vec2} from "gl-matrix";
 import {GRAVITY, SUB_STEPS} from "./PhysicsConstants";
-import {Constraint, Constraints} from "./constraint/Constraint";
-import {Shape, Shapes} from "./Shape";
+import {Constraint} from "./constraint/Constraint";
+import {Body} from "./entity/Body";
 
 export interface Engine
 {
     addPoints: (...points: PointMass[]) => void;
     addConstraints: (...constraints: Constraint[]) => void,
-    addShapes: (...shapes: Shape[]) => void;
-    addShapes2: (...shapes: Shape[]) => void;
+    addBodies: (...bodies: Body[]) => void;
     simulate: (dt: number) => void;
     points: PointMass[];
     constraints: Constraint[];
-    shapes: Shape[];
+    bodies: Body[];
 }
 export const createEngine = () =>
 {
     const pointMasses: PointMass[] = [];
     const constraints: Constraint[] = [];
-    const shapes: Shape[] = [];
+    const bodies: Body[] = [];
 
     const preSolve = (dt: number) =>
     {
@@ -81,83 +80,24 @@ export const createEngine = () =>
         pointMasses.push(...points);
     }
 
-    const addShapes = (...addedShapes: Shape[]) =>
+    const addBodies = (...b: Body[]) =>
     {
-        if (addedShapes.length > 1)
+        b.forEach(b =>
         {
-            for (let i = 0; i < addedShapes.length - 1; i++)
-            {
-                const cur = addedShapes[i];
-                for (let j = i + 1; j < addedShapes.length; j++)
-                {
-                    const next = addedShapes[j];
-                    addConstraints(...Constraints.shapeCollision(cur, next, 0));
-                }
-            }
-            addConstraints(...Constraints.shapeCollision(addedShapes[0], addedShapes[addedShapes.length - 1], 0));
-        }
-
-        shapes.forEach(shape =>
-        {
-            addedShapes.forEach(addedShape =>
-            {
-                addConstraints(...Constraints.shapeCollision(shape, addedShape, 0));
-            });
-        });
-        // set name and index
-        addedShapes.forEach((s, i) =>
-        {
-            s.index = shapes.length + i;
-        })
-
-        pointMasses.push(...addedShapes.flatMap(s => s.points));
-        addConstraints(...addedShapes.flatMap(s => s.constraints));
-        shapes.push(...addedShapes);
-    }
-
-    const addShapes2 = (...addedShapes: Shape[]) =>
-    {
-
-        if (addedShapes.length > 1)
-        {
-            for (let i = 0; i < addedShapes.length - 1; i++)
-            {
-                const cur = addedShapes[i];
-                for (let j = i + 1; j < addedShapes.length; j++)
-                {
-                    const next = addedShapes[j];
-                    addConstraints(Constraints.shapeCollision2(cur, next, 0));
-                }
-            }
-        }
-
-        shapes.forEach(shape =>
-        {
-            addedShapes.forEach(addedShape =>
-            {
-                addConstraints(Constraints.shapeCollision2(shape, addedShape, 0));
-            });
+            addPoints(...b.points);
+            addConstraints(...b.constraints);
         });
 
-        // set name and index
-        addedShapes.forEach((s, i) =>
-        {
-            s.index = shapes.length + i;
-        })
-
-        pointMasses.push(...addedShapes.flatMap(s => s.points));
-        addConstraints(...addedShapes.flatMap(s => s.constraints));
-        shapes.push(...addedShapes);
+        bodies.push(...b);
     }
 
     return {
         addPoints: addPoints,
         addConstraints: addConstraints,
-        addShapes: addShapes,
-        addShapes2: addShapes2,
+        addBodies: addBodies,
         simulate: simulate,
         points: pointMasses,
         constraints: constraints,
-        shapes: shapes,
+        bodies: bodies,
     } as Engine;
 }

@@ -112,6 +112,8 @@ export interface Transform
 {
     toSimulation: (x: number, y: number) => Point,
     toScreen: (x: number, y: number) => Point,
+    toSimulationScale: (distance: number) => number,
+    toScreenScale: (distance: number) => number,
     simulatorWidth: number,
     simulatorHeight: number,
 }
@@ -138,9 +140,19 @@ export const createTransform = (width = 800,
         return { x: xn, y: yn } as Point;
     };
 
+    const toSimulationScale = (distance: number): number => {
+        return distance / cScale;
+    };
+
+    const toScreenScale = (distance: number): number => {
+        return distance * cScale;
+    };
+
     return {
         toSimulation: toSimulation,
         toScreen: toScreen,
+        toSimulationScale: toSimulationScale,
+        toScreenScale: toScreenScale,
         simulatorWidth: simWidth,
         simulatorHeight: simHeight,
     } as Transform;

@@ -1,4 +1,4 @@
-import {findClosestPointOnLine, isPointInsideShape} from "../CollisionUtils";
+import {findClosestPointOnLine, isPointInsideShape} from "../utils/CollisionUtils";
 import {vec2} from "gl-matrix";
 
 test('point above mid line', () =>

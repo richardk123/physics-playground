@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {areSegmentsOnSameLine, findClosestPointOnLine} from "../CollisionUtils";
+import {areSegmentsOnSameLine, findClosestPointOnLine} from "../utils/CollisionUtils";
 
 test('segments on same line', () =>
 {

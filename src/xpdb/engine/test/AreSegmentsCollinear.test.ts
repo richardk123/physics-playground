@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {areSegmentsCollinear} from "../CollisionUtils";
+import {areSegmentsCollinear} from "../utils/CollisionUtils";
 
 test('segments collinear', () =>
 {

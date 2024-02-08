@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {findIntersectionPointOfLineAndLineSegment} from "../CollisionUtils";
+import {findIntersectionPointOfLineAndLineSegment} from "../utils/CollisionUtils";
 
 test('line linesegment intersection line segment vertical', () =>
 {

@@ -1,6 +1,6 @@
 import {vec2} from "gl-matrix";
-import {PointMass} from "./PointMass";
-import {Shape} from "./Shape";
+import {PointMass} from "../entity/PointMass";
+import {Body} from "../entity/Body";
 
 interface IntersectionResult
 {
@@ -144,7 +144,7 @@ export const isPointOnLineSegment = (point: vec2, segment: { start: vec2, end: v
     return false;
 }
 
-export const isPointInsideShape = (point: PointMass, shape: Shape): boolean =>
+export const isPointInsideShape = (point: PointMass, shape: Body): boolean =>
 {
     const shapePoints = shape.points;
     const numVertices = shapePoints.length;
@@ -207,7 +207,7 @@ interface ClosestPoint
     line: LineSegment;
 }
 
-export const findClosestPointOnShape = (point: PointMass, shape: Shape): ClosestPoint =>
+export const findClosestPointOnShape = (point: PointMass, shape: Body): ClosestPoint =>
 {
     const lines = aggregatePointsToConnectedLines(shape.points);
 

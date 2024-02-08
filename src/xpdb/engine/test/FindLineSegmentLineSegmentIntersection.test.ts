@@ -1,6 +1,6 @@
 import {vec2} from "gl-matrix";
 import {expectVecEquivalence} from "./TestUtils";
-import {findLineSegmentLineSegmentIntersection} from "../CollisionUtils2";
+import {findLineSegmentLineSegmentIntersection} from "../utils/CollisionUtils2";
 
 test('segments does not intersect', () =>
 {

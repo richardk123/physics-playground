@@ -1,11 +1,11 @@
-import {findClosestPointOnShape, isPointInsideShape} from "../CollisionUtils";
-import {Shapes} from "../Shape";
-import {Points} from "../PointMass";
+import {findClosestPointOnShape, isPointInsideShape} from "../utils/CollisionUtils";
+import {Bodies} from "../entity/Body";
+import {Points} from "../entity/PointMass";
 import {vec2} from "gl-matrix";
 
 test('poin on shape top left point', () =>
 {
-    const shape = Shapes.rectangle(5, 5, 5, 5, 0);
+    const shape = Bodies.rectangle(5, 5, 5, 5, 0);
     const point = Points.create(5, 5);
 
     expectVecEquivalence(findClosestPointOnShape(point, shape).intersectionPoint, vec2.fromValues(5, 5));
@@ -13,7 +13,7 @@ test('poin on shape top left point', () =>
 
 test('poin on shape top bellow top left', () =>
 {
-    const shape = Shapes.rectangle(5, 5, 5, 5, 0);
+    const shape = Bodies.rectangle(5, 5, 5, 5, 0);
     const point = Points.create(5, 4);
 
     expectVecEquivalence(findClosestPointOnShape(point, shape).intersectionPoint, vec2.fromValues(5, 5));
@@ -21,7 +21,7 @@ test('poin on shape top bellow top left', () =>
 
 test('point inside shape', () =>
 {
-    const shape = Shapes.rectangle(5, 5, 5, 5, 0);
+    const shape = Bodies.rectangle(5, 5, 5, 5, 0);
     const point = Points.create(3, 4);
 
     expectVecEquivalence(findClosestPointOnShape(point, shape).intersectionPoint, vec2.fromValues(3, 4));

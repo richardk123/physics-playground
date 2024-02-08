@@ -1,5 +1,5 @@
 import {vec2} from "gl-matrix";
-import {findGeometricCenter} from "../CollisionUtils2";
+import {findGeometricCenter} from "../utils/CollisionUtils2";
 import {expectVecEquivalence} from "./TestUtils";
 
 test('geometric center', () =>
