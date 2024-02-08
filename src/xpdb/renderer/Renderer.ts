@@ -19,8 +19,8 @@ export interface EngineRenderer
     render: (p5: p5Types) => void;
     transform: () => Transform;
     lookAt: (x: number, y: number) => void;
-    setSimulatorMinWidth: (width: number) => void;
-    getSimulationMinWidth: () => number;
+    setSimulationWidth: (width: number) => void;
+    getSimulationWidth: () => number;
     addCustomRender: (renderer: CustomRenderer) => void;
     removeCustomRenderer: (name: string) => void;
 }
@@ -103,8 +103,8 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
         render: render,
         transform: () => transform,
         lookAt: (x: number, y: number) => vec2.set(lookAtPos, x, y),
-        setSimulatorMinWidth: (width: number) => simulatorMinWidth = width,
-        getSimulationMinWidth: () => simulatorMinWidth,
+        setSimulationWidth: (width: number) => simulatorMinWidth = width,
+        getSimulationWidth: () => simulatorMinWidth,
         addCustomRender: (r) => customRenderers.set(r.name, r),
         removeCustomRenderer: (name) => customRenderers.delete(name),
     } as EngineRenderer;

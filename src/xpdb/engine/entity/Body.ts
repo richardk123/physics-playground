@@ -82,9 +82,9 @@ export class Bodies
     {
         const points: PointMass[] = [];
 
-        for (let y = 0; y < width; y++)
+        for (let y = 0; y < height; y++)
         {
-            for (let x = 0; x < height; x++)
+            for (let x = 0; x < width; x++)
             {
                 points.push(Points.create(topLeftX + x, topLeftY + y, mass))
             }
@@ -132,10 +132,22 @@ export class Bodies
                         )
                     );
                 }
+
+                // Diagonal neighbor
+                if (x < width - 1 && y < height - 1) {
+                    const bottomIndex = (y + 1) * width + x;
+                    const rightIndex = y * width + (x + 1);
+                    constraints.push(
+                        Constraints.distance(
+                            compliance,
+                            points[rightIndex],
+                            points[bottomIndex]
+                        )
+                    );
+                }
             }
         }
 
-        const bodyConstraint = Constraints.bodyConstraint(...constraints);
         return this.create(points, constraints, name || "rectangle");
     }
 

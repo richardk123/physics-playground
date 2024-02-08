@@ -51,6 +51,5 @@ export const SettingsSidebar = (props: Props) =>
             <p>Points count: {points.length}</p>
             {renderPoints()}
         </TreeView>
-        <button>ass</button>
     </Card>
 }

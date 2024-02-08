@@ -1,7 +1,7 @@
 import {PointMass} from "./entity/PointMass";
 import {vec2} from "gl-matrix";
 import {GRAVITY, SUB_STEPS} from "./PhysicsConstants";
-import {Constraint} from "./constraint/Constraint";
+import {Constraint, Constraints} from "./constraint/Constraint";
 import {Body} from "./entity/Body";
 
 export interface Engine

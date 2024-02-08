@@ -17,7 +17,37 @@ export const VisualizationXPDB = () =>
     const engine = createEngine();
     const renderer = createRenderer(engine);
     renderer.lookAt(45, 20);
-    renderer.setSimulatorMinWidth(60);
+    renderer.setSimulationWidth(60);
+
+    // rope
+    // const rope = Bodies.rope(10, 30, 10, 0);
+    // const rect = Bodies.rectangle(10, 18, 3, 3, 0);
+    // engine.addConstraints(Constraints.attachBodyToRope(rope, rect, 0));
+    // engine.addBodies(rope, rect);
+    //
+    // // soft body
+    // engine.addBodies(
+    //     Bodies.rectangle(16, 20, 5, 5, 0.001, 1, "soft-body-1"),
+    //     Bodies.rectangle(16, 30, 5, 5, 0.001, 1, "soft-body-2"),
+    // );
+
+    // boxes
+    // engine.addBodies(
+    //     // bottom line
+    //     Bodies.rectangle(45 + 0, 11, 5, 5, 0),
+    //     Bodies.rectangle(45 + 6, 11, 5, 5, 0),
+    //     Bodies.rectangle(45 + 12, 11, 5, 5, 0),
+    //     // middle line
+    //     Bodies.rectangle(45 + 3, 17, 5, 5, 0),
+    //     Bodies.rectangle(45 + 9, 17, 5, 5, 0),
+    //     // top line
+    //     Bodies.rectangle(45 + 6, 23, 5, 5, 0),
+    // );
+
+    // bridge
+    // engine.addBodies(
+    //     Bodies.rectangle(25, 23, 20, 5, 0.00001),
+    // );
 
     // point collisions
     engine.addConstraints(Constraints.pointCollision(engine.points));
@@ -28,32 +58,7 @@ export const VisualizationXPDB = () =>
             Polygon.rectangle(0, 5, 30, 5),
             engine.points),
         Constraints.polygonCollision(Polygon.rectangle(40, 5, 50, 5),
-            engine.points))
-
-    // rope
-    const rope = Bodies.rope(10, 30, 10, 0);
-    const rect = Bodies.rectangle(10, 18, 3, 3, 0);
-    engine.addConstraints(Constraints.attachBodyToRope(rope, rect, 0));
-    engine.addBodies(rope, rect);
-
-    // soft body
-    engine.addBodies(
-        Bodies.rectangle(16, 20, 5, 5, 0.001, 1, "soft-body-1"),
-        Bodies.rectangle(16, 30, 5, 5, 0.001, 1, "soft-body-1"),
-    );
-
-    // boxes
-    engine.addBodies(
-        // bottom line
-        Bodies.rectangle(45 + 0, 11, 5, 5, 0),
-        Bodies.rectangle(45 + 6, 11, 5, 5, 0),
-        Bodies.rectangle(45 + 12, 11, 5, 5, 0),
-        // middle line
-        Bodies.rectangle(45 + 3, 17, 5, 5, 0),
-        Bodies.rectangle(45 + 9, 17, 5, 5, 0),
-        // top line
-        Bodies.rectangle(45 + 6, 23, 5, 5, 0),
-    );
+            engine.points));
 
     const registerShooting = (canvas: HTMLCanvasElement) =>
     {
@@ -66,7 +71,7 @@ export const VisualizationXPDB = () =>
             vec2.scale(direction, direction, distance / 2);
 
             const position = renderer.transform().toSimulation(downUp[0][0], downUp[0][1]);
-            const bullet = Bodies.rectangle(position.x, position.y, 5, 5, 0);
+            const bullet = Bodies.rectangle(position.x, position.y, 2, 2, 0);
             Bodies.rotate(bullet, angle);
 
             // y must be inversed
