@@ -62,7 +62,6 @@ export const createEngine = () =>
 
     const simulate = (dt: number) =>
     {
-        console.log(dt);
         const ddt = dt / SUB_STEPS;
         for (let i = 0; i < SUB_STEPS; i++)
         {

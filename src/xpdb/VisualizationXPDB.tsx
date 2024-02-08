@@ -17,27 +17,31 @@ export const VisualizationXPDB = () =>
 
     // floor
     engine.addShapes2(
-        Shapes.rectangle(0, 5, 30, 5, 0, true),
-        Shapes.rectangle(40, 5, 50, 5, 0, true),
+        Shapes.rectangle(0, 5, 30, 5, 0, true, "floor-left"),
+        Shapes.rectangle(40, 5, 50, 5, 0, true, "floor-right"),
     );
 
     // bridge
     // engine.addShapes2(
-    //     Shapes.complexRectangle(5, 20, 30, 5, 7, 0.01)
+    //     Shapes.complexRectangle(5, 20, 30, 5, 7, 0.001)
     // )
 
-    // boxes
     // engine.addShapes2(
-    //     // bottom line
-    //     Shapes.rectangle(45 + 0, 11, 5, 5, 0),
-    //     Shapes.rectangle(45 + 6, 11, 5, 5, 0),
-    //     Shapes.rectangle(45 + 12, 11, 5, 5, 0),
-    //     // middle line
-    //     Shapes.rectangle(45 + 3, 17, 5, 5, 0),
-    //     Shapes.rectangle(45 + 9, 17, 5, 5, 0),
-    //     // top line
-    //     Shapes.rectangle(45 + 5, 23, 5, 5, 0),
+    //     Shapes.rectangle(5, 20, 30, 5, 0, false, "soft-body"),
     // );
+
+    // boxes
+    engine.addShapes2(
+        // bottom line
+        Shapes.rectangle(45 + 0, 11, 5, 5, 0),
+        Shapes.rectangle(45 + 6, 11, 5, 5, 0),
+        Shapes.rectangle(45 + 12, 11, 5, 5, 0),
+        // middle line
+        Shapes.rectangle(45 + 3, 17, 5, 5, 0),
+        Shapes.rectangle(45 + 9, 17, 5, 5, 0),
+        // top line
+        Shapes.rectangle(45 + 6, 23, 5, 5, 0),
+    );
     //
     // const s1 = Shapes.rectangle(45.001, 11.001, 5, 5, 0);
     // const s2 = Shapes.rectangle(45, 17, 5, 5, 0);
@@ -52,7 +56,6 @@ export const VisualizationXPDB = () =>
         {
             const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
             const angle = -Math.atan2(downUp[1][1] - downUp[0][1], downUp[1][0] - downUp[0][0]);
-            console.log(angle);
             const distance = vec2.len(direction);
             vec2.normalize(direction, direction);
             vec2.scale(direction, direction, distance / 2);

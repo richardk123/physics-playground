@@ -8,7 +8,7 @@ interface IntersectionResult
     point?: vec2;
 }
 
-interface LineSegment {
+export interface LineSegment {
     start: PointMass;
     end: PointMass;
 }
