@@ -4,9 +4,7 @@ import {Engines} from "./engine/Engine";
 import p5Types from "p5";
 import {Renderers} from "./engine/Renderer";
 import {Bodies} from "./engine/Body";
-import {drag$, shoot$} from "../xpdb/renderer/CanvasUtils";
-import {vec2} from "gl-matrix";
-import {delay, fromEvent} from "rxjs";
+import {SettingsSidebar} from "./SettingsSidebar";
 
 export const VisualizationXPDB2 = () =>
 {
@@ -17,7 +15,7 @@ export const VisualizationXPDB2 = () =>
     renderer.lookAt(50, 50);
     renderer.setSimulationWidth(120);
 
-    bodies.rectangle(10, 15, 10, 10, 0.0001, 0.2);
+    bodies.rectangle(10, 20, 40, 40, 0, 0.5);
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
@@ -37,7 +35,7 @@ export const VisualizationXPDB2 = () =>
             </main>
         </div>
         <div className="w-64 text-white">
-            {/*<SettingsSidebar engine={engine} renderer={renderer} />*/}
+            <SettingsSidebar engine={engine} />
         </div>
     </div>;
 

@@ -5,16 +5,16 @@
 import {Engines} from "../Engine";
 import {Bodies} from "../Body";
 
+
+// changed alg
+// hashmap 54344
+// optimalized 3708
 test('stressTest', () =>
 {
     const measurements = [];
-    for (let i = 0; i < 50; i++)
-    {
-        measurements.push(stress());
-    }
+    measurements.push(stress());
 
     console.log(measurements.reduce((sum, value) => sum + value) / measurements.length);
-
 });
 
 const stress = () =>
@@ -25,7 +25,10 @@ const stress = () =>
     const bodies = new Bodies(engine);
 
     bodies.rectangle(0, 0, 100, 100, 0);
-    engine.simulate(1);
+    for (let i = 0; i < 50; i++)
+    {
+        engine.simulate(1);
+    }
 
     return performance.now() - t1;
 }

@@ -1,5 +1,5 @@
-export const MAX_PARTICLE_COUNT = 20000;
-export const MAX_CONSTRAINTS_COUNT = 200000;
+export const MAX_PARTICLE_COUNT = 10000;
+export const MAX_CONSTRAINTS_COUNT = 50000;
 
 export const GRAVITY = -100;
 

@@ -6,6 +6,8 @@ import {solveFloor} from "./constraint/FloorConstraint";
 import {DistanceConstraintData, solveDistanceConstraint} from "./constraint/DistanceConstraint";
 import {Vec} from "./Vec";
 import {Bodies} from "./Body";
+import {Hash} from "./common/Hash";
+import {solvePointCollisionOptimalized} from "./constraint/PointCollisionConstraintHash";
 
 export interface Engine
 {
@@ -14,6 +16,7 @@ export interface Engine
     distanceConstraints: DistanceConstraintData,
     addPoint: (x: number, y: number, mass?: number) => number;
     addDistanceConstraint: (p1Index: number, p2Index: number, breakThreshold?: number, compliance?: number) => number;
+    duration: () => number;
 }
 
 export class Engines
@@ -39,7 +42,10 @@ export class Engines
             count: 0,
         } as DistanceConstraintData;
 
-        let grid: Grid = createGrid(points.count, POINT_DIAMETER);
+        let duration = 0;
+
+        // const hash: Hash = new Hash(POINT_DIAMETER, MAX_PARTICLE_COUNT);
+        let grid: Grid;
 
         const preSolve = (dt: number) =>
         {
@@ -60,6 +66,7 @@ export class Engines
                 // add point to collision grid
                 grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
             }
+            // hash.create(points.positionCurrent);
         }
 
         const solve = (dt: number) =>
@@ -67,6 +74,7 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 solvePointCollision(grid, points, i);
+                // solvePointCollisionOptimalized(hash, points, i);
                 solveFloor(points, i);
             }
 
@@ -89,6 +97,8 @@ export class Engines
 
         const simulate = (dt: number) =>
         {
+            const t = performance.now();
+
             const ddt = dt / SUB_STEPS;
             for (let i = 0; i < SUB_STEPS; i++)
             {
@@ -96,6 +106,8 @@ export class Engines
                 solve(ddt);
                 postSolve(ddt);
             }
+
+            duration = performance.now() - t;
         }
 
         const addPoint = (x: number, y: number, mass = 1) =>
@@ -128,6 +140,7 @@ export class Engines
             simulate: simulate,
             addPoint: addPoint,
             addDistanceConstraint: addDistanceConstraint,
+            duration: () => duration,
         } as Engine;
     }
 
