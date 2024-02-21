@@ -34,32 +34,36 @@ export class Renderers
             const points = engine.points;
             transform = Transformer.create(p5.width, p5.height, lookAtPos, simulatorMinWidth);
 
-            // for (let i = 0; i < points.count; i++)
-            // {
-            //     p5.strokeWeight(1);
-            //     p5.stroke(25, 25, 25);
-            //     p5.fill(25, 255, 25);
-            //
-            //     const position = transform.toScreen(points.x[i], points.y[i]);
-            //     p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
-            // }
-
-            for (let i = 0; i < engine.distanceConstraints.count; i++)
+            for (let i = 0; i < points.count; i++)
             {
-                if (engine.distanceConstraints.active[i])
-                {
-                    p5.strokeWeight(1);
-                    p5.stroke(25, 25, 255);
+                p5.strokeWeight(1);
+                p5.stroke(25, 25, 25);
+                p5.fill(25, 255, 25);
 
-                    const p1Index = engine.distanceConstraints.p1Index[i];
-                    const p2Index = engine.distanceConstraints.p2Index[i];
-
-                    const p1 = transform.toScreen(engine.points.x[p1Index], engine.points.y[p1Index]);
-                    const p2 = transform.toScreen(engine.points.x[p2Index], engine.points.y[p2Index]);
-
-                    p5.line(p1.x, p1.y, p2.x, p2.y);
-                }
+                const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
+                p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
             }
+
+            // for (let i = 0; i < engine.distanceConstraints.count; i++)
+            // {
+            //     if (engine.distanceConstraints.active[i])
+            //     {
+            //         p5.strokeWeight(1);
+            //         p5.stroke(25, 25, 255);
+            //
+            //         const p1Index = engine.distanceConstraints.p1Index[i];
+            //         const p2Index = engine.distanceConstraints.p2Index[i];
+            //
+            //         const p1 = transform.toScreen(
+            //             points.positionCurrent[p1Index * 2 + 0],
+            //             points.positionCurrent[p1Index * 2 + 1]);
+            //         const p2 = transform.toScreen(
+            //             points.positionCurrent[p2Index * 2 + 0],
+            //             points.positionCurrent[p2Index * 2 + 1]);
+            //
+            //         p5.line(p1.x, p1.y, p2.x, p2.y);
+            //     }
+            // }
 
             customRenderers.forEach((value, key) =>
             {

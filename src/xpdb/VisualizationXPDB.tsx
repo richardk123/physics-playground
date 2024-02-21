@@ -21,6 +21,9 @@ export const VisualizationXPDB = () =>
     engine.addBodies(
         Bodies.rectangle(50, 0, 15, 15, 0.0001),
     );
+    engine.addBodies(
+        Bodies.rectangle(10, 10, 10, 10, 0, 0.5)
+    );
 
     // rope
     const rope = Bodies.rope(40, 90, 20, 0);

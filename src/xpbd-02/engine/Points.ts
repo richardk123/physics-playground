@@ -1,13 +1,10 @@
 
 export interface PointsData
 {
-    x: Float32Array,
-    y: Float32Array,
-    prevX: Float32Array,
-    prevY: Float32Array,
-    velocityX: Float32Array,
-    velocityY: Float32Array,
-    mass: Float32Array,
+    positionCurrent: Float32Array,
+    positionPrevious: Float32Array,
+    velocity: Float32Array,
+    massInverse: Float32Array,
     isStatic: Array<boolean>,
     count: number
 }

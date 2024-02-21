@@ -21,24 +21,21 @@ export class Engines
     static create = () =>
     {
         const points = {
-            x: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            y: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            prevX: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            prevY: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            velocityX: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            velocityY: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
-            mass: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
+            positionCurrent: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
+            positionPrevious: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
+            velocity: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
+            massInverse: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
             isStatic: new Array(MAX_PARTICLE_COUNT).fill(false),
             count: 0,
         } as PointsData;
 
         const distanceConstraints = {
-            p1Index: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
-            p2Index: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
+            p1Index: new Int32Array(MAX_CONSTRAINTS_COUNT).fill(0),
+            p2Index: new Int32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             compliance: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             breakThreshold: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             active: new Array(MAX_CONSTRAINTS_COUNT).fill(true),
-            restLength: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
+            restLengthSqr: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             count: 0,
         } as DistanceConstraintData;
 
@@ -52,18 +49,16 @@ export class Engines
             {
                 // apply gravity
                 const g = GRAVITY * dt;
-                points.velocityY[i] = points.velocityY[i] + g;
+                points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
 
-                // update previous position
-                points.prevX[i] = points.x[i];
-                points.prevY[i] = points.y[i];
+                // update previous position with current position
+                Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
 
                 // update current position with velocity
-                points.x[i] = points.x[i] + (points.velocityX[i] * dt)
-                points.y[i] = points.y[i] + (points.velocityY[i] * dt)
+                Vec.add(points.positionCurrent, i, points.velocity, i, dt);
 
                 // add point to collision grid
-                grid.add(points.x[i], points.y[i], i);
+                grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
             }
         }
 
@@ -83,12 +78,12 @@ export class Engines
 
         const postSolve = (dt: number) =>
         {
+            const inverseDt = (1 / dt);
+
             for (let i = 0; i < points.count; i++)
             {
                 // update velocity
-                const inverseDt = (1 / dt);
-                points.velocityX[i] = (points.x[i] - points.prevX[i]) * inverseDt;
-                points.velocityY[i] = (points.y[i] - points.prevY[i]) * inverseDt;
+                Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
             }
         }
 
@@ -106,9 +101,9 @@ export class Engines
         const addPoint = (x: number, y: number, mass = 1) =>
         {
             const index = points.count;
-            points.x[index] = x;
-            points.y[index] = y;
-            points.mass[index] = mass;
+            points.positionCurrent[index * 2 + 0] = x;
+            points.positionCurrent[index * 2 + 1] = y;
+            points.massInverse[index] = 1 / mass;
             points.count += 1;
             return index;
         }
@@ -121,8 +116,7 @@ export class Engines
             distanceConstraints.p2Index[index] = p2Index;
             distanceConstraints.breakThreshold[index] = breakThreshold;
             distanceConstraints.compliance[index] = compliance;
-            distanceConstraints.restLength[index] = Vec.dist(points.x[p1Index], points.y[p1Index], points.x[p2Index], points.y[p2Index]);
-
+            distanceConstraints.restLengthSqr[index] = Vec.distSquared(points.positionCurrent, p1Index, points.positionCurrent, p2Index);
             distanceConstraints.count += 1;
 
             return index;

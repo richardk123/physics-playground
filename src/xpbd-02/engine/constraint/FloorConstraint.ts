@@ -2,20 +2,20 @@ import {PointsData} from "../Points";
 
 export const solveFloor = (points: PointsData, index: number) =>
 {
-    if (points.y[index] <= 0)
+    if (points.positionCurrent[index * 2 + 1] <= 0)
     {
-        points.y[index] = 0;
+        points.positionCurrent[index * 2 + 1] = 0;
     }
-    else if (points.y[index] >= 100)
+    else if (points.positionCurrent[index * 2 + 1] >= 100)
     {
-        points.y[index] = 100;
+        points.positionCurrent[index * 2 + 1] = 100;
     }
-    if (points.x[index] <= -20)
+    if (points.positionCurrent[index * 2] <= -20)
     {
-        points.x[index] = -20;
+        points.positionCurrent[index * 2] = -20;
     }
-    else if (points.x[index] >= 120)
+    else if (points.positionCurrent[index * 2] >= 120)
     {
-        points.x[index] = 120;
+        points.positionCurrent[index * 2] = 120;
     }
 }
