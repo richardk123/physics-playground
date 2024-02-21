@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "types": ["@webgpu/types"],
     "lib": [
       "dom",
       "dom.iterable",

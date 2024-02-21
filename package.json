@@ -13,6 +13,7 @@
     "@types/node": "^16.18.73",
     "@types/react": "18.2.19",
     "@types/react-dom": "^18.2.18",
+    "@webgpu/types": "^0.1.40",
     "autoprefixer": "^10.4.17",
     "gl-matrix": "^3.4.3",
     "postcss-cli": "^11.0.0",

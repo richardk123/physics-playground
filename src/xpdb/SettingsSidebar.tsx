@@ -19,13 +19,13 @@ export const SettingsSidebar = (props: Props) =>
 
     useEffect(() =>
     {
-        const sub = timer(100).subscribe(() =>
-        {
-            setConstraints([...props.engine.constraints]);
-            setPoints([...props.engine.points]);
-        });
-
-        return () => sub.unsubscribe();
+        // const sub = timer(5000).subscribe(() =>
+        // {
+        //     setConstraints([...props.engine.constraints]);
+        //     setPoints([...props.engine.points]);
+        // });
+        //
+        // return () => sub.unsubscribe();
     }, [points]);
 
     const renderPoints = () =>
@@ -42,7 +42,13 @@ export const SettingsSidebar = (props: Props) =>
 
     //TODO: sem tlacitko zoom in a zoom out
 
+    const reload = () =>
+    {
+        window.location.reload();
+    }
+
     return <Card className="w-96 h-full">
+        <button onClick={reload}>Reload</button>
         <TreeView
             aria-label="file system navigator"
             sx={{ height: 240, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}

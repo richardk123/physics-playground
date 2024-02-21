@@ -12,7 +12,7 @@ export const Sidebar = () =>
 
     const createLink = (url: string, name: string) =>
     {
-        const prefixUrl = "/physics-playground" + url;
+        const prefixUrl = url;
         return (
             <NavLink to={prefixUrl}>
                 <ListItem selected={isSelected(prefixUrl)}>
@@ -27,6 +27,8 @@ export const Sidebar = () =>
             {createLink("/", "Verlet Integration naive")}
             {createLink("/verlet02", "Verlet Integration optimalized")}
             {createLink("/xpdb", "XPDB")}
+            {createLink("/xpdb2", "XPDB optimalized")}
+            {createLink("/verlet-gpu", "Verlet gpu")}
         </List>
     </Card>);
 }

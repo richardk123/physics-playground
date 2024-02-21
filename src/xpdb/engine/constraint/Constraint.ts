@@ -7,9 +7,9 @@ import {
 import {vec2} from "gl-matrix";
 import {createPointCollisionConstraint, PointCollisionConstraint} from "./PointCollisionConstraint";
 import {Body} from "../entity/Body";
-import {createBodyConstraint} from "./BodyConstraint";
+import {createDistanceConstraint2} from "./DistanceConstraint2";
 
-export type ConstraintType = "distance" | "polygon-collision" | "point-collision" | "body-constraint";
+export type ConstraintType = "distance" | "polygon-collision" | "point-collision" | "body-constraint" | "distance2";
 
 export interface Constraint
 {
@@ -25,6 +25,11 @@ export class Constraints
         return createDistanceConstraint(points, compliance);
     }
 
+    static distance2(compliance: number, threshold: number, p1: PointMass, p2: PointMass)
+    {
+        return createDistanceConstraint2(p1, p2, threshold, compliance);
+    }
+
     static polygonCollision(polygon: vec2[],
                             points: PointMass[]): PolygonCollisionConstraint
     {
@@ -36,10 +41,6 @@ export class Constraints
         return createPointCollisionConstraint(points);
     }
 
-    static bodyConstraint(...distanceConstraints: DistanceConstraint[])
-    {
-        return createBodyConstraint(distanceConstraints);
-    }
 
     static attachBodyToRope(rope: Body, body: Body, compliance: number)
     {

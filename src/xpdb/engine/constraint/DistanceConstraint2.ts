@@ -2,38 +2,39 @@ import {Constraint} from "./Constraint";
 import {PointMass} from "../entity/PointMass";
 import {vec2} from "gl-matrix";
 
-export interface DistanceConstraint extends Constraint
+export interface DistanceConstraint2 extends Constraint
 {
-    points: PointMass[];
+    p1: PointMass,
+    p2: PointMass,
+    active: () => boolean,
 }
-export const createDistanceConstraint = (points: PointMass[], compliance: number) =>
-{
-    const restLengths: number[] = [];
 
-    for (let i = 1; i < points.length; i++)
-    {
-        restLengths.push(vec2.distance(points[i].position, points[i -1].position));
-    }
+
+export const createDistanceConstraint2 = (p1: PointMass, p2: PointMass, breakThreshold: number, compliance: number) =>
+{
+    const restLength = vec2.distance(p1.position, p2.position);
+    let active = true;
 
     const solve = (dt: number) =>
     {
-        const alpha = compliance / dt /dt;
-
-        for (let i = 1; i < points.length; i++)
+        if (active)
         {
-            const p1 = points[i - 1];
-            const p2 = points[i - 0];
+            const alpha = compliance / dt /dt;
 
             const w1 = 1 / p1.mass;
             const w2 = 1 / p2.mass;
             const w = w1 + w2;
 
             const dx = vec2.subtract(vec2.create(), p2.position, p1.position)
-            const restLength = restLengths[i - 1];
             const length = vec2.len(dx);
 
             const C = restLength - length;
             const lambda = C / length / (w + alpha);
+
+            if (Math.abs(C) / restLength > breakThreshold)
+            {
+                active = false;
+            }
 
             if (lambda !== 0)
             {
@@ -44,8 +45,10 @@ export const createDistanceConstraint = (points: PointMass[], compliance: number
     }
 
     return {
-        points: points,
+        p1: p1,
+        p2: p2,
+        active: () => active,
         solve: solve,
-        type: "distance",
-    } as DistanceConstraint;
+        type: "distance2",
+    } as DistanceConstraint2;
 }

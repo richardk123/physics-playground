@@ -1,22 +1,26 @@
 import React from 'react';
 import {Sidebar} from "./components/Sidebar";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, HashRouter, Route, Routes} from "react-router-dom";
 import {Layout} from "./components/Layout";
 import {VerletIntegration01} from "./verlet-integration-01/VerletIntegration01";
 import {VerletIntegration02} from "./verlet-integration-02/VerletIntegration02";
 import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
+import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
+import {VerletGpu} from "./verlet-gpu/VerletGpu";
 
 function App() {
   return (
-      <BrowserRouter>
-    <Routes>
-      <Route path="/physics-playground/" element={<Layout />}>
-        <Route path="/physics-playground/" element={<VerletIntegration01 />} />
-        <Route path="/physics-playground/verlet02" element={<VerletIntegration02 />} />
-        <Route path="/physics-playground/xpdb" element={<VisualizationXPDB />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+      <HashRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<VerletIntegration01 />} />
+            <Route path="/verlet02" element={<VerletIntegration02 />} />
+            <Route path="/xpdb" element={<VisualizationXPDB />} />
+            <Route path="/xpdb2" element={<VisualizationXPDB2 />} />
+            <Route path="/verlet-gpu" element={<VerletGpu />} />
+          </Route>
+        </Routes>
+      </HashRouter>
   );
 }
 

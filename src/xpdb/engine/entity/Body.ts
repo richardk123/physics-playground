@@ -2,7 +2,7 @@ import {PointMass, Points} from "./PointMass";
 import {Constraint, Constraints} from "../constraint/Constraint";
 import {mat2, vec2} from "gl-matrix";
 import {findGeometricCenter} from "../utils/CollisionUtils2";
-import {DistanceConstraint} from "../constraint/DistanceConstraint";
+import {Polygon} from "./Polygon";
 
 export type Body =
 {
@@ -17,27 +17,7 @@ export class Bodies
     static rotate = (body: Body, angleInRadians: number) =>
     {
         // Create a 2D rotation matrix
-        const rotationMatrix = mat2.create();
-        mat2.fromRotation(rotationMatrix, angleInRadians);
-        const center = findGeometricCenter(body.points.map(p => p.position));
-
-        return body.points.map(p => {
-            const position = vec2.fromValues(p.position[0], p.position[1]);
-
-            // Translate the point to the origin
-            vec2.sub(position, position, center);
-
-            // Multiply the translation vector by the rotation matrix
-            vec2.transformMat2(position, position, rotationMatrix);
-
-            // Translate the point back to its original position
-            vec2.add(position, position, center);
-
-            // Update the point position
-            vec2.set(p.position, position[0], position[1]);
-
-            return p;
-        });
+        Polygon.rotate(body.points.map(p => p.position), angleInRadians);
     }
 
     static setVelocity = (shape: Body, velocity: vec2) =>
@@ -90,7 +70,8 @@ export class Bodies
             }
         }
 
-        const constraints: DistanceConstraint[] = [];
+        const constraints: Constraint[] = [];
+        const threshold = 0.5;
 
         // Create constraints for neighboring points
         for (let y = 0; y < height; y++) {
@@ -101,8 +82,9 @@ export class Bodies
                 if (x < width - 1) {
                     const rightIndex = y * width + (x + 1);
                     constraints.push(
-                        Constraints.distance(
+                        Constraints.distance2(
                             compliance,
+                            threshold,
                             points[currentIndex],
                             points[rightIndex]
                         )
@@ -113,8 +95,9 @@ export class Bodies
                 if (y < height - 1) {
                     const bottomIndex = (y + 1) * width + x;
                     constraints.push(
-                        Constraints.distance(
+                        Constraints.distance2(
                             compliance,
+                            threshold,
                             points[currentIndex],
                             points[bottomIndex]
                         )
@@ -125,8 +108,9 @@ export class Bodies
                 if (x < width - 1 && y < height - 1) {
                     const diagonalIndex = (y + 1) * width + (x + 1);
                     constraints.push(
-                        Constraints.distance(
+                        Constraints.distance2(
                             compliance,
+                            threshold,
                             points[currentIndex],
                             points[diagonalIndex]
                         )
@@ -138,8 +122,9 @@ export class Bodies
                     const bottomIndex = (y + 1) * width + x;
                     const rightIndex = y * width + (x + 1);
                     constraints.push(
-                        Constraints.distance(
+                        Constraints.distance2(
                             compliance,
+                            threshold,
                             points[rightIndex],
                             points[bottomIndex]
                         )

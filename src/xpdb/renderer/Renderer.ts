@@ -6,7 +6,7 @@ import {vec2} from "gl-matrix";
 import {PolygonCollisionConstraint} from "../engine/constraint/PolygonCollisionConstraint";
 import {findPolygonLines} from "../engine/utils/CollisionUtils2";
 import {POINT_DIAMETER} from "../engine/PhysicsConstants";
-import {BodyConstraint} from "../engine/constraint/BodyConstraint";
+import {DistanceConstraint2} from "../engine/constraint/DistanceConstraint2";
 
 interface CustomRenderer
 {
@@ -40,16 +40,11 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
         {
             p5.strokeWeight(1);
             p5.stroke(25, 25, 25);
-            p5.fill(255);
+            p5.fill(25, 255, 25);
 
             const position = transform.toScreen(p.position[0], p.position[1]);
-            p5.ellipse(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
-
-            const prevPos = transform.toScreen(p.previousPosition[0], p.previousPosition[1]);
-            p5.strokeWeight(1);
-            p5.stroke(50, 50, 50);
-            p5.fill(50, 50, 50);
-            p5.line(position.x, position.y, prevPos.x, prevPos.y);
+            // p5.ellipse(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
+            p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
         });
 
         const renderDistanceConstraint = (c : DistanceConstraint) =>
@@ -60,6 +55,20 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
                 p5.stroke(100, 200, 100);
                 const pv1 = c.points[i].position;
                 const pv2 = c.points[i + 1].position;
+                const p1 = transform.toScreen(pv1[0], pv1[1]);
+                const p2 = transform.toScreen(pv2[0], pv2[1]);
+
+                p5.line(p1.x, p1.y, p2.x, p2.y);
+            }
+        }
+        const renderDistance2Constraint = (c : DistanceConstraint2) =>
+        {
+            if (c.active())
+            {
+                p5.strokeWeight(1)
+                p5.stroke(100, 200, 100);
+                const pv1 = c.p1.position;
+                const pv2 = c.p2.position;
                 const p1 = transform.toScreen(pv1[0], pv1[1]);
                 const p2 = transform.toScreen(pv2[0], pv2[1]);
 
@@ -87,9 +96,9 @@ export const createRenderer = (engine: Engine): EngineRenderer =>
         {
             switch (c.type)
             {
-                case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
+                // case "distance": renderDistanceConstraint(c as DistanceConstraint); break;
+                // case "distance2": renderDistance2Constraint(c as DistanceConstraint2); break;
                 case "polygon-collision": renderPolygonConstraint(c as PolygonCollisionConstraint); break;
-                case "body-constraint": (c as BodyConstraint).distanceConstraints.forEach(c => renderDistanceConstraint(c)); break;
             }
         });
 

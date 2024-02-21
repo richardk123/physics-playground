@@ -8,27 +8,30 @@ import {delay, fromEvent} from "rxjs";
 import React from "react";
 import {SettingsSidebar} from "./SettingsSidebar";
 import {Constraints} from "./engine/constraint/Constraint";
-import {Polygon} from "./engine/entity/Polygon";
 import {Bodies} from "./engine/entity/Body";
-import {body} from "@material-tailwind/react/theme/base/typography";
+import {Polygon} from "./engine/entity/Polygon";
 
 export const VisualizationXPDB = () =>
 {
     const engine = createEngine();
     const renderer = createRenderer(engine);
-    renderer.lookAt(45, 20);
-    renderer.setSimulationWidth(60);
+    renderer.lookAt(50, 50);
+    renderer.setSimulationWidth(120);
+
+    engine.addBodies(
+        Bodies.rectangle(50, 0, 15, 15, 0.0001),
+    );
 
     // rope
-    // const rope = Bodies.rope(10, 30, 10, 0);
-    // const rect = Bodies.rectangle(10, 18, 3, 3, 0);
-    // engine.addConstraints(Constraints.attachBodyToRope(rope, rect, 0));
-    // engine.addBodies(rope, rect);
-    //
-    // // soft body
+    const rope = Bodies.rope(40, 90, 20, 0);
+    const rect = Bodies.rectangle(30, 60, 10, 10, 0);
+    engine.addConstraints(Constraints.attachBodyToRope(rope, rect, 0));
+    engine.addBodies(rope, rect);
+
+    // soft body
     // engine.addBodies(
-    //     Bodies.rectangle(16, 20, 5, 5, 0.001, 1, "soft-body-1"),
-    //     Bodies.rectangle(16, 30, 5, 5, 0.001, 1, "soft-body-2"),
+    //     Bodies.rectangle(16, 20, 5, 5, 0.01, 1, "soft-body-1"),
+    //     Bodies.rectangle(16, 30, 5, 5, 0.01, 1, "soft-body-2"),
     // );
 
     // boxes
@@ -43,21 +46,44 @@ export const VisualizationXPDB = () =>
     //     // top line
     //     Bodies.rectangle(45 + 6, 23, 5, 5, 0),
     // );
-
-    // bridge
+    //
+    // // bridge
     // engine.addBodies(
-    //     Bodies.rectangle(25, 23, 20, 5, 0.00001),
+    //     Bodies.rectangle(32.1, 23, 10, 20, 0.0001),
     // );
 
     // point collisions
     engine.addConstraints(Constraints.pointCollision(engine.points));
 
+    // drop
+    const line1 = Polygon.rectangle(70, 20, 30, 3);
+    Polygon.rotate(line1, 3.14 / 4);
+
+    const line2 = Polygon.rectangle(50, 50, 30, 3);
+    Polygon.rotate(line2, -3.14 / 4);
+
+    const line3 = Polygon.rectangle(70, 80, 30, 3);
+    Polygon.rotate(line3, 3.14 / 4);
+
+    engine.addConstraints(
+        Constraints.polygonCollision(line1, engine.points),
+        Constraints.polygonCollision(line2, engine.points),
+        Constraints.polygonCollision(line3, engine.points),
+    )
+
     // floor
     engine.addConstraints(
         Constraints.polygonCollision(
-            Polygon.rectangle(0, 5, 30, 5),
+            Polygon.rectangle(0, 0, 105, 5),
             engine.points),
-        Constraints.polygonCollision(Polygon.rectangle(40, 5, 50, 5),
+        Constraints.polygonCollision(
+            Polygon.rectangle(0, 100, 105, 5),
+            engine.points),
+        Constraints.polygonCollision(
+            Polygon.rectangle(0, 100, 5, 105),
+            engine.points),
+        Constraints.polygonCollision(
+            Polygon.rectangle(100, 100, 5, 105),
             engine.points));
 
     const registerShooting = (canvas: HTMLCanvasElement) =>
@@ -68,10 +94,10 @@ export const VisualizationXPDB = () =>
             const angle = -Math.atan2(downUp[1][1] - downUp[0][1], downUp[1][0] - downUp[0][0]);
             const distance = vec2.len(direction);
             vec2.normalize(direction, direction);
-            vec2.scale(direction, direction, distance / 2);
+            vec2.scale(direction, direction, distance);
 
             const position = renderer.transform().toSimulation(downUp[0][0], downUp[0][1]);
-            const bullet = Bodies.rectangle(position.x, position.y, 2, 2, 0);
+            const bullet = Bodies.rectangle(position.x, position.y, 5, 5, 0);
             Bodies.rotate(bullet, angle);
 
             // y must be inversed
