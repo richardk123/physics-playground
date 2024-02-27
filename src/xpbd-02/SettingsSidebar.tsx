@@ -30,6 +30,6 @@ export const SettingsSidebar = (props: Props) =>
 
     return <Card className="w-96 h-full">
         <button onClick={reload}>Reload</button>
-        <p>Simulation duration: {duration}</p>
+        <p>Physics ms per frame: {duration}</p>
     </Card>
 }
