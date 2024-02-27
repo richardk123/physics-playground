@@ -1,6 +1,6 @@
 import {POINT_DIAMETER} from "../../../xpdb/engine/PhysicsConstants";
 import {PointsData} from "../Points";
-import {Vec} from "../Vec";
+import {Vec} from "../utils/Vec";
 import {Hash} from "../common/Hash";
 
 const normal = new Float32Array(2);

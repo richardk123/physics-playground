@@ -3,7 +3,7 @@
 // optimalized 384
 // second optimalized 277
 import {Engines} from "../Engine";
-import {Bodies} from "../Body";
+import {ParticleFormations} from "../entitity/ParticleFormation";
 
 
 // changed alg
@@ -22,7 +22,7 @@ const stress = () =>
     const t1 = performance.now();
 
     const engine = Engines.create();
-    const bodies = new Bodies(engine);
+    const bodies = new ParticleFormations(engine);
 
     bodies.rectangle(0, 0, 100, 100, 0);
     for (let i = 0; i < 50; i++)

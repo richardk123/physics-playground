@@ -1,7 +1,7 @@
 import {POINT_DIAMETER} from "../../../xpdb/engine/PhysicsConstants";
 import {Grid} from "../Grid";
 import {PointsData} from "../Points";
-import {Vec} from "../Vec";
+import {Vec} from "../utils/Vec";
 
 const normal = new Float32Array(2);
 
@@ -23,8 +23,8 @@ export const solvePointCollision = (grid: Grid, points: PointsData, index: numbe
 
             const corr = (POINT_DIAMETER - d) * 0.5;
 
-            Vec.add(points.positionCurrent, index, normal, 0, corr);
-            Vec.add(points.positionCurrent, index2, normal, 0, -corr);
+            Vec.add(points.positionCurrent, index, normal, 0, corr * (points.isStatic[index] ? 0 : 1));
+            Vec.add(points.positionCurrent, index2, normal, 0, -corr * (points.isStatic[index2] ? 0 : 1));
 
             // TODO: does it do anything? velocity at the end is calculated as pos -prevpos
             // reflect velocities along normal

@@ -1,5 +1,5 @@
 import {PointsData} from "../Points";
-import {Vec} from "../Vec";
+import {Vec} from "../utils/Vec";
 
 export interface DistanceConstraintData
 {
@@ -43,7 +43,7 @@ export const solveDistanceConstraint = (data: DistanceConstraintData,
             data.active[index] = false;
         }
 
-        Vec.add(pointsData.positionCurrent, p1Index, dx, 0, -lambda * w1);
-        Vec.add(pointsData.positionCurrent, p2Index, dx, 0, lambda * w2);
+        Vec.add(pointsData.positionCurrent, p1Index, dx, 0, -lambda * w1 * (pointsData.isStatic[p1Index] ? 0 : 1));
+        Vec.add(pointsData.positionCurrent, p2Index, dx, 0, lambda * w2 * (pointsData.isStatic[p2Index] ? 0 : 1));
     }
 }

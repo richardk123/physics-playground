@@ -3,6 +3,9 @@ import p5Types from "p5";
 import {Transformer} from "./Transformer";
 import {POINT_DIAMETER} from "./Constants";
 import {Transform} from "../../xpdb/renderer/CanvasUtils";
+import {Points} from "../../xpdb/engine/entity/PointMass";
+import {PointsData} from "./Points";
+import {WORLD_MAX_X, WORLD_MAX_Y, WORLD_MIN_X, WORLD_MIN_Y} from "./constraint/FloorConstraint";
 
 interface CustomRenderer
 {
@@ -29,41 +32,76 @@ export class Renderers
         let simulatorMinWidth = 60;
         const customRenderers = new Map<string, CustomRenderer>();
 
-        const render = (p5: p5Types) =>
+        const renderPoints = (p5: p5Types) =>
         {
             const points = engine.points;
-            transform = Transformer.create(p5.width, p5.height, lookAtPos, simulatorMinWidth);
-
             for (let i = 0; i < points.count; i++)
             {
-                p5.strokeWeight(1);
-                p5.stroke(25, 25, 25);
-                p5.fill(25, 255, 25);
+                const isStatic = points.isStatic[i];
+                if (!isStatic)
+                {
+                    const r = points.color[i * 3 + 0];
+                    const g = points.color[i * 3 + 1];
+                    const b = points.color[i * 3 + 2];
 
-                const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
-                p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
+                    p5.strokeWeight(1);
+                    p5.stroke(25, 25, 25);
+                    p5.fill(r, g, b);
+
+                    const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
+                    p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
+                }
             }
+        }
 
-            // for (let i = 0; i < engine.distanceConstraints.count; i++)
-            // {
-            //     if (engine.distanceConstraints.active[i])
-            //     {
-            //         p5.strokeWeight(1);
-            //         p5.stroke(25, 25, 255);
-            //
-            //         const p1Index = engine.distanceConstraints.p1Index[i];
-            //         const p2Index = engine.distanceConstraints.p2Index[i];
-            //
-            //         const p1 = transform.toScreen(
-            //             points.positionCurrent[p1Index * 2 + 0],
-            //             points.positionCurrent[p1Index * 2 + 1]);
-            //         const p2 = transform.toScreen(
-            //             points.positionCurrent[p2Index * 2 + 0],
-            //             points.positionCurrent[p2Index * 2 + 1]);
-            //
-            //         p5.line(p1.x, p1.y, p2.x, p2.y);
-            //     }
-            // }
+        const renderDistanceConstraints = (p5: p5Types) =>
+        {
+            const points = engine.points;
+
+            for (let i = 0; i < engine.distanceConstraints.count; i++)
+            {
+                if (engine.distanceConstraints.active[i])
+                {
+                    p5.strokeWeight(1);
+                    p5.stroke(25, 25, 255);
+
+                    const p1Index = engine.distanceConstraints.p1Index[i];
+                    const p2Index = engine.distanceConstraints.p2Index[i];
+
+                    const p1 = transform.toScreen(
+                        points.positionCurrent[p1Index * 2 + 0],
+                        points.positionCurrent[p1Index * 2 + 1]);
+                    const p2 = transform.toScreen(
+                        points.positionCurrent[p2Index * 2 + 0],
+                        points.positionCurrent[p2Index * 2 + 1]);
+
+                    p5.line(p1.x, p1.y, p2.x, p2.y);
+                }
+            }
+        }
+
+        const renderFloorConstraint = (p5: p5Types) =>
+        {
+            const topLeft = transform.toScreen(WORLD_MIN_X, WORLD_MAX_Y);
+            const topRight = transform.toScreen(WORLD_MAX_X, WORLD_MAX_Y);
+            const bottomLeft =  transform.toScreen(WORLD_MIN_X, WORLD_MIN_Y);
+            const bottomRight =  transform.toScreen(WORLD_MAX_X, WORLD_MIN_Y);
+
+            p5.strokeWeight(5);
+            p5.stroke(255, 25, 25);
+
+            p5.line(topLeft.x, topLeft.y, topRight.x, topRight.y);
+            p5.line(bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y);
+            p5.line(topLeft.x, topLeft.y, bottomLeft.x, bottomLeft.y);
+            p5.line(topRight.x, topRight.y, bottomRight.x, bottomRight.y);
+        }
+
+        const render = (p5: p5Types) =>
+        {
+            transform = Transformer.create(p5.width, p5.height, lookAtPos, simulatorMinWidth);
+
+            renderFloorConstraint(p5);
+            renderPoints(p5);
 
             customRenderers.forEach((value, key) =>
             {

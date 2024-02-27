@@ -4,19 +4,19 @@ import {createGrid, Grid} from "./Grid";
 import {solvePointCollision} from "./constraint/PointCollisionConstraint";
 import {solveFloor} from "./constraint/FloorConstraint";
 import {DistanceConstraintData, solveDistanceConstraint} from "./constraint/DistanceConstraint";
-import {Vec} from "./Vec";
-import {Bodies} from "./Body";
-import {Hash} from "./common/Hash";
-import {solvePointCollisionOptimalized} from "./constraint/PointCollisionConstraintHash";
+import {Vec} from "./utils/Vec";
+import {ParticleFormations} from "./entitity/ParticleFormation";
+import {Color} from "./entitity/Color";
 
 export interface Engine
 {
     simulate: (dt: number) => void;
     points: PointsData,
     distanceConstraints: DistanceConstraintData,
-    addPoint: (x: number, y: number, mass?: number) => number;
+    addPoint: (x: number, y: number, mass: number, color: Color) => number;
     addDistanceConstraint: (p1Index: number, p2Index: number, breakThreshold?: number, compliance?: number) => number;
     duration: () => number;
+    bodies: () => ParticleFormations;
 }
 
 export class Engines
@@ -29,6 +29,7 @@ export class Engines
             velocity: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
             massInverse: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
             isStatic: new Array(MAX_PARTICLE_COUNT).fill(false),
+            color: new Float32Array(MAX_PARTICLE_COUNT * 3).fill(0),
             count: 0,
         } as PointsData;
 
@@ -54,18 +55,23 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 // apply gravity
-                const g = GRAVITY * dt;
-                points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
+                if (!points.isStatic[i])
+                {
+                    const g = GRAVITY * dt;
+                    points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
 
-                // update previous position with current position
-                Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
+                    // update previous position with current position
+                    Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
 
-                // update current position with velocity
-                Vec.add(points.positionCurrent, i, points.velocity, i, dt);
+                    // update current position with velocity
+                    Vec.add(points.positionCurrent, i, points.velocity, i, dt);
+                }
 
                 // add point to collision grid
                 grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
+
             }
+
             // hash.create(points.positionCurrent);
         }
 
@@ -110,12 +116,15 @@ export class Engines
             duration = performance.now() - t;
         }
 
-        const addPoint = (x: number, y: number, mass = 1) =>
+        const addPoint = (x: number, y: number, mass: number, color: Color) =>
         {
             const index = points.count;
             points.positionCurrent[index * 2 + 0] = x;
             points.positionCurrent[index * 2 + 1] = y;
             points.massInverse[index] = 1 / mass;
+            points.color[index * 3 + 0] = color.r;
+            points.color[index * 3 + 1] = color.g;
+            points.color[index * 3 + 2] = color.b;
             points.count += 1;
             return index;
         }
