@@ -47,4 +47,12 @@ export class Vec
         anr *= 2; bnr *= 2;
         return a[anr] * b[bnr] + a[anr + 1] * b[bnr + 1];
     }
+
+    static setSum = (dst: Float32Array, dnr: number, a: Float32Array, anr: number, b: Float32Array,bnr: number, scale = 1.0) =>
+    {
+        dnr *= 2; anr *= 2; bnr *= 2;
+        dst[dnr++] = (a[anr++] + b[bnr++]) * scale;
+        dst[dnr++] = (a[anr++] + b[bnr++]) * scale;
+        dst[dnr]   = (a[anr] + b[bnr]) * scale;
+    }
 }

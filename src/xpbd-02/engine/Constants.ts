@@ -6,3 +6,5 @@ export const GRAVITY = -100;
 export const POINT_DIAMETER = 1;
 
 export const SUB_STEPS = 8;
+
+export const FRICTION = 0.1;
