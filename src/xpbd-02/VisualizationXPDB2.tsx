@@ -17,7 +17,7 @@ export const VisualizationXPDB2 = () =>
     const bodies = new ParticleFormations(engine);
 
     renderer.lookAt(50, 50);
-    renderer.setSimulationWidth(120);
+    renderer.setSimulationWidth(200);
 
     // bowl
     bodies.rope(0, 50, 40, 50, 0, 0.5, 0.01)
