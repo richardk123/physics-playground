@@ -1,6 +1,7 @@
 import {ParticleFormation} from "./ParticleFormation";
 import {Engine} from "../Engine";
-import {Color} from "./Color";
+import {Color, Colors} from "./Color";
+import {POINT_DIAMETER} from "../Constants";
 
 export class Circle implements ParticleFormation
 {
@@ -20,25 +21,41 @@ export class Circle implements ParticleFormation
     {
         this._engine = engine;
 
-        const pointIndexes: number[] = [];
-        const circumference = 2 * Math.PI * radius;
-        const numPoints = Math.ceil(circumference / pointDistance);
-
-        for (let i = 0; i < numPoints; i++) {
-            const angle = (i / numPoints) * 2 * Math.PI;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            pointIndexes.push(engine.addPoint(x, y, mass, color));
-        }
-
-        // constraints around circle
-        for (let i = 0; i < pointIndexes.length; i++)
+        const createCircle = (radius: number, color: Color): number[] =>
         {
-            engine.addDistanceConstraint(pointIndexes[i], pointIndexes[(i + 1) % pointIndexes.length], breakThreshold, compliance)
+            const pointIndexes: number[] = [];
+            const circumference = 2 * Math.PI * radius;
+            const numPoints = Math.ceil(circumference / pointDistance);
+
+            // outer points
+            for (let i = 0; i < numPoints; i++) {
+                const angle = ((i / numPoints) * 2 * Math.PI) + (Math.PI / 2);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                pointIndexes.push(engine.addPoint(x, y, mass, color));
+            }
+            return pointIndexes;
         }
 
-        this.indexFrom = pointIndexes[0];
-        this.indexTo = pointIndexes[pointIndexes.length - 1];
+        const outerPointIndexes = createCircle(radius, color);
+        // constraints around circle
+        for (let i = 0; i < outerPointIndexes.length; i++)
+        {
+            engine.addDistanceConstraint(outerPointIndexes[i], outerPointIndexes[(i + 1) % outerPointIndexes.length], breakThreshold, compliance)
+        }
+
+        // inner points
+        const innerCircleCount = Math.floor(radius / POINT_DIAMETER);
+        for (let i = 0; i < innerCircleCount; i++)
+        {
+            createCircle(radius - (i + 1) * POINT_DIAMETER, Colors.blue());
+        }
+
+        // center point
+        engine.addPoint(centerX, centerY, mass, Colors.blue());
+
+        this.indexFrom = outerPointIndexes[0];
+        this.indexTo = outerPointIndexes[outerPointIndexes.length - 1];
     }
 
     rotate(angle: number): void

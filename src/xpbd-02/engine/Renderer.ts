@@ -102,6 +102,7 @@ export class Renderers
 
             renderFloorConstraint(p5);
             renderPoints(p5);
+            // renderDistanceConstraints(p5);
 
             customRenderers.forEach((value, key) =>
             {
