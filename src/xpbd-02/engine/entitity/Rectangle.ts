@@ -12,24 +12,18 @@ export class Rectangle implements ParticleFormation
     private pointIndexes: number[] = [];
     private width: number;
     private height: number;
-    private compliance: number;
-    private breakThreshold: number;
 
     constructor(engine: Engine,
                 bottomLeftX: number,
                 bottomLeftY: number,
                 width: number,
                 height: number,
-                compliance: number,
-                breakThreshold = 0.5,
                 mass = 1,
                 color: Color = {r: 25, g: 255, b: 25} as Color)
     {
         this._engine = engine;
         this.height = height;
         this.width = width;
-        this.compliance = compliance;
-        this.breakThreshold = breakThreshold;
 
         for (let y = 0; y < height; y++)
         {
@@ -43,7 +37,8 @@ export class Rectangle implements ParticleFormation
         this.indexTo = this.pointIndexes[this.pointIndexes.length - 1];
     }
 
-    withNeighbouringConstraints = () =>
+    withNeighbouringConstraints = (compliance: number,
+                                   breakThreshold = 0.5) =>
     {
 
         // Create constraints for neighboring points
@@ -57,8 +52,8 @@ export class Rectangle implements ParticleFormation
                     this._engine.addDistanceConstraint(
                         this.pointIndexes[currentIndex],
                         this.pointIndexes[rightIndex],
-                        this.breakThreshold,
-                        this.compliance
+                        breakThreshold,
+                        compliance
                     );
                 }
 
@@ -68,8 +63,8 @@ export class Rectangle implements ParticleFormation
                     this._engine.addDistanceConstraint(
                         this.pointIndexes[currentIndex],
                         this.pointIndexes[bottomIndex],
-                        this.breakThreshold,
-                        this.compliance
+                        breakThreshold,
+                        compliance
                     );
                 }
 
@@ -79,8 +74,8 @@ export class Rectangle implements ParticleFormation
                     this._engine.addDistanceConstraint(
                         this.pointIndexes[currentIndex],
                         this.pointIndexes[diagonalIndex],
-                        this.breakThreshold,
-                        this.compliance
+                        breakThreshold,
+                        compliance
                     );
                 }
 
@@ -91,8 +86,8 @@ export class Rectangle implements ParticleFormation
                     this._engine.addDistanceConstraint(
                         this.pointIndexes[rightIndex],
                         this.pointIndexes[bottomIndex],
-                        this.breakThreshold,
-                        this.compliance
+                        breakThreshold,
+                        compliance
                     );
                 }
             }

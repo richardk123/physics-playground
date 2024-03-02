@@ -30,12 +30,10 @@ export class ParticleFormations
               bottomLeftY: number,
               width: number,
               height: number,
-              compliance: number,
-              breakThreshold: number = 0.5,
               mass: number = 1,
               color: Color = {r: 25, g: 255, b: 25} as Color): Rectangle
     {
-        return new Rectangle(this._engine, bottomLeftX, bottomLeftY, width, height, compliance, breakThreshold, mass, color);
+        return new Rectangle(this._engine, bottomLeftX, bottomLeftY, width, height, mass, color);
     }
 
     rope(x1: number,

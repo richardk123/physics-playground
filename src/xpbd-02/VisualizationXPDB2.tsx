@@ -25,10 +25,11 @@ export const VisualizationXPDB2 = () =>
         .withFirstPointStatic();
 
     // water
-    bodies.rectangle(15, 55, 8, 12, 0, 0.5, 1, Colors.blue());
+    bodies.rectangle(15, 55, 8, 12, 1, Colors.blue());
 
     // house
-    bodies.rectangle(90, 0, 10, 15, 0, 0.5, 1, Colors.pink())
+    bodies.rectangle(90, 0, 10, 25, 1, Colors.pink())
+        .withNeighbouringConstraints(0, 0.01);
 
     // pendulum 1
     {
@@ -68,8 +69,8 @@ export const VisualizationXPDB2 = () =>
             vec2.scale(direction, direction, distance);
 
             const position = renderer.transform().toSimulation(downUp[0][0], downUp[0][1]);
-            const bullet = bodies.rectangle(position.x, position.y, 5, 5, 0, 0.5, 1, Colors.darkYellow())
-                .withNeighbouringConstraints();
+            const bullet = bodies.rectangle(position.x, position.y, 5, 5, 1, Colors.darkYellow())
+                .withNeighbouringConstraints(0, 0.1);
             bullet.rotate(angle);
 
             // y must be inversed

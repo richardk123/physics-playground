@@ -8,6 +8,13 @@ import {Vec} from "./utils/Vec";
 import {ParticleFormations} from "./entitity/ParticleFormation";
 import {Color} from "./entitity/Color";
 
+export interface EngineInfo
+{
+    duration: number;
+    pointsCount: number;
+    distanceConstraintCount: number;
+}
+
 export interface Engine
 {
     simulate: (dt: number) => void;
@@ -15,7 +22,7 @@ export interface Engine
     distanceConstraints: DistanceConstraintData,
     addPoint: (x: number, y: number, mass: number, color: Color) => number;
     addDistanceConstraint: (p1Index: number, p2Index: number, breakThreshold?: number, compliance?: number) => number;
-    duration: () => number;
+    info: () => EngineInfo;
     bodies: () => ParticleFormations;
 }
 
@@ -143,13 +150,22 @@ export class Engines
             return index;
         }
 
+        const getEngineInfo = (): EngineInfo =>
+        {
+            return {
+                distanceConstraintCount: distanceConstraints.count,
+                duration: duration,
+                pointsCount: points.count,
+            };
+        }
+
         return {
             points: points,
             distanceConstraints: distanceConstraints,
             simulate: simulate,
             addPoint: addPoint,
             addDistanceConstraint: addDistanceConstraint,
-            duration: () => duration,
+            info: getEngineInfo,
         } as Engine;
     }
 
