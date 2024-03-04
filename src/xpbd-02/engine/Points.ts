@@ -7,5 +7,6 @@ export interface PointsData
     massInverse: Float32Array,
     color: Float32Array,
     isStatic: Array<boolean>,
+    isSlime: Array<boolean>,
     count: number
 }

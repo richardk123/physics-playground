@@ -30,17 +30,18 @@ export class Engines
 {
     static create = () =>
     {
-        const points = {
+        const points: PointsData = {
             positionCurrent: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
             positionPrevious: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
             velocity: new Float32Array(MAX_PARTICLE_COUNT * 2).fill(0),
             massInverse: new Float32Array(MAX_PARTICLE_COUNT).fill(0),
             isStatic: new Array(MAX_PARTICLE_COUNT).fill(false),
+            isSlime: new Array(MAX_PARTICLE_COUNT).fill(false),
             color: new Float32Array(MAX_PARTICLE_COUNT * 3).fill(0),
             count: 0,
-        } as PointsData;
+        };
 
-        const distanceConstraints = {
+        const distanceConstraints: DistanceConstraintData = {
             p1Index: new Int32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             p2Index: new Int32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             compliance: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
@@ -48,7 +49,7 @@ export class Engines
             active: new Array(MAX_CONSTRAINTS_COUNT).fill(true),
             restLengthSqr: new Float32Array(MAX_CONSTRAINTS_COUNT).fill(0),
             count: 0,
-        } as DistanceConstraintData;
+        };
 
         let duration = 0;
 
@@ -76,7 +77,6 @@ export class Engines
 
                 // add point to collision grid
                 grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
-
             }
 
             // hash.create(points.positionCurrent);
