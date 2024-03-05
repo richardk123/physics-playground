@@ -24,7 +24,7 @@ export const calculateDensity = (grid: Grid,
     surrounding.forEach(index2 =>
     {
         const distance = Math.sqrt(Vec.distSquared(points.positionCurrent, index, points.positionCurrent, index2));
-        const influence = smoothingKernel(SMOOTHING_RADIUS, distance);
+        const influence = -smoothingKernel(SMOOTHING_RADIUS, distance);
         points.density[index] += influence * (1 / points.massInverse[index]);
     })
 }
@@ -87,12 +87,12 @@ export const solveFluidConstraint = (grid: Grid,
             const density = points.density[index2];
             const mass = 1 / points.massInverse[index];
             const sharedPressure = calculateSharedPressure(density, points.density[index]);
-            Vec.add(positionChange, 0, vecs, 0, sharedPressure * slope * mass / density);
+            Vec.add(positionChange, 0, vecs, 0, (sharedPressure * slope * mass) / density);
         }
     }
     positionChange.fill(0);
     calculateMoveVector();
 
-    Vec.add(points.positionCurrent, index, positionChange, 0, dt);
+    Vec.copy(points.velocity, index, positionChange, 0);
 
 }

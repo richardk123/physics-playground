@@ -13,6 +13,7 @@ import {Vec} from "./utils/Vec";
 import {ParticleFormations} from "./entitity/ParticleFormation";
 import {Color} from "./entitity/Color";
 import {calculateDensity, solveFluidConstraint} from "./constraint/FluidConstraint";
+import {solvePointCollision} from "./constraint/PointCollisionConstraint";
 
 export interface EngineInfo
 {
@@ -52,7 +53,9 @@ export class Engines
 
         const preSolve = (dt: number) =>
         {
-            grid = createGrid(points.count, SMOOTHING_RADIUS / Math.pow(2, 2));
+
+            // najdi delku strany z prepony
+            grid = createGrid(points.count, SMOOTHING_RADIUS / Math.sqrt(2));
 
             for (let i = 0; i < points.count; i++)
             {
@@ -60,7 +63,7 @@ export class Engines
                 if (!points.isStatic[i])
                 {
                     const g = GRAVITY * dt;
-                    // points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
+                    points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
 
                     // update previous position with current position
                     Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
@@ -93,6 +96,7 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 solveFloor(points, i);
+                solvePointCollision(grid, points, i);
             }
             for (let i = 0; i < points.count; i++)
             {
@@ -102,13 +106,13 @@ export class Engines
 
         const postSolve = (dt: number) =>
         {
-            const inverseDt = (1 / dt);
-
-            for (let i = 0; i < points.count; i++)
-            {
-                // update velocity
-                Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
-            }
+            // const inverseDt = (1 / dt);
+            //
+            // for (let i = 0; i < points.count; i++)
+            // {
+            //     // update velocity
+            //     Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
+            // }
         }
 
         const simulate = (dt: number) =>
