@@ -93,6 +93,6 @@ export const solveFluidConstraint = (grid: Grid,
     positionChange.fill(0);
     calculateMoveVector();
 
-    Vec.copy(points.velocity, index, positionChange, 0);
+    Vec.add(points.positionCurrent, index, positionChange, 0, dt);
 
 }

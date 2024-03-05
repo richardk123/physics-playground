@@ -96,7 +96,7 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 solveFloor(points, i);
-                solvePointCollision(grid, points, i);
+                // solvePointCollision(grid, points, i);
             }
             for (let i = 0; i < points.count; i++)
             {
@@ -106,13 +106,13 @@ export class Engines
 
         const postSolve = (dt: number) =>
         {
-            // const inverseDt = (1 / dt);
-            //
-            // for (let i = 0; i < points.count; i++)
-            // {
-            //     // update velocity
-            //     Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
-            // }
+            const inverseDt = (1 / dt);
+
+            for (let i = 0; i < points.count; i++)
+            {
+                // update velocity
+                Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
+            }
         }
 
         const simulate = (dt: number) =>

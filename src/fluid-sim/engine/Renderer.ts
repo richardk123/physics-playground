@@ -47,7 +47,7 @@ export class Renderers
                     p5.fill(densityColor, 0, 0);
 
                     const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
-                    p5.rect(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
+                    p5.ellipse(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
                 }
             }
         }
