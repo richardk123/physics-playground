@@ -1,11 +1,12 @@
 import {Engine} from "./Engine";
 import p5Types from "p5";
 import {Transformer} from "./Transformer";
-import {POINT_DIAMETER} from "./Constants";
+import {POINT_DIAMETER, TARGET_DENSITY} from "./Constants";
 import {Transform} from "../../xpdb/renderer/CanvasUtils";
 import {Points} from "../../xpdb/engine/entity/PointMass";
 import {PointsData} from "./Points";
 import {WORLD_MAX_X, WORLD_MAX_Y, WORLD_MIN_X, WORLD_MIN_Y} from "./constraint/FloorConstraint";
+import {Vec} from "./utils/Vec";
 
 interface CustomRenderer
 {
@@ -42,9 +43,16 @@ export class Renderers
                 {
 
                     p5.strokeWeight(1);
-                    const densityColor = (128 / engine.info().averageDensity) * points.density[i];
-                    p5.stroke(densityColor, 0, 0);
-                    p5.fill(densityColor, 0, 0);
+                    const MAX_VEL = 600;
+
+                    const vel = Vec.lengthSquared(points.velocity, i);
+                    const r = points.color[i * 3 + 0];
+                    const g = (points.color[i * 3 + 1] / MAX_VEL) * vel;
+                    const b = points.color[i * 3 + 2];
+
+                    p5.strokeWeight(1);
+                    p5.stroke(r, g, b);
+                    p5.fill(r, g, b);
 
                     const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
                     p5.ellipse(position.x, position.y, transform.toScreenScale(POINT_DIAMETER));
@@ -54,10 +62,10 @@ export class Renderers
 
         const renderFloorConstraint = (p5: p5Types) =>
         {
-            const topLeft = transform.toScreen(WORLD_MIN_X, WORLD_MAX_Y);
-            const topRight = transform.toScreen(WORLD_MAX_X, WORLD_MAX_Y);
-            const bottomLeft =  transform.toScreen(WORLD_MIN_X, WORLD_MIN_Y);
-            const bottomRight =  transform.toScreen(WORLD_MAX_X, WORLD_MIN_Y);
+            const topLeft = transform.toScreen(WORLD_MIN_X - POINT_DIAMETER / 2, WORLD_MAX_Y  + POINT_DIAMETER / 2);
+            const topRight = transform.toScreen(WORLD_MAX_X + POINT_DIAMETER / 2, WORLD_MAX_Y + POINT_DIAMETER / 2);
+            const bottomLeft =  transform.toScreen(WORLD_MIN_X - POINT_DIAMETER / 2, WORLD_MIN_Y - POINT_DIAMETER / 2);
+            const bottomRight =  transform.toScreen(WORLD_MAX_X + POINT_DIAMETER / 2, WORLD_MIN_Y - POINT_DIAMETER / 2);
 
             p5.strokeWeight(1);
             p5.stroke(255, 25, 25);

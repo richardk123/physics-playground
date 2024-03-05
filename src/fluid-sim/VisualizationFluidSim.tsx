@@ -6,6 +6,7 @@ import {Renderers} from "./engine/Renderer";
 import {ParticleFormations} from "./engine/entitity/ParticleFormation";
 import {SettingsSidebar} from "./SettingsSidebar";
 import {createScene1} from "./engine/scene/Scene1";
+import {createScene2} from "./engine/scene/Scene2";
 
 export const VisualizationFluidSim = () =>
 {
@@ -14,9 +15,10 @@ export const VisualizationFluidSim = () =>
     const bodies = new ParticleFormations(engine);
 
     renderer.lookAt(50, 50);
-    renderer.setSimulationWidth(200);
+    renderer.setSimulationWidth(100);
 
-    createScene1(engine, bodies);
+    // createScene1(engine, bodies);
+    createScene2(engine, bodies);
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {

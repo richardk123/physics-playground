@@ -4,7 +4,7 @@ import {
     POINT_DIAMETER,
     SUB_STEPS,
     MAX_CONSTRAINTS_COUNT,
-    SMOOTHING_RADIUS
+    SMOOTHING_RADIUS, DAMPING
 } from "./Constants";
 import {PointsData} from "./Points";
 import {createGrid, Grid} from "./Grid";
@@ -55,7 +55,7 @@ export class Engines
         {
 
             // najdi delku strany z prepony
-            grid = createGrid(points.count, SMOOTHING_RADIUS / Math.sqrt(2));
+            grid = createGrid(points.count, (SMOOTHING_RADIUS / Math.sqrt(2)));
 
             for (let i = 0; i < points.count; i++)
             {
@@ -96,11 +96,8 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 solveFloor(points, i);
-                // solvePointCollision(grid, points, i);
-            }
-            for (let i = 0; i < points.count; i++)
-            {
                 solveFluidConstraint(grid, points, i, dt);
+                // solvePointCollision(grid, points, i);
             }
         }
 

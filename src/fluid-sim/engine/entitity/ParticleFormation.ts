@@ -1,6 +1,7 @@
 import {Engine} from "../Engine";
 import {RandomRectangle} from "./RandomRectangle";
 import {Color} from "./Color";
+import {Rectangle} from "./Rectangle";
 
 
 export interface ParticleFormation
@@ -32,6 +33,16 @@ export class ParticleFormations
               color: Color = {r: 25, g: 255, b: 25} as Color): RandomRectangle
     {
         return new RandomRectangle(this._engine, bottomLeftX, bottomLeftY, width, height, pointsCount, mass, color);
+    }
+
+    rectangle(bottomLeftX: number,
+              bottomLeftY: number,
+              width: number,
+              height: number,
+              mass: number = 1,
+              color: Color = {r: 25, g: 255, b: 25} as Color): Rectangle
+    {
+        return new Rectangle(this._engine, bottomLeftX, bottomLeftY, width, height, mass, color);
     }
 
 }

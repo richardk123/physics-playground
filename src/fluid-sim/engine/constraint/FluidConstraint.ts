@@ -1,7 +1,7 @@
 import {Grid} from "../Grid";
 import {PointsData} from "../Points";
 import {Vec} from "../utils/Vec";
-import {PRESSURE_MULTIPLIER, SMOOTHING_RADIUS, TARGET_DENSITY} from "../Constants";
+import {DAMPING, PRESSURE_MULTIPLIER, SMOOTHING_RADIUS, TARGET_DENSITY} from "../Constants";
 
 const positionChange = new Float32Array(2);
 const vecs = new Float32Array(2);
@@ -24,7 +24,7 @@ export const calculateDensity = (grid: Grid,
     surrounding.forEach(index2 =>
     {
         const distance = Math.sqrt(Vec.distSquared(points.positionCurrent, index, points.positionCurrent, index2));
-        const influence = -smoothingKernel(SMOOTHING_RADIUS, distance);
+        const influence = smoothingKernel(SMOOTHING_RADIUS, distance);
         points.density[index] += influence * (1 / points.massInverse[index]);
     })
 }
@@ -88,6 +88,7 @@ export const solveFluidConstraint = (grid: Grid,
             const mass = 1 / points.massInverse[index];
             const sharedPressure = calculateSharedPressure(density, points.density[index]);
             Vec.add(positionChange, 0, vecs, 0, (sharedPressure * slope * mass) / density);
+            Vec.scale(positionChange, 0, DAMPING);
         }
     }
     positionChange.fill(0);
