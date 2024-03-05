@@ -7,6 +7,7 @@ import {VerletIntegration02} from "./verlet-integration-02/VerletIntegration02";
 import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
 import {VerletGpu} from "./verlet-gpu/VerletGpu";
+import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/xpdb" element={<VisualizationXPDB />} />
             <Route path="/xpdb2" element={<VisualizationXPDB2 />} />
             <Route path="/verlet-gpu" element={<VerletGpu />} />
+            <Route path="/fluid-sim" element={<VisualizationFluidSim />} />
           </Route>
         </Routes>
       </HashRouter>

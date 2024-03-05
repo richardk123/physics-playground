@@ -29,6 +29,7 @@ export const Sidebar = () =>
             {createLink("/xpdb", "XPDB")}
             {createLink("/xpdb2", "XPDB optimalized")}
             {createLink("/verlet-gpu", "Verlet gpu")}
+            {createLink("/fluid-sim", "Fluid simulation")}
         </List>
     </Card>);
 }
