@@ -78,8 +78,6 @@ export class Engines
                 // add point to collision grid
                 grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
             }
-
-            // hash.create(points.positionCurrent);
         }
 
         const solve = (dt: number) =>
@@ -87,7 +85,6 @@ export class Engines
             for (let i = 0; i < points.count; i++)
             {
                 solvePointCollision(grid, points, i);
-                // solvePointCollisionOptimalized(hash, points, i);
                 solveFloor(points, i);
             }
 
