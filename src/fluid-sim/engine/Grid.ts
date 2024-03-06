@@ -1,5 +1,3 @@
-import {vec2} from "gl-matrix";
-
 export interface Grid
 {
     add: (x: number, y: number, index: number) => void;

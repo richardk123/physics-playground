@@ -2,6 +2,7 @@ import {Engine} from "../Engine";
 import {RandomRectangle} from "./RandomRectangle";
 import {Color} from "./Color";
 import {Rectangle} from "./Rectangle";
+import {CollisionCircle} from "./CollisionCircle";
 
 
 export interface ParticleFormation
@@ -45,4 +46,10 @@ export class ParticleFormations
         return new Rectangle(this._engine, bottomLeftX, bottomLeftY, width, height, mass, color);
     }
 
+    collisionCircle(x: number,
+                    y: number,
+                    radius: number): CollisionCircle
+    {
+        return new CollisionCircle(this._engine, x, y, radius);
+    }
 }

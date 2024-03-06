@@ -76,12 +76,29 @@ export class Renderers
             p5.line(topRight.x, topRight.y, bottomRight.x, bottomRight.y);
         }
 
+        const renderCircleConstraints = (p5: p5Types) =>
+        {
+            const circles = engine.collisionCirclesData;
+
+            for (let i = 0; i < circles.count; i++)
+            {
+                p5.strokeWeight(1);
+                p5.stroke(255, 25, 25);
+                p5.fill(255, 255, 255, 150);
+
+                const position = transform.toScreen(circles.position[i * 2], circles.position[i * 2 + 1]);
+                const radius = transform.toScreenScale(circles.radius[i])
+                p5.ellipse(position.x, position.y, radius * 2);
+            }
+        }
+
         const render = (p5: p5Types) =>
         {
             transform = Transformer.create(p5.width, p5.height, lookAtPos, simulatorMinWidth);
 
             renderFloorConstraint(p5);
             renderPoints(p5);
+            renderCircleConstraints(p5);
             // renderDistanceConstraints(p5);
 
             customRenderers.forEach((value, key) =>

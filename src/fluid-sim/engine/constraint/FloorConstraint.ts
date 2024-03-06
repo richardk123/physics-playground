@@ -1,8 +1,8 @@
 import {PointsData} from "../Points";
 import {FRICTION} from "../Constants";
 
-export const WORLD_MIN_X = -20;
-export const WORLD_MAX_X = 120;
+export const WORLD_MIN_X = 0;
+export const WORLD_MAX_X = 100;
 
 export const WORLD_MIN_Y = 0;
 export const WORLD_MAX_Y = 100;

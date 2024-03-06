@@ -3,8 +3,6 @@ import p5Types from "p5";
 import {Transformer} from "./Transformer";
 import {POINT_DIAMETER} from "./Constants";
 import {Transform} from "../../xpdb/renderer/CanvasUtils";
-import {Points} from "../../xpdb/engine/entity/PointMass";
-import {PointsData} from "./Points";
 import {WORLD_MAX_X, WORLD_MAX_Y, WORLD_MIN_X, WORLD_MIN_Y} from "./constraint/FloorConstraint";
 
 interface CustomRenderer

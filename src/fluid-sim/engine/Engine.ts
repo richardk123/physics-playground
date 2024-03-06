@@ -13,7 +13,7 @@ import {Vec} from "./utils/Vec";
 import {ParticleFormations} from "./entitity/ParticleFormation";
 import {Color} from "./entitity/Color";
 import {calculateDensity, solveFluidConstraint} from "./constraint/FluidConstraint";
-import {solvePointCollision} from "./constraint/PointCollisionConstraint";
+import {CollisionCircleConstraintData, solveCollisionCircleConstraint} from "./constraint/CollisionCircleConstraint";
 
 export interface EngineInfo
 {
@@ -26,7 +26,9 @@ export interface Engine
 {
     simulate: (dt: number) => void;
     points: PointsData,
+    collisionCirclesData: CollisionCircleConstraintData,
     addPoint: (x: number, y: number, mass: number, color: Color) => number;
+    addCollisionCircle: (x: number, y: number, radius: number) => number;
     info: () => EngineInfo;
     bodies: () => ParticleFormations;
 }
@@ -45,6 +47,12 @@ export class Engines
             color: new Float32Array(MAX_PARTICLE_COUNT * 3).fill(0),
             count: 0,
         };
+
+        const collisionCirclesData: CollisionCircleConstraintData = {
+            position: new Float32Array(MAX_CONSTRAINTS_COUNT * 2),
+            radius: new Float32Array(MAX_CONSTRAINTS_COUNT),
+            count: 0,
+        }
 
         let duration = 0;
         let averageDensity = 0;
@@ -83,12 +91,12 @@ export class Engines
             {
                 calculateDensity(grid, points, i);
             }
-            averageDensity = 0
-            for (let i = 0; i < points.count; i++)
-            {
-                averageDensity += points.density[i];
-            }
-            averageDensity = averageDensity / points.count;
+            // averageDensity = 0
+            // for (let i = 0; i < points.count; i++)
+            // {
+            //     averageDensity += points.density[i];
+            // }
+            // averageDensity = averageDensity / points.count;
         }
 
         const solve = (dt: number) =>
@@ -97,6 +105,7 @@ export class Engines
             {
                 solveFloor(points, i);
                 solveFluidConstraint(grid, points, i, dt);
+                solveCollisionCircleConstraint(points, i, collisionCirclesData)
                 // solvePointCollision(grid, points, i);
             }
         }
@@ -140,6 +149,16 @@ export class Engines
             return index;
         }
 
+        const addCollisionCircle = (x: number, y: number, radius: number) =>
+        {
+            const index = collisionCirclesData.count;
+            collisionCirclesData.position[index * 2 + 0] = x;
+            collisionCirclesData.position[index * 2 + 1] = y;
+            collisionCirclesData.radius[index] = radius;
+            collisionCirclesData.count += 1;
+            return index;
+        }
+
         const getEngineInfo = (): EngineInfo =>
         {
             return {
@@ -151,8 +170,10 @@ export class Engines
 
         return {
             points: points,
+            collisionCirclesData: collisionCirclesData,
             simulate: simulate,
             addPoint: addPoint,
+            addCollisionCircle: addCollisionCircle,
             info: getEngineInfo,
         } as Engine;
     }

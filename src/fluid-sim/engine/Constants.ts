@@ -13,6 +13,6 @@ export const DAMPING = 1;
 
 export const SMOOTHING_RADIUS = 1.2;
 
-export const TARGET_DENSITY = 0.5;
+export const TARGET_DENSITY = 1.4;
 
-export const PRESSURE_MULTIPLIER = 10;
+export const PRESSURE_MULTIPLIER = 50;

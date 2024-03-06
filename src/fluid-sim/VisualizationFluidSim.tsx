@@ -7,6 +7,8 @@ import {ParticleFormations} from "./engine/entitity/ParticleFormation";
 import {SettingsSidebar} from "./SettingsSidebar";
 import {createScene1} from "./engine/scene/Scene1";
 import {createScene2} from "./engine/scene/Scene2";
+import {mouseMove$} from "./engine/utils/CanvasUtils";
+import {Colors} from "./engine/entitity/Color";
 
 export const VisualizationFluidSim = () =>
 {
@@ -18,11 +20,24 @@ export const VisualizationFluidSim = () =>
     renderer.setSimulationWidth(100);
 
     // createScene1(engine, bodies);
-    createScene2(engine, bodies);
+    bodies.rectangle(
+        20,
+        20,
+        35,
+        35,
+        1,
+        Colors.blue());
+
+    const collisionCircle = bodies.collisionCircle(1000, 1000, 10);
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
         renderer.render(p5);
+        mouseMove$(canvas).subscribe(position =>
+        {
+            const simPos = renderer.transform().toSimulation(position[0], position[1]);
+            collisionCircle.setPosition(simPos.x, simPos.y);
+        })
     }
 
     const render = (p5: p5Types) =>

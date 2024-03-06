@@ -6,7 +6,7 @@ import {FRICTION} from "../Constants";
 
 const normal = new Float32Array(2);
 const vecs = new Float32Array(3 * 2);
-export const solvePointCollision = (grid: Grid, points: PointsData, index: number) =>
+export const solveCollisionPointConstraint = (grid: Grid, points: PointsData, index: number) =>
 {
     const surrounding = grid.getInSurroundingCells(
         points.positionCurrent[index * 2],
