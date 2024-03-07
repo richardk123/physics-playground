@@ -1,4 +1,4 @@
-import {Vec2d} from "../engine/data/Vec2d";
+import {Vec2d} from "../../engine/data/Vec2d";
 import {Box, TextField} from "@mui/material";
 import {useEffect, useState} from "react";
 

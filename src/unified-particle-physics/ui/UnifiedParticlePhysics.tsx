@@ -1,10 +1,10 @@
-import {P5Renderer} from "../components/P5Renderer";
+import {P5Renderer} from "../../components/P5Renderer";
 import React from "react";
 import p5Types from "p5";
-import {Renderer} from "./renderer/Renderer";
+import {Renderer} from "../renderer/Renderer";
 import {SettingsSidebar} from "./SettingsSidebar";
-import {BoundingBoxes} from "./engine/data/BoundingBox";
-import {Engine} from "./engine/Engine";
+import {BoundingBoxes} from "../engine/data/BoundingBox";
+import {Engine} from "../engine/Engine";
 
 export const UnifiedParticlePhysics = () =>
 {

@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {timer} from "rxjs";
-import {Solver} from "./engine/solver/Solver";
+import {Solver} from "../engine/solver/Solver";
 import {Card} from "@material-tailwind/react";
 import {VectorComponent} from "./components/VectorComponent";
-import {EngineRenderer} from "./renderer/Renderer";
+import {EngineRenderer} from "../renderer/Renderer";
 import {SliderComponent} from "./components/SliderComponent";
 import {AccordionComponent} from "./components/AccordionComponent";
-import {BoundingBoxes} from "./engine/data/BoundingBox";
-import {Engine} from "./engine/Engine";
+import {BoundingBoxes} from "../engine/data/BoundingBox";
+import {Engine} from "../engine/Engine";
 import {BoxTitle} from "./components/BoxTitle";
 
 interface Props
@@ -54,8 +54,8 @@ export const SettingsSidebar = (props: Props) =>
             <BoxTitle label="Point diameter">
                 <SliderComponent value={simSettings.pointDiameter}
                                  setValue={val => engine.setSettings({...simSettings, pointDiameter: val})}
-                                 minVal={1 / 120}
-                                 maxVal={1 / 10} />
+                                 minVal={0.1}
+                                 maxVal={10} />
             </BoxTitle>
             <BoxTitle label="Sub-step count">
                 <SliderComponent value={simSettings.subStepCount}

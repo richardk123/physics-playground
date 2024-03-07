@@ -8,7 +8,7 @@ import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
 import {VerletGpu} from "./verlet-gpu/VerletGpu";
 import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
-import {UnifiedParticlePhysics} from "./unified-particle-physics/UnifiedParticlePhysics";
+import {UnifiedParticlePhysics} from "./unified-particle-physics/ui/UnifiedParticlePhysics";
 
 function App() {
   return (
