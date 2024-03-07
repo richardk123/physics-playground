@@ -1,8 +1,8 @@
-import {Engine} from "../engine/Engine";
 import p5Types from "p5";
 import {Transform, Transformer} from "./Transformer";
-import {Vec} from "../engine/utils/Vec";
+import {Vec} from "../engine/solver/utils/Vec";
 import {Vec2d} from "../engine/data/Vec2d";
+import {Engine} from "../engine/Engine";
 
 interface CustomRenderer
 {
@@ -21,7 +21,7 @@ export interface EngineRenderer
     removeCustomRenderer: (name: string) => void;
 }
 
-export class Renderers
+export class Renderer
 {
     static create  = (engine: Engine): EngineRenderer =>
     {
@@ -32,7 +32,7 @@ export class Renderers
 
         const renderPoints = (p5: p5Types) =>
         {
-            const points = engine.points;
+            const points = engine.solver.points;
             for (let i = 0; i < points.count; i++)
             {
                 const isStatic = points.isNotStatic[i] === 0;
@@ -52,7 +52,7 @@ export class Renderers
                     p5.fill(r, g, b);
 
                     const position = transform.toScreen(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1]);
-                    p5.ellipse(position.x, position.y, transform.toScreenScale(engine.settings.pointDiameter));
+                    p5.ellipse(position.x, position.y, transform.toScreenScale(engine.solver.settings.pointDiameter));
                 }
             }
         }
@@ -60,11 +60,11 @@ export class Renderers
         const renderWorldBoundingBoxConstraint = (p5: p5Types) =>
         {
             const bb = engine.getWorldBoundingBox();
-            const POINT_DIAMETER = engine.settings.pointDiameter;
-            const WORLD_MIN_X = bb.minX;
-            const WORLD_MIN_Y = bb.minY;
-            const WORLD_MAX_X = bb.maxX;
-            const WORLD_MAX_Y = bb.maxY;
+            const POINT_DIAMETER = engine.solver.settings.pointDiameter;
+            const WORLD_MIN_X = bb.bottomLeft.x;
+            const WORLD_MIN_Y = bb.bottomLeft.y;
+            const WORLD_MAX_X = bb.topRight.x;
+            const WORLD_MAX_Y = bb.topRight.y;
 
             const topLeft = transform.toScreen(WORLD_MIN_X - POINT_DIAMETER / 2, WORLD_MAX_Y  + POINT_DIAMETER / 2);
             const topRight = transform.toScreen(WORLD_MAX_X + POINT_DIAMETER / 2, WORLD_MAX_Y + POINT_DIAMETER / 2);

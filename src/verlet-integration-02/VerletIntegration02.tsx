@@ -1,4 +1,4 @@
-import {Renderer} from "../components/Renderer";
+import {P5Renderer} from "../components/P5Renderer";
 import {createEngine} from "./Verlet02";
 import {vec2} from "gl-matrix";
 import p5Types from "p5";
@@ -137,6 +137,6 @@ export const VerletIntegration02 = () =>
     }
 
     return <>
-        <Renderer render={render} setup={setup}/>
+        <P5Renderer render={render} setup={setup}/>
     </>
 }

@@ -1,4 +1,4 @@
-import {Renderer} from "../components/Renderer";
+import {P5Renderer} from "../components/P5Renderer";
 import React from "react";
 import {Engines} from "./engine/Engine";
 import p5Types from "p5";
@@ -80,7 +80,7 @@ export const VisualizationXPDB2 = () =>
     return <div className="flex h-full bg-gray-200">
         <div className="flex-1 flex flex-col overflow-hidden">
             <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 h-full w-full">
-                <Renderer render={render} setup={setup}/>
+                <P5Renderer render={render} setup={setup}/>
             </main>
         </div>
         <div className="w-64 text-white">

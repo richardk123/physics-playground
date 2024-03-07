@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import {createTheme, ThemeProvider} from "@mui/material";
 
 const theme = createTheme({
-    spacing: 1,
+    spacing: 2,
     components: {
         MuiButton: {
             defaultProps: {

@@ -8,7 +8,7 @@ interface Props
     setup: (p5: p5Types, canvas: HTMLCanvasElement) => void;
 }
 
-export const Renderer = (props: Props) =>
+export const P5Renderer = (props: Props) =>
 {
     const [parent, setParent] = useState<Element>();
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);

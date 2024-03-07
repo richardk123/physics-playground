@@ -1,15 +1,15 @@
 import {Grid} from "../utils/Grid";
 import {PointsData} from "../data/PointsData";
 import {Vec} from "../utils/Vec";
-import {createGrid} from "../../../xpbd-02/engine/Grid";
-import {EngineSettings} from "../Engine";
+import {createGrid} from "../../../../xpbd-02/engine/Grid";
+import {SolverSettings} from "../Solver";
 
 export class PointCollisionConstraint
 {
     private normal= new Float32Array(2);
     private vecs = new Float32Array(3 * 2);
     
-    public solve(es: EngineSettings,
+    public solve(es: SolverSettings,
                  points: PointsData,
                  indexFrom: number,
                  indexTo: number)
@@ -22,7 +22,7 @@ export class PointCollisionConstraint
         }
     }
 
-    private solveOneIndex(es: EngineSettings,
+    private solveOneIndex(es: SolverSettings,
                           grid: Grid,
                           points: PointsData,
                           index: number)

@@ -6,6 +6,7 @@ interface Props
     value: number;
     setValue: (val: number) => void;
     minVal: number;
+    step?: number;
     maxVal: number;
 }
 export const SliderComponent = (props: Props) =>
@@ -17,11 +18,11 @@ export const SliderComponent = (props: Props) =>
         props.setValue(value);
     }, [value]);
 
-    return <Box component="form">
+    return <Box component="form"sx={{'& > :not(style)': { m: 1, width: '25ch' },}}>
         <Slider
             defaultValue={value}
             valueLabelDisplay="auto"
-            step={(props.maxVal - props.minVal) / 100}
+            step={props.step || (props.maxVal - props.minVal) / 500}
             marks
             min={props.minVal}
             max={props.maxVal}

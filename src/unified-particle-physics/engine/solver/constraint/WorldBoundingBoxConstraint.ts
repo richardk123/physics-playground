@@ -1,5 +1,5 @@
 import {PointsData} from "../data/PointsData";
-import {EngineSettings} from "../Engine";
+import {SolverSettings} from "../Solver";
 
 export class WorldBoundingBoxConstraint
 {
@@ -16,7 +16,7 @@ export class WorldBoundingBoxConstraint
         this.maxY = maxY;
     }
 
-    public solve(engineSettings: EngineSettings,
+    public solve(engineSettings: SolverSettings,
                  points: PointsData,
                  index: number): void
     {

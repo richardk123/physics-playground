@@ -4,11 +4,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 interface Props
 {
     label: string;
+    expanded: boolean;
     children?: React.ReactNode;
 }
 export const AccordionComponent = (props: Props) =>
 {
-    return <Accordion defaultExpanded disableGutters>
+    return <Accordion defaultExpanded={props.expanded} disableGutters>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             {props.label}
         </AccordionSummary>
