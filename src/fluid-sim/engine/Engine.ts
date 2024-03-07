@@ -14,10 +14,14 @@ import {ParticleFormations} from "./entitity/ParticleFormation";
 import {Color} from "./entitity/Color";
 import {calculateDensity, solveFluidConstraint} from "./constraint/FluidConstraint";
 import {CollisionCircleConstraintData, solveCollisionCircleConstraint} from "./constraint/CollisionCircleConstraint";
+import {measureDuration} from "./utils/TimeUtils";
 
 export interface EngineInfo
 {
-    duration: number;
+    simulationDuration: number;
+    preSolveDuration: number;
+    solveDuration: number;
+    postSolveDuration: number;
     pointsCount: number;
     averageDensity: number,
 }
@@ -54,86 +58,95 @@ export class Engines
             count: 0,
         }
 
-        let duration = 0;
+        let simulationDuration = 0;
+        let preSolveDuration = 0;
+        let solveDuration = 0;
+        let postSolveDuration = 0;
+
         let averageDensity = 0;
 
         let grid: Grid;
 
         const preSolve = (dt: number) =>
         {
-
-            // najdi delku strany z prepony
-            grid = createGrid(points.count, (SMOOTHING_RADIUS / Math.sqrt(2)));
-
-            for (let i = 0; i < points.count; i++)
+            return measureDuration(() =>
             {
-                // apply gravity
-                if (!points.isStatic[i])
+                // najdi delku strany z prepony
+                grid = createGrid(points.count, (SMOOTHING_RADIUS / Math.sqrt(2)));
+
+                for (let i = 0; i < points.count; i++)
                 {
-                    const g = GRAVITY * dt;
-                    points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
+                    // apply gravity
+                    if (!points.isStatic[i])
+                    {
+                        const g = GRAVITY * dt;
+                        points.velocity[i * 2 + 1] = points.velocity[i * 2 + 1] + g;
 
-                    // update previous position with current position
-                    Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
+                        // update previous position with current position
+                        Vec.copy(points.positionPrevious, i, points.positionCurrent, i);
 
-                    // update current position with velocity
-                    Vec.add(points.positionCurrent, i, points.velocity, i, dt);
+                        // update current position with velocity
+                        Vec.add(points.positionCurrent, i, points.velocity, i, dt);
+                    }
+
+                    // add point to collision grid
+                    grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
                 }
 
-                // add point to collision grid
-                grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
-            }
+                // clear density
+                points.density.fill(0);
 
-            // clear density
-            points.density.fill(0);
-
-            for (let i = 0; i < points.count; i++)
-            {
-                calculateDensity(grid, points, i);
-            }
-            // averageDensity = 0
-            // for (let i = 0; i < points.count; i++)
-            // {
-            //     averageDensity += points.density[i];
-            // }
-            // averageDensity = averageDensity / points.count;
+                for (let i = 0; i < points.count; i++)
+                {
+                    calculateDensity(grid, points, i);
+                }
+            });
         }
 
         const solve = (dt: number) =>
         {
-            for (let i = 0; i < points.count; i++)
+            return measureDuration(() =>
             {
-                solveFloor(points, i);
-                solveFluidConstraint(grid, points, i, dt);
-                solveCollisionCircleConstraint(points, i, collisionCirclesData)
-                // solvePointCollision(grid, points, i);
-            }
+                for (let i = 0; i < points.count; i++)
+                {
+                    solveFloor(points, i);
+                    solveFluidConstraint(grid, points, i, dt);
+                    solveCollisionCircleConstraint(points, i, collisionCirclesData)
+                    // solvePointCollision(grid, points, i);
+                }
+            })
         }
 
         const postSolve = (dt: number) =>
         {
-            const inverseDt = (1 / dt);
-
-            for (let i = 0; i < points.count; i++)
+            return measureDuration(() =>
             {
-                // update velocity
-                Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
-            }
+                const inverseDt = (1 / dt);
+
+                for (let i = 0; i < points.count; i++)
+                {
+                    // update velocity
+                    Vec.setDiff(points.velocity, i, points.positionCurrent, i, points.positionPrevious, i, inverseDt);
+                }
+            });
         }
 
         const simulate = (dt: number) =>
         {
-            const t = performance.now();
+            preSolveDuration = 0;
+            solveDuration = 0;
+            postSolveDuration = 0;
 
-            const ddt = dt / SUB_STEPS;
-            for (let i = 0; i < SUB_STEPS; i++)
+            simulationDuration = measureDuration(() =>
             {
-                preSolve(ddt);
-                solve(ddt);
-                postSolve(ddt);
-            }
-
-            duration = performance.now() - t;
+                const ddt = dt / SUB_STEPS;
+                for (let i = 0; i < SUB_STEPS; i++)
+                {
+                    preSolveDuration += preSolve(ddt);
+                    solveDuration += solve(ddt);
+                    postSolveDuration += postSolve(ddt);
+                }
+            });
         }
 
         const addPoint = (x: number, y: number, mass: number, color: Color) =>
@@ -162,7 +175,10 @@ export class Engines
         const getEngineInfo = (): EngineInfo =>
         {
             return {
-                duration: duration,
+                simulationDuration: simulationDuration,
+                postSolveDuration: postSolveDuration,
+                solveDuration: solveDuration,
+                preSolveDuration: postSolveDuration,
                 pointsCount: points.count,
                 averageDensity: averageDensity,
             };

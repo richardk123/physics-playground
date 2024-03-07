@@ -8,6 +8,7 @@ import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
 import {VerletGpu} from "./verlet-gpu/VerletGpu";
 import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
+import {UnifiedParticlePhysics} from "./unified-particle-physics/UnifiedParticlePhysics";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route path="/xpdb2" element={<VisualizationXPDB2 />} />
             <Route path="/verlet-gpu" element={<VerletGpu />} />
             <Route path="/fluid-sim" element={<VisualizationFluidSim />} />
+            <Route path="/unified-particle-physics" element={<UnifiedParticlePhysics />} />
           </Route>
         </Routes>
       </HashRouter>
