@@ -1,5 +1,6 @@
 import {Solver, SolverSettings} from "./solver/Solver";
 import {BoundingBox} from "./data/BoundingBox";
+import {Colors} from "./data/Color";
 
 
 export class Engine
@@ -25,9 +26,25 @@ export class Engine
         this.solver = Solver.create(solverSettings);
     }
 
-    public simulate()
+    public createRectangle(bottomLeftX: number, bottomLeftY: number, width: number, height: number, mass = 1, color = Colors.blue())
     {
-        this.solver.simulate();
+        const pointIndexes: number[] = [];
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
+                pointIndexes.push(this.solver.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color))
+            }
+        }
+        const indexFrom = pointIndexes[0];
+        const indexTo = pointIndexes[pointIndexes.length - 1];
+
+        this.solver.addFluidConstraint(indexFrom, indexTo, {smoothingRadius: 1.2, pressureMultiplier: 50, targetDensity: 1.4})
+    }
+
+    public async simulate()
+    {
+        return this.solver.simulate();
     }
 
     public getWorldBoundingBox = (): BoundingBox =>

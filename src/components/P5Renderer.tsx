@@ -20,7 +20,6 @@ export const P5Renderer = (props: Props) =>
         const c = canvasParentRef.querySelector('canvas');
         setCanvas(c);
         props.setup(p5, c!);
-
         c!.oncontextmenu = e =>
         {
             e.preventDefault();

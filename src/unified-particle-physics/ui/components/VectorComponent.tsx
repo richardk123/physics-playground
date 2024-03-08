@@ -10,7 +10,7 @@ export const VectorComponent = (props: {vector: Vec2d, change: (vector: Vec2d) =
     useEffect(() =>
     {
         props.change({x: x, y: y});
-    }, [x, y])
+    }, [x, y, props])
 
     return <Box component="form" sx={{'& > :not(style)': { m: 1, width: '12ch' },}}>
         <TextField label="X:" variant="standard" type="number" defaultValue={x}

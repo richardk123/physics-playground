@@ -22,6 +22,11 @@ export class Colors
         return {r: 255, g: 192,b: 203}
     }
 
+    static red = (): Color =>
+    {
+        return {r: 255, g: 0, b: 0}
+    }
+
     static darkYellow = (): Color =>
     {
         return {r: 139, g: 128, b: 0};

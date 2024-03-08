@@ -1,4 +1,4 @@
-import {Accordion, AccordionDetails, AccordionSummary, Box, TextField} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface Props

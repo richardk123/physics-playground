@@ -5,15 +5,32 @@ import {Renderer} from "../renderer/Renderer";
 import {SettingsSidebar} from "./SettingsSidebar";
 import {BoundingBoxes} from "../engine/data/BoundingBox";
 import {Engine} from "../engine/Engine";
+import {Colors} from "../../fluid-sim/engine/entitity/Color";
 
 export const UnifiedParticlePhysics = () =>
 {
     const engine = Engine.create();
-    engine.setWorldBoundingBox(BoundingBoxes.create(0, 10, 100, 80));
+    engine.setWorldBoundingBox(BoundingBoxes.create(10, 10, 60, 80));
 
     const renderer = Renderer.create(engine);
     renderer.setLookAt(50, 50);
     renderer.setSimulationWidth(100);
+
+    engine.createRectangle(
+        20,
+        20,
+        25,
+        25,
+        1,
+        Colors.blue());
+
+    engine.createRectangle(
+        40,
+        20,
+        25,
+        25,
+        1,
+        Colors.red());
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
