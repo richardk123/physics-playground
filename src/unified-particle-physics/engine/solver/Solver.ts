@@ -1,15 +1,16 @@
 import {PointsData} from "./data/PointsData";
 import {Vec2d} from "../data/Vec2d";
 import {WorldBoundingBoxConstraint} from "./constraint/WorldBoundingBoxConstraint";
-import {Vec} from "../../../fluid-sim/engine/utils/Vec";
 import {measureDuration} from "./utils/TimeUtils";
 import {
     createFluidGrid,
     FluidConstraintData, FluidSettings,
-    setCalculatedPointDensity,
-    solveFluidConstraint
+    setCalculatedPointDensity, solveFluidConstraint,
 } from "./constraint/FluidConstraint";
 import {Color} from "../data/Color";
+import {FluidConstraintParallelEvaluator} from "./paraller/FluidConstraintParallelEvaluator";
+import {Vec} from "./utils/Vec";
+import {FluidDensityParallelEvaluator} from "./paraller/FluidDensityParallelEvaluator";
 
 export interface SolverSettings
 {
@@ -29,6 +30,8 @@ export class Solver
     public fluidConstraints: FluidConstraintData[];
     public worldBoundingBox = new WorldBoundingBoxConstraint(-Infinity, -Infinity, Infinity, Infinity);
     public simulationDuration = 0;
+    private fluidDensityParallelEvaluator = new FluidDensityParallelEvaluator();
+    private fluidConstraintParallelEvaluator= new FluidConstraintParallelEvaluator();
 
     static create(settings: SolverSettings): Solver
     {
@@ -38,19 +41,7 @@ export class Solver
     private constructor(settings: SolverSettings)
     {
         this.settings = settings;
-
-        this.points = {
-            positionCurrent: new Float32Array(this.settings.maxParticleCount * 2).fill(0),
-            positionPrevious: new Float32Array(this.settings.maxParticleCount * 2).fill(0),
-            velocity: new Float32Array(this.settings.maxParticleCount * 2).fill(0),
-            massInverse: new Float32Array(this.settings.maxParticleCount).fill(0),
-            density: new Float32Array(this.settings.maxParticleCount).fill(0),
-            isNotStatic: new Int32Array(this.settings.maxParticleCount).fill(1),
-            isNotFluid: new Int32Array(this.settings.maxParticleCount).fill(1),
-            color: new Float32Array(this.settings.maxParticleCount * 3).fill(0),
-            count: 0,
-        }
-
+        this.points = PointsData.create(this.settings.maxParticleCount);
         this.fluidConstraints = [];
     }
 
@@ -76,13 +67,16 @@ export class Solver
         }
     }
 
-    private solve(dt: number)
+    private async solve(dt: number)
     {
         this.worldBoundingBox.solve(this.settings, this.points);
 
         const fluidGrid = createFluidGrid(this.fluidConstraints, this.points);
-        setCalculatedPointDensity(this.fluidConstraints, fluidGrid, this.points);
-        solveFluidConstraint(this.fluidConstraints, fluidGrid, this.points, dt);
+        await this.fluidDensityParallelEvaluator.process(this.fluidConstraints, fluidGrid, this.points);
+        // setCalculatedPointDensity(this.fluidConstraints, fluidGrid, this.points);
+        // solveFluidConstraint(this.fluidConstraints, fluidGrid, this.points, dt);
+        console.log("Solve fluid constraint complete")
+        // await this.fluidConstraintParallelEvaluator.process(this.fluidConstraints, fluidGrid, this.points, dt);
     }
 
     private postSolve(dt: number)
@@ -97,16 +91,15 @@ export class Solver
 
     public async simulate()
     {
-        this.simulationDuration = measureDuration(() =>
+        const ddt = this.settings.deltaTime / this.settings.subStepCount;
+        const t = performance.now();
+        for (let i = 0; i < this.settings.subStepCount; i++)
         {
-            const ddt = this.settings.deltaTime / this.settings.subStepCount;
-            for (let i = 0; i < this.settings.subStepCount; i++)
-            {
-                this.preSolve(ddt);
-                this.solve(ddt);
-                this.postSolve(ddt);
-            }
-        });
+            this.preSolve(ddt);
+            await this.solve(ddt);
+            this.postSolve(ddt);
+        }
+        this.simulationDuration = performance.now() - t;
     }
 
     public addPoint(x: number, y: number, mass: number, color: Color)

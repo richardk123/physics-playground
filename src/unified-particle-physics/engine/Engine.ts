@@ -39,12 +39,21 @@ export class Engine
         const indexFrom = pointIndexes[0];
         const indexTo = pointIndexes[pointIndexes.length - 1];
 
-        this.solver.addFluidConstraint(indexFrom, indexTo, {smoothingRadius: 1.2, pressureMultiplier: 50, targetDensity: 1.4})
+        this.solver.addFluidConstraint(indexFrom, indexTo + 1, {smoothingRadius: 1.2, pressureMultiplier: 50, targetDensity: 1.4})
     }
 
-    public async simulate()
+    private async simulateForever(): Promise<void>
     {
-        return this.solver.simulate();
+        await this.solver.simulate(); // Your async operation here
+        await new Promise(resolve => setTimeout(resolve, 5));
+        return this.simulateForever();
+    }
+
+    public simulate()
+    {
+        this.simulateForever().catch(error => {
+            console.error("An error occurred:", error);
+        });
     }
 
     public getWorldBoundingBox = (): BoundingBox =>

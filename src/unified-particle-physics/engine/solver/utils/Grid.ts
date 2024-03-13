@@ -3,59 +3,112 @@ export interface Grid
     add: (x: number, y: number, index: number) => void;
     getInCell: (x: number, y: number) => number[];
     getInSurroundingCells: (x: number, y: number) => number[];
+    getData: () => GridData;
 }
 
-export const createGrid = (width: number, spacing: number) =>
+export interface GridData
 {
-    const data: Map<number, number[]> = new Map();
+    spacing: number;
+    width: number;
+    data: Map<number, number[]>;
+}
 
-    const getKey = (x: number, y: number) =>
+export class Grids implements Grid
+{
+    private spacing: number;
+    private width: number;
+    public data: Map<number, number[]>;
+
+    private constructor(width: number, spacing: number, data: Map<number, number[]>)
     {
-        const xi = Math.floor(x / spacing);
-        const yi = Math.floor(y / spacing);
-        return xi * width + yi;
+        this.width = width;
+        this.spacing = spacing;
+        this.data = data;
     }
 
-    const add = (x: number, y: number, index: number) =>
+    public static create(width: number, spacing: number): Grid
     {
-        const key = getKey(x, y);
+        return new Grids(width, spacing,  new Map());
+    }
 
-        if (!data.has(key)) {
-            data.set(key, []);
+    public static createFromMap(width: number, spacing: number, data: Map<number, number[]>): Grid
+    {
+        return new Grids(width, spacing, data);
+    }
+
+    private getKey(x: number, y: number)
+    {
+        const xi = Math.floor(x / this.spacing);
+        const yi = Math.floor(y / this.spacing);
+        return xi * this.width + yi;
+    }
+
+    public add(x: number, y: number, index: number)
+    {
+        const key = this.getKey(x, y);
+
+        if (!this.data.has(key)) {
+            this.data.set(key, []);
         }
-        data.get(key)!.push(index);
+        this.data.get(key)!.push(index);
     }
 
-    const getInCell = (x: number, y: number): number[] =>
+    public getInCell(x: number, y: number): number[]
     {
-        const key = getKey(x, y);
-        return data.get(key) || [];
+        const key = this.getKey(x, y);
+        return this.data.get(key) || [];
     }
 
-    const getInSurroundingCells = (x: number, y: number): number[] =>
+    public getInSurroundingCells(x: number, y: number): number[]
     {
         const result = [];
-        const s = spacing;
+        const s = this.spacing;
 
-        result.push(...getInCell(x - s, y - s));
-        result.push(...getInCell(x - 0, y - s));
-        result.push(...getInCell(x + s, y - s));
+        result.push(...this.getInCell(x - s, y - s));
+        result.push(...this.getInCell(x - 0, y - s));
+        result.push(...this.getInCell(x + s, y - s));
 
-        result.push(...getInCell(x - s, y - 0));
-        result.push(...getInCell(x - 0, y - 0));
-        result.push(...getInCell(x + s, y - 0));
+        result.push(...this.getInCell(x - s, y - 0));
+        result.push(...this.getInCell(x - 0, y - 0));
+        result.push(...this.getInCell(x + s, y - 0));
 
-        result.push(...getInCell(x - s, y + s));
-        result.push(...getInCell(x - 0, y + s));
-        result.push(...getInCell(x + s, y + s));
+        result.push(...this.getInCell(x - s, y + s));
+        result.push(...this.getInCell(x - 0, y + s));
+        result.push(...this.getInCell(x + s, y + s));
 
         return result;
     }
 
-
-    return {
-        add: add,
-        getInCell: getInCell,
-        getInSurroundingCells: getInSurroundingCells
-    } as Grid;
+    public getData(): GridData
+    {
+        return {width: this.width, spacing: this.spacing, data: this.data};
+    }
 }
+//
+// export class ColumnsGrid
+// {
+//     private spacing: number;
+//     private width: number;
+//     public data: Map<number, number[]>;
+//
+//     private constructor(spacing: number, data: Map<number, number[]>)
+//     {
+//         this.spacing = spacing;
+//         this.data = data;
+//     }
+//
+//     private getKey(x: number)
+//     {
+//         return Math.floor(x / this.spacing);
+//     }
+//
+//     public add(x: number, y: number, index: number)
+//     {
+//         const key = this.getKey(x, y);
+//
+//         if (!this.data.has(key)) {
+//             this.data.set(key, []);
+//         }
+//         this.data.get(key)!.push(index);
+//     }
+// }

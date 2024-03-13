@@ -1,7 +1,6 @@
-import {Grid} from "../utils/Grid";
+import {Grid, Grids} from "../utils/Grid";
 import {PointsData} from "../data/PointsData";
 import {Vec} from "../utils/Vec";
-import {createGrid} from "../../../../xpbd-02/engine/Grid";
 import {SolverSettings} from "../Solver";
 
 export class PointCollisionConstraint
@@ -14,7 +13,7 @@ export class PointCollisionConstraint
                  indexFrom: number,
                  indexTo: number)
     {
-        const grid = createGrid(points.count, es.pointDiameter);
+        const grid = Grids.create(points.count, es.pointDiameter);
 
         for (let i = indexFrom; i < indexTo; i++)
         {

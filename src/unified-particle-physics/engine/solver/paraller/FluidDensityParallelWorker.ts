@@ -1,6 +1,6 @@
 import {PointsData, PointsDataShared} from "../data/PointsData";
 import {GridData, Grids} from "../utils/Grid";
-import {FluidSettings, solveFluidOnePoint} from "../constraint/FluidConstraint";
+import {FluidSettings, setCalculatedPointDensityForOnePoint, solveFluidOnePoint} from "../constraint/FluidConstraint";
 import {Range} from "../utils/Utils";
 
 export interface WorkerRequest
@@ -8,7 +8,6 @@ export interface WorkerRequest
     points: PointsDataShared;
     gridData: GridData;
     indexesToProcess: Range<FluidSettings>[];
-    dt: number
 }
 
 // eslint-disable-next-line no-restricted-globals
@@ -27,9 +26,8 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) =>
 
             for (let i = indexFrom; i < indexTo; i++)
             {
-                solveFluidOnePoint(grid, pointsData, itp.value, i, request.dt);
+                setCalculatedPointDensityForOnePoint(grid, itp.value, pointsData, i);
             }
-            console.log(pointsData.positionCurrent[1]);
         })
     }
     catch (e)
@@ -38,7 +36,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) =>
     }
 
     // eslint-disable-next-line no-restricted-globals
-    self.postMessage(0);
+    self.postMessage("fluid density parallel worker success");
 };
 
 export {};

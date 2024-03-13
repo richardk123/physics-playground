@@ -1,8 +1,6 @@
 import {Vec} from "../utils/Vec";
 import {PointsData} from "../data/PointsData";
-import {createGrid} from "../../../../xpbd-02/engine/Grid";
-import {Grid} from "../utils/Grid";
-import {SolverSettings} from "../Solver";
+import {Grid, Grids} from "../utils/Grid";
 
 const positionChange = new Float32Array(2);
 const vecs = new Float32Array(2);
@@ -24,21 +22,14 @@ export interface FluidSettings
 export const createFluidGrid = (data: FluidConstraintData[],
                                 points: PointsData): Grid =>
 {
-    const fluidPointCount = data
-        .map(d => d.indexTo - d.indexFrom)
-        .reduce((a, b) => a + b);
-
     const maxSmoothingRadius = Math.max(...data.map(d => d.settings.smoothingRadius));
 
-    const grid = createGrid(fluidPointCount, (maxSmoothingRadius / Math.sqrt(2)));
+    const grid = Grids.create(points.count, (maxSmoothingRadius / Math.sqrt(2)));
 
-    data.forEach(d =>
+    for (let i = 0; i < points.count; i++)
     {
-        for (let i = d.indexFrom; i < d.indexTo; i++)
-        {
-            grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
-        }
-    });
+        grid.add(points.positionCurrent[i * 2], points.positionCurrent[i * 2 + 1], i);
+    }
 
     return grid;
 }
@@ -47,7 +38,6 @@ export const createFluidGrid = (data: FluidConstraintData[],
                                            grid: Grid,
                                            points: PointsData) =>
 {
-
     // clear density TODO: optimalize
     points.density.fill(0);
 
@@ -55,32 +45,40 @@ export const createFluidGrid = (data: FluidConstraintData[],
     {
         for (let index = d.indexFrom; index < d.indexTo; index++)
         {
-            const smoothingKernel = (radius: number, distance: number) =>
-            {
-                if (distance >= radius) return 0;
-                const volume = (Math.PI * Math.pow(radius, 4)) / 6;
-                return (radius - distance) * (radius - distance) / volume;
-            }
-
-            const surrounding = grid.getInSurroundingCells(
-                points.positionCurrent[index * 2],
-                points.positionCurrent[index * 2 + 1]);
-
-            surrounding.forEach(index2 =>
-            {
-                const distance = Math.sqrt(Vec.distSquared(points.positionCurrent, index, points.positionCurrent, index2));
-                const influence = smoothingKernel(d.settings.smoothingRadius, distance);
-                points.density[index] += influence * (1 / points.massInverse[index]);
-            });
+            setCalculatedPointDensityForOnePoint(grid, d.settings, points, index);
         }
     })
 }
 
-const solveOnePoint = (grid: Grid,
-                       points: PointsData,
-                       settings: FluidSettings,
-                       index: number,
-                       dt: number) =>
+export const setCalculatedPointDensityForOnePoint = (grid: Grid,
+                                                     fluidSettings: FluidSettings,
+                                                     points: PointsData,
+                                                     index: number) =>
+{
+    const smoothingKernel = (radius: number, distance: number) =>
+    {
+        if (distance >= radius) return 0;
+        const volume = (Math.PI * Math.pow(radius, 4)) / 6;
+        return (radius - distance) * (radius - distance) / volume;
+    }
+
+    const surrounding = grid.getInSurroundingCells(
+        points.positionCurrent[index * 2],
+        points.positionCurrent[index * 2 + 1]);
+
+    surrounding.forEach(index2 =>
+    {
+        const distance = Math.sqrt(Vec.distSquared(points.positionCurrent, index, points.positionCurrent, index2));
+        const influence = smoothingKernel(fluidSettings.smoothingRadius, distance);
+        points.density[index] += influence * (1 / points.massInverse[index]);
+    });
+}
+
+export const solveFluidOnePoint = (grid: Grid,
+                                   points: PointsData,
+                                   settings: FluidSettings,
+                                   index: number,
+                                   dt: number) =>
 {
     const smoothingKernelDerivative = (distance: number,
                                        radius: number) =>
@@ -154,7 +152,7 @@ export const solveFluidConstraint = (data: FluidConstraintData[],
     {
         for (let i = d.indexFrom; i < d.indexTo; i++)
         {
-            solveOnePoint(grid, points, d.settings, i, dt);
+            solveFluidOnePoint(grid, points, d.settings, i, dt);
         }
     });
 }

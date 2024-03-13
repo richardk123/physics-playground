@@ -32,6 +32,16 @@ export const UnifiedParticlePhysics = () =>
         1,
         Colors.red());
 
+    // engine.createRectangle(
+    //     20,
+    //     20,
+    //     1,
+    //     2,
+    //     1,
+    //     Colors.blue());
+
+    engine.simulate();
+
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
         renderer.render(p5);
@@ -39,7 +49,6 @@ export const UnifiedParticlePhysics = () =>
 
     const render = (p5: p5Types) =>
     {
-        engine.simulate();
         renderer.render(p5);
     }
 
