@@ -1,6 +1,6 @@
 import {Vec} from "../utils/Vec";
 import {PointsData} from "../data/PointsData";
-import {Grid, Grids} from "../utils/Grid";
+import {Columns, Grid, Grids} from "../utils/Grid";
 
 const positionChange = new Float32Array(2);
 const vecs = new Float32Array(2);

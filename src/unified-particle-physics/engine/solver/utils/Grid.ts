@@ -84,31 +84,51 @@ export class Grids implements Grid
         return {width: this.width, spacing: this.spacing, data: this.data};
     }
 }
-//
-// export class ColumnsGrid
-// {
-//     private spacing: number;
-//     private width: number;
-//     public data: Map<number, number[]>;
-//
-//     private constructor(spacing: number, data: Map<number, number[]>)
-//     {
-//         this.spacing = spacing;
-//         this.data = data;
-//     }
-//
-//     private getKey(x: number)
-//     {
-//         return Math.floor(x / this.spacing);
-//     }
-//
-//     public add(x: number, y: number, index: number)
-//     {
-//         const key = this.getKey(x, y);
-//
-//         if (!this.data.has(key)) {
-//             this.data.set(key, []);
-//         }
-//         this.data.get(key)!.push(index);
-//     }
-// }
+
+export interface ColumnsData
+{
+    spacing: number;
+    data: Map<number, number[]>;
+}
+
+export class Columns
+{
+    private spacing: number;
+    public data: Map<number, number[]>;
+
+    private constructor(spacing: number, data: Map<number, number[]>)
+    {
+        this.spacing = spacing;
+        this.data = data;
+    }
+
+    public static create(spacing: number): Columns
+    {
+        return new Columns(spacing, new Map());
+    }
+
+    public static createFromMap(spacing: number, data: Map<number, number[]>)
+    {
+        return new Columns(spacing, data);
+    }
+
+    private getKey(x: number)
+    {
+        return Math.floor(x / this.spacing);
+    }
+
+    public add(x: number, index: number)
+    {
+        const key = this.getKey(x);
+
+        if (!this.data.has(key)) {
+            this.data.set(key, []);
+        }
+        this.data.get(key)!.push(index);
+    }
+
+    public getData(): ColumnsData
+    {
+        return {spacing: this.spacing, data: this.data};
+    }
+}

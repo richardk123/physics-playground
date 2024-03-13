@@ -45,7 +45,7 @@ export class Engine
     private async simulateForever(): Promise<void>
     {
         await this.solver.simulate(); // Your async operation here
-        await new Promise(resolve => setTimeout(resolve, 5));
+        await new Promise(resolve => setTimeout(resolve, 1));
         return this.simulateForever();
     }
 

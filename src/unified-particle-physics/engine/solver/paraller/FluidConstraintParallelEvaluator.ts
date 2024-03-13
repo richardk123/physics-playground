@@ -1,19 +1,21 @@
-import {Grid} from "../utils/Grid";
+import {Columns, Grid} from "../utils/Grid";
 import {PointsData} from "../data/PointsData";
 import {FluidConstraintData, FluidSettings} from "../constraint/FluidConstraint";
 import {WorkerRequest} from "./FluidConstraintParallelWorker";
-import {Range} from "../utils/Utils";
+import {aggregateRangesToBatches, Range} from "../utils/Utils";
 import {firstValueFrom, forkJoin, fromEvent, Observable, take} from "rxjs";
 
 export class FluidConstraintParallelEvaluator
 {
     private _workers: Worker[];
+    private _numberOfCores: number;
 
     constructor()
     {
         this._workers = [];
-        const numberOfCores = 1;
-        for (let i = 0; i < numberOfCores; i++)
+        this._numberOfCores = navigator.hardwareConcurrency - 1
+
+        for (let i = 0; i < this._numberOfCores; i++)
         {
             const worker = new Worker(new URL("./FluidConstraintParallelWorker.ts", import.meta.url));
             this._workers.push(worker);
@@ -21,23 +23,27 @@ export class FluidConstraintParallelEvaluator
     }
 
     public async process(data: FluidConstraintData[],
-                         grid: Grid,
                          points: PointsData,
                          dt: number)
     {
-        Array.from(Array(10).keys())
 
-        const workersResult = data.map((d, i) =>
-        {
-            const indexesToProcess: Range<FluidSettings>[] = [{indexFrom: d.indexFrom, indexTo: d.indexTo, value: d.settings}];
-            const message: WorkerRequest = {points: points, gridData: grid.getData(), indexesToProcess: indexesToProcess, dt: dt}
-            const worker = this._workers[i];
+        const ranges: Range<FluidSettings>[] = data
+            .map(d =>
+            {
+                return {indexFrom: d.indexFrom, indexTo: d.indexTo, value: d.settings};
+            });
 
-            const message$ = fromEvent<MessageEvent<void>>(worker, 'message').pipe(take(1));
-            worker.postMessage(message);
-            return message$;
-        });
+        const workersResult$ = aggregateRangesToBatches(ranges, this._numberOfCores)
+            .map((r, i) =>
+            {
+                const message: WorkerRequest = {points: points, fluidConstraintData: data, indexesToProcess: r, dt: dt};
+                const worker = this._workers[i];
 
-        await firstValueFrom(forkJoin(workersResult));
+                const message$ = fromEvent<MessageEvent<void>>(worker, 'message').pipe(take(1));
+                worker.postMessage(message);
+                return message$;
+            });
+
+        await firstValueFrom(forkJoin(workersResult$));
     }
 }

@@ -1,5 +1,4 @@
 import {FluidConstraintData, FluidSettings} from "../constraint/FluidConstraint";
-import {Grid} from "../utils/Grid";
 import {PointsData} from "../data/PointsData";
 import {aggregateRangesToBatches, Range} from "../utils/Utils";
 import {firstValueFrom, forkJoin, fromEvent, take, tap} from "rxjs";
@@ -22,7 +21,6 @@ export class FluidDensityParallelEvaluator
     }
 
     public async process(data: FluidConstraintData[],
-                         grid: Grid,
                          points: PointsData)
     {
         // clear density
@@ -37,12 +35,11 @@ export class FluidDensityParallelEvaluator
         const workersResult$ = aggregateRangesToBatches(ranges, this._numberOfCores)
             .map((r, i) =>
             {
-                const message: WorkerRequest = {points: points, gridData: grid.getData(), indexesToProcess: r};
+                const message: WorkerRequest = {points: points, fluidConstraintData: data, indexesToProcess: r};
                 const worker = this._workers[i];
 
                 const message$ = fromEvent<MessageEvent<void>>(worker, 'message')
-                    .pipe(take(1))
-                    .pipe(tap(v => console.log(v.data)));
+                    .pipe(take(1));
                 worker.postMessage(message);
                 return message$;
             });

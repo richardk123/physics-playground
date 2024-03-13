@@ -71,12 +71,12 @@ export class Solver
     {
         this.worldBoundingBox.solve(this.settings, this.points);
 
-        const fluidGrid = createFluidGrid(this.fluidConstraints, this.points);
-        await this.fluidDensityParallelEvaluator.process(this.fluidConstraints, fluidGrid, this.points);
+        await this.fluidDensityParallelEvaluator.process(this.fluidConstraints, this.points);
+        await this.fluidConstraintParallelEvaluator.process(this.fluidConstraints, this.points, dt);
+
+        // const fluidGrid = createFluidGrid(this.fluidConstraints, this.points);
         // setCalculatedPointDensity(this.fluidConstraints, fluidGrid, this.points);
         // solveFluidConstraint(this.fluidConstraints, fluidGrid, this.points, dt);
-        console.log("Solve fluid constraint complete")
-        // await this.fluidConstraintParallelEvaluator.process(this.fluidConstraints, fluidGrid, this.points, dt);
     }
 
     private postSolve(dt: number)
@@ -118,5 +118,9 @@ export class Solver
     public addFluidConstraint(indexFrom: number, indexTo: number, settings: FluidSettings)
     {
         this.fluidConstraints.push({indexFrom: indexFrom, indexTo: indexTo, settings: settings});
+        for (let i = indexFrom; i < indexTo; i++)
+        {
+            this.points.isNotFluid[i] = 0;
+        }
     }
 }

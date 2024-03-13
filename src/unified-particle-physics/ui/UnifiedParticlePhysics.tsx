@@ -10,35 +10,27 @@ import {Colors} from "../../fluid-sim/engine/entitity/Color";
 export const UnifiedParticlePhysics = () =>
 {
     const engine = Engine.create();
-    engine.setWorldBoundingBox(BoundingBoxes.create(10, 10, 60, 80));
+    engine.setWorldBoundingBox(BoundingBoxes.create(0, 0, 100, 100));
 
     const renderer = Renderer.create(engine);
     renderer.setLookAt(50, 50);
     renderer.setSimulationWidth(100);
 
     engine.createRectangle(
-        20,
-        20,
+        10,
+        10,
         25,
-        25,
+        60,
         1,
         Colors.blue());
 
     engine.createRectangle(
         40,
-        20,
+        10,
         25,
-        25,
+        60,
         1,
         Colors.red());
-
-    // engine.createRectangle(
-    //     20,
-    //     20,
-    //     1,
-    //     2,
-    //     1,
-    //     Colors.blue());
 
     engine.simulate();
 

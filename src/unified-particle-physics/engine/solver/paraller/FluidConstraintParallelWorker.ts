@@ -1,12 +1,12 @@
 import {PointsData, PointsDataShared} from "../data/PointsData";
 import {GridData, Grids} from "../utils/Grid";
-import {FluidSettings, solveFluidOnePoint} from "../constraint/FluidConstraint";
+import {createFluidGrid, FluidConstraintData, FluidSettings, solveFluidOnePoint} from "../constraint/FluidConstraint";
 import {Range} from "../utils/Utils";
 
 export interface WorkerRequest
 {
     points: PointsDataShared;
-    gridData: GridData;
+    fluidConstraintData: FluidConstraintData[];
     indexesToProcess: Range<FluidSettings>[];
     dt: number
 }
@@ -18,7 +18,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) =>
     {
         const request = e.data;
         const pointsData = PointsData.createFromSharedBuffers(request.points);
-        const grid = Grids.createFromMap(request.gridData.width, request.gridData.spacing, request.gridData.data);
+        const grid = createFluidGrid(request.fluidConstraintData, pointsData);
 
         request.indexesToProcess.forEach(itp =>
         {
@@ -29,7 +29,6 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) =>
             {
                 solveFluidOnePoint(grid, pointsData, itp.value, i, request.dt);
             }
-            console.log(pointsData.positionCurrent[1]);
         })
     }
     catch (e)
