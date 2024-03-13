@@ -1,15 +1,19 @@
 {
   "files": {
     "main.css": "/physics-playground/static/css/main.6c19edf4.css",
-    "main.js": "/physics-playground/static/js/main.2342cbeb.js",
+    "main.js": "/physics-playground/static/js/main.01483c97.js",
+    "static/js/293.17e52d86.chunk.js": "/physics-playground/static/js/293.17e52d86.chunk.js",
+    "static/js/431.1cf233c5.chunk.js": "/physics-playground/static/js/431.1cf233c5.chunk.js",
     "static/js/787.786c7edf.chunk.js": "/physics-playground/static/js/787.786c7edf.chunk.js",
     "index.html": "/physics-playground/index.html",
     "main.6c19edf4.css.map": "/physics-playground/static/css/main.6c19edf4.css.map",
-    "main.2342cbeb.js.map": "/physics-playground/static/js/main.2342cbeb.js.map",
+    "main.01483c97.js.map": "/physics-playground/static/js/main.01483c97.js.map",
+    "293.17e52d86.chunk.js.map": "/physics-playground/static/js/293.17e52d86.chunk.js.map",
+    "431.1cf233c5.chunk.js.map": "/physics-playground/static/js/431.1cf233c5.chunk.js.map",
     "787.786c7edf.chunk.js.map": "/physics-playground/static/js/787.786c7edf.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6c19edf4.css",
-    "static/js/main.2342cbeb.js"
+    "static/js/main.01483c97.js"
   ]
 }
