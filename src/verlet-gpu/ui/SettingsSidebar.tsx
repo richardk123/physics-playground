@@ -84,19 +84,21 @@ export const SettingsSidebar = (props: Props) =>
             </BoxTitle>
         </AccordionComponent>
         <AccordionComponent expanded={true} label="Camera">
-            <BoxTitle label="Scale">
-                <VectorComponent vector={{x: camera.getScale().x, y: camera.getScale().y}}
-                                 change={(v) => camera.setScale(v)}/>
+            <BoxTitle label="Zoom">
+                <SliderComponent value={camera.zoom}
+                                 setValue={val => camera.zoom = val}
+                                 minVal={0.1}
+                                 maxVal={100} />
             </BoxTitle>
             <BoxTitle label="Translation">
-                <VectorComponent vector={{x: camera.getTranslation().x, y: camera.getTranslation().y}}
-                                 change={(v) => camera.setTranslation(v)}/>
+                <VectorComponent vector={{x: camera.translation.x, y: camera.translation.y}}
+                                 change={(v) => camera.translation = v}/>
             </BoxTitle>
             <BoxTitle label="Rotation">
-                <SliderComponent value={camera.getRotation()}
-                                 setValue={val => camera.setRotation(val)}
-                                 minVal={-Math.PI}
-                                 maxVal={Math.PI} />
+                <SliderComponent value={camera.rotation}
+                                 setValue={val => camera.rotation = val}
+                                 minVal={-Math.PI * 2}
+                                 maxVal={Math.PI * 2} />
             </BoxTitle>
         </AccordionComponent>
     </Card>

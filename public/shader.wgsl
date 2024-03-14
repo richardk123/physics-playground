@@ -1,32 +1,31 @@
-struct Fragment {
-    @builtin(position) Position : vec4<f32>,
-    @location(0) Color : vec4<f32>
+struct TransformData {
+    model: mat4x4<f32>,
+    view: mat4x4<f32>,
+    projection: mat4x4<f32>,
 };
 
-@vertex
-fn vs_main(@builtin(vertex_index) v_id: u32) -> Fragment {
-
-    //pre-bake positions and colors, for now.
-    var positions = array<vec2<f32>, 3> (
-        vec2<f32>( 0.0,  0.5),
-        vec2<f32>(-0.5, -0.5),
-        vec2<f32>( 0.5, -0.5)
+@group(0) @binding(0) var<uniform> transformUBO: TransformData;
+@vertex fn vs(
+@builtin(vertex_index) vertexIndex : u32) -> @builtin(position) vec4f
+{
+    let pos = array(
+      vec2f( 0.0,  0.5),  // top center
+      vec2f(-0.5, -0.5),  // bottom left
+      vec2f( 0.5, -0.5)   // bottom right
     );
 
-    var colors = array<vec3<f32>, 3> (
-        vec3<f32>(1.0, 0.0, 0.0),
-        vec3<f32>(0.0, 1.0, 0.0),
-        vec3<f32>(0.0, 0.0, 1.0)
+    // Perform matrix-vector multiplication manually
+    let transformedPos = transformUBO.projection * transformUBO.view * transformUBO.model * vec4<f32>(
+        0.1,
+        pos[vertexIndex].x,
+        pos[vertexIndex].y,
+        1.0
     );
 
-    var output : Fragment;
-    output.Position = vec4<f32>(positions[v_id], 0.0, 1.0);
-    output.Color = vec4<f32>(colors[v_id], 1.0);
-
-    return output;
+    return transformedPos;
 }
 
-@fragment
-fn fs_main(@location(0) Color: vec4<f32>) -> @location(0) vec4<f32> {
-    return Color;
+@fragment fn fs() -> @location(0) vec4f
+{
+    return vec4f(.5, .5, .5, 1.0);
 }

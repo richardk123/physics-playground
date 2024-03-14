@@ -2,7 +2,7 @@ import {GPUData, initPipeline} from "./GPUPipeline";
 import {Vec2d} from "../../../unified-particle-physics/engine/data/Vec2d";
 import {Points} from "../data/Points";
 import {BoundingBox} from "../data/BoundingBox";
-import { mat3 } from "gl-matrix";
+import {mat3, mat4} from "gl-matrix";
 import {Camera} from "../data/Camera";
 
 export interface SolverSettings
@@ -49,14 +49,30 @@ export class Solver
         const pipeline = this.gpu.pipeline;
         const bindGroup = this.gpu.bindGroup;
         const canvas = this.gpu.canvas;
+        const cameraBuffer = this.gpu.cameraBuffer;
 
-        // Compute the matrices
-        mat3.create()
-        var matrix = mat3.create();
-        mat3.projection(matrix, canvas.clientWidth, canvas.clientHeight);
-        mat3.translate(matrix, matrix, this.camera.translation);
-        mat3.rotate(matrix, matrix, this.camera.rotation);
-        mat3.scale(matrix, matrix, this.camera.scale);
+        // Compute camera matrices
+        const projection = mat4.create();
+        const zoom = this.camera.zoom;
+        mat4.ortho(projection, -zoom, zoom, -zoom, zoom, -1000, 1000);
+        // load perspective projection into the projection matrix,
+        // Field of view = 45 degrees (pi/4)
+        // Aspect ratio = 800/600
+        // near = 0.1, far = 10
+        // mat4.perspective(projection, Math.PI/4, canvas.clientWidth / canvas.height, 0.1, 100);
+
+        const view = mat4.create();
+        const tx = this.camera.translation.x;
+        const ty = this.camera.translation.y;
+        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, 1]);
+
+        const model = mat4.create();
+        mat4.rotate(model, model, this.camera.rotation, [-1, 0, 0]);
+
+        // copy the values from JavaScript to the GPU
+        device.queue.writeBuffer(cameraBuffer, 0, <ArrayBuffer>model);
+        device.queue.writeBuffer(cameraBuffer, 64, <ArrayBuffer>view);
+        device.queue.writeBuffer(cameraBuffer, 128, <ArrayBuffer>projection);
 
         //command encoder: records draw commands for submission
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
@@ -73,7 +89,7 @@ export class Solver
         });
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
-        renderpass.draw(3, 1, 0, 0);
+        renderpass.draw(3);
         renderpass.end();
 
         device.queue.submit([commandEncoder.finish()]);

@@ -27,13 +27,18 @@ export class Points
     public addPoint(x: number, y: number, mass: number, color: Color)
     {
         const index = this.count;
+
         this.positionCurrent[index * 2 + 0] = x;
         this.positionCurrent[index * 2 + 1] = y;
+
         this.massInverse[index] = 1 / mass;
+
         this.color[index * 3 + 0] = color.r;
         this.color[index * 3 + 1] = color.g;
         this.color[index * 3 + 2] = color.b;
+
         this.count += 1;
+
         return index;
     }
 }

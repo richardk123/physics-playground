@@ -6,6 +6,7 @@ export interface GPUData
     format : GPUTextureFormat;
     bindGroup: GPUBindGroup;
     pipeline: GPURenderPipeline;
+    cameraBuffer: GPUBuffer;
     canvas: HTMLCanvasElement;
 }
 export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
@@ -14,50 +15,62 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
     const device : GPUDevice = <GPUDevice> await adapter?.requestDevice();
     const context : GPUCanvasContext = <GPUCanvasContext> canvas.getContext("webgpu");
     const format : GPUTextureFormat = navigator.gpu.getPreferredCanvasFormat();
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
     context.configure({
-        device: device,
-        format: format,
-        alphaMode: "opaque"
+        device,
+        format: presentationFormat,
+    });
+
+    const shader = await fetch('/physics-playground/shader.wgsl')
+        .then((r) => r.text());
+
+    const module = device.createShaderModule({
+        code: shader
     });
 
     const bindGroupLayout = device.createBindGroupLayout({
-        entries: [],
-    });
-
-    const bindGroup: GPUBindGroup = device.createBindGroup({
-        layout: bindGroupLayout,
-        entries: []
+        entries: [
+            {
+                binding: 0,
+                visibility: GPUShaderStage.VERTEX,
+                buffer: {
+                    type: "uniform",
+                }
+            },
+        ] as GPUBindGroupLayoutEntry[]
     });
 
     const pipelineLayout = device.createPipelineLayout({
         bindGroupLayouts: [bindGroupLayout]
     });
-    const shader = await fetch('/physics-playground/shader.wgsl')
-        .then((r) => r.text());
 
-    const pipeline: GPURenderPipeline = device.createRenderPipeline({
-        vertex : {
-            module : device.createShaderModule({
-                code : shader
-            }),
-            entryPoint : "vs_main"
+    const pipeline = device.createRenderPipeline({
+        label: 'triangle with uniforms',
+        layout: pipelineLayout,
+        vertex: {
+            module,
+            entryPoint: 'vs',
         },
-
-        fragment : {
-            module : device.createShaderModule({
-                code : shader
-            }),
-            entryPoint : "fs_main",
-            targets : [{
-                format : format
-            }]
+        fragment: {
+            module,
+            entryPoint: 'fs',
+            targets: [{ format: presentationFormat }],
         },
+    });
 
-        primitive : {
-            topology : "triangle-list"
-        },
+    const cameraBuffer = device.createBuffer({
+        label: 'camera buffer',
+        size: 64 * 3,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
 
-        layout: pipelineLayout
+    const bindGroup = device.createBindGroup({
+        label: 'triangle bind group',
+        layout: pipeline.getBindGroupLayout(0),
+        entries: [
+            { binding: 0, resource: { buffer: cameraBuffer }},
+        ],
     });
 
     return {
@@ -68,5 +81,6 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
         device: device,
         format: format,
         canvas: canvas,
+        cameraBuffer: cameraBuffer,
     };
 }
