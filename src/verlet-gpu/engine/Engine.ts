@@ -1,5 +1,7 @@
 import {Solver, SolverSettings} from "./solver/Solver";
 import {Vec2d} from "../../unified-particle-physics/engine/data/Vec2d";
+import {BoundingBox} from "./data/BoundingBox";
+import {Camera} from "./data/Camera";
 
 export const DEFAULT_ENGINE_SETTINGS: SolverSettings = {
     pointDiameter: 1,
@@ -42,13 +44,13 @@ export class Engine
         this.solver.settings = settings;
     }
 
-    public updateWorldBoundingBox(bottomLeft: Vec2d, topRight: Vec2d)
-    {
-        this.solver.updateWorldBoundingBox(bottomLeft, topRight);
-    }
-
-    public getWorldBoundingBox(): {bottomLeft: Vec2d, topRight: Vec2d}
+    public getWorldBoundingBox(): BoundingBox
     {
         return this.solver.getWorldBoundingBox();
+    }
+
+    public getCamera(): Camera
+    {
+        return this.solver.getCamera();
     }
 }

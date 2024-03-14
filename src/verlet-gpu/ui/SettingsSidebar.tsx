@@ -6,6 +6,7 @@ import {SliderComponent} from "./components/SliderComponent";
 import {AccordionComponent} from "./components/AccordionComponent";
 import {Engine} from "../engine/Engine";
 import {BoxTitle} from "./components/BoxTitle";
+import {Camera} from "../engine/data/Camera";
 
 interface Props
 {
@@ -33,6 +34,7 @@ export const SettingsSidebar = (props: Props) =>
     const engine = props.engine;
     const bb = engine.getWorldBoundingBox();
     const simSettings = engine.getSettings();
+    const camera: Camera = engine.getCamera();
 
     return <Card className="w-96 h-full">
         <p>Physics ms per frame: {simulationDuration}</p>
@@ -69,16 +71,32 @@ export const SettingsSidebar = (props: Props) =>
                                  maxVal={20} />
             </BoxTitle>
             <BoxTitle label="Bounding box">
-                <VectorComponent vector={{x: bb.bottomLeft.x, y: bb.bottomLeft.y}}
+                <VectorComponent vector={{x: bb.getCorners().bottomLeft.x, y: bb.getCorners().bottomLeft.y}}
                                  change={(v) =>
                                  {
-                                     props.engine.updateWorldBoundingBox(v, bb.topRight)
+                                     bb.update(v, bb.getCorners().topRight)
                                  }}/>
-                <VectorComponent vector={{x: bb.topRight.x, y: bb.topRight.y}}
+                <VectorComponent vector={{x: bb.getCorners().topRight.x, y: bb.getCorners().topRight.y}}
                                  change={(v) =>
                                  {
-                                     props.engine.updateWorldBoundingBox(bb.bottomLeft, v);
+                                     bb.update(bb.getCorners().bottomLeft, v);
                                  }}/>
+            </BoxTitle>
+        </AccordionComponent>
+        <AccordionComponent expanded={true} label="Camera">
+            <BoxTitle label="Scale">
+                <VectorComponent vector={{x: camera.getScale().x, y: camera.getScale().y}}
+                                 change={(v) => camera.setScale(v)}/>
+            </BoxTitle>
+            <BoxTitle label="Translation">
+                <VectorComponent vector={{x: camera.getTranslation().x, y: camera.getTranslation().y}}
+                                 change={(v) => camera.setTranslation(v)}/>
+            </BoxTitle>
+            <BoxTitle label="Rotation">
+                <SliderComponent value={camera.getRotation()}
+                                 setValue={val => camera.setRotation(val)}
+                                 minVal={-180}
+                                 maxVal={180} />
             </BoxTitle>
         </AccordionComponent>
     </Card>

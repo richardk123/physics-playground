@@ -2,6 +2,8 @@ import {GPUData, initPipeline} from "./GPUPipeline";
 import {Vec2d} from "../../../unified-particle-physics/engine/data/Vec2d";
 import {Points} from "../data/Points";
 import {BoundingBox} from "../data/BoundingBox";
+import { mat3 } from "gl-matrix";
+import {Camera} from "../data/Camera";
 
 export interface SolverSettings
 {
@@ -18,6 +20,7 @@ export class Solver
     public settings: SolverSettings;
     public points: Points;
     private worldBoundingBox: BoundingBox;
+    private camera: Camera;
     public simulationDuration: number = 0;
 
     private constructor(gpu: GPUData,
@@ -27,6 +30,7 @@ export class Solver
         this.settings = settings;
         this.points = Points.create(settings.maxParticleCount);
         this.worldBoundingBox = new BoundingBox({x: 0, y: 0}, {x: 100, y: 100});
+        this.camera = new Camera();
     }
 
     static async create(canvas: HTMLCanvasElement,
@@ -44,6 +48,15 @@ export class Solver
         const context = this.gpu.context;
         const pipeline = this.gpu.pipeline;
         const bindGroup = this.gpu.bindGroup;
+        const canvas = this.gpu.canvas;
+
+        // Compute the matrices
+        mat3.create()
+        var matrix = mat3.create();
+        mat3.projection(matrix, canvas.clientWidth, canvas.clientHeight);
+        mat3.translate(matrix, matrix, this.camera.translation);
+        mat3.rotate(matrix, matrix, this.camera.rotation);
+        mat3.scale(matrix, matrix, this.camera.scale);
 
         //command encoder: records draw commands for submission
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
@@ -53,7 +66,7 @@ export class Solver
         const renderpass : GPURenderPassEncoder = commandEncoder.beginRenderPass({
             colorAttachments: [{
                 view: textureView,
-                clearValue: {r: 0.5, g: 0.0, b: 0.25, a: 1.0},
+                clearValue: {r: 0, g: 0, b: 0, a: 1.0},
                 loadOp: "clear",
                 storeOp: "store"
             }] as GPURenderPassColorAttachment[],
@@ -68,13 +81,13 @@ export class Solver
         this.simulationDuration = performance.now() - t;
     }
 
-    public updateWorldBoundingBox(bottomLeft: Vec2d, topRight: Vec2d)
+    public getWorldBoundingBox(): BoundingBox
     {
-        this.worldBoundingBox.update(bottomLeft, topRight);
+        return this.worldBoundingBox;
     }
 
-    public getWorldBoundingBox(): {bottomLeft: Vec2d, topRight: Vec2d}
+    public getCamera(): Camera
     {
-        return this.worldBoundingBox.getCorners();
+        return this.camera;
     }
 }

@@ -6,6 +6,7 @@ export interface GPUData
     format : GPUTextureFormat;
     bindGroup: GPUBindGroup;
     pipeline: GPURenderPipeline;
+    canvas: HTMLCanvasElement;
 }
 export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
 {
@@ -66,5 +67,6 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
         context: context,
         device: device,
         format: format,
+        canvas: canvas,
     };
 }
