@@ -6,7 +6,7 @@ import {VerletIntegration01} from "./verlet-integration-01/VerletIntegration01";
 import {VerletIntegration02} from "./verlet-integration-02/VerletIntegration02";
 import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
-import {VerletGpu} from "./verlet-gpu/VerletGpu";
+import {VerletGpu} from "./verlet-gpu/ui/VerletGpu";
 import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
 import {UnifiedParticlePhysics} from "./unified-particle-physics/ui/UnifiedParticlePhysics";
 

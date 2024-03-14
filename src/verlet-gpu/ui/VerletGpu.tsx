@@ -1,16 +1,20 @@
-import React, {useEffect} from "react";
-import {createRenderer} from "./renderer/Renderer";
+import React, {useEffect, useState} from "react";
+import {Engine} from "../engine/Engine";
+import {SettingsSidebar} from "./SettingsSidebar";
 
 export const VerletGpu = () =>
 {
+    const [engine, setEngine] = useState<Engine | undefined>();
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
-
-    useEffect(function () {
-        createRenderer(canvasRef.current!).then(() =>
-        {
-            console.log("success");
-        });
+    useEffect(function ()
+    {
+        Engine.create(canvasRef.current!)
+            .then(e =>
+            {
+                setEngine(e);
+                e.simulate();
+            });
     }, []);
 
     return <div className="flex h-full bg-gray-200">
@@ -20,7 +24,7 @@ export const VerletGpu = () =>
             </div>
         </div>
         <div className="w-64 text-white">
-            {/*<SettingsSidebar engine={engine} renderer={renderer} />*/}
+            {engine === undefined ? <></> : <SettingsSidebar engine={engine} />}
         </div>
     </div>;
 }
