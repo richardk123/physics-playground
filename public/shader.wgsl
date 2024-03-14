@@ -4,14 +4,20 @@ struct TransformData {
     projection: mat4x4<f32>,
 };
 
+struct VertexOutput {
+    @builtin(position) transformedPos: vec4<f32>,
+    @location(0) localSpace: vec2<f32>,
+}
+
 @group(0) @binding(0) var<uniform> transformUBO: TransformData;
-@vertex fn vs(
-@builtin(vertex_index) vertexIndex : u32) -> @builtin(position) vec4f
+@vertex
+fn vs(@builtin(vertex_index) vertexIndex : u32) -> VertexOutput
 {
+    var out: VertexOutput;
     let pos = array(
-      vec2f( 0.0,  0.5),  // top center
-      vec2f(-0.5, -0.5),  // bottom left
-      vec2f( 0.5, -0.5)   // bottom right
+      vec2f( 0.0,  2.0),  // top center
+      vec2f(1.7321, -1.0),  // bottom left
+      vec2f(-1.7321, -1.0)   // bottom right
     );
 
     // Perform matrix-vector multiplication manually
@@ -22,10 +28,17 @@ struct TransformData {
         1.0
     );
 
-    return transformedPos;
+    out.transformedPos = transformedPos;
+    out.localSpace = pos[vertexIndex];
+    return out;
 }
 
-@fragment fn fs() -> @location(0) vec4f
+@fragment
+fn fs(in: VertexOutput) -> @location(0) vec4f
 {
-    return vec4f(.5, .5, .5, 1.0);
+    if (dot(in.localSpace, in.localSpace) > 1.0)
+    {
+        discard;
+    }
+    return vec4f(1.0, .1, .1, 1.0);
 }

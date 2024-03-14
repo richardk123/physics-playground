@@ -54,12 +54,9 @@ export class Solver
         // Compute camera matrices
         const projection = mat4.create();
         const zoom = this.camera.zoom;
-        mat4.ortho(projection, -zoom, zoom, -zoom, zoom, -1000, 1000);
-        // load perspective projection into the projection matrix,
-        // Field of view = 45 degrees (pi/4)
-        // Aspect ratio = 800/600
-        // near = 0.1, far = 10
-        // mat4.perspective(projection, Math.PI/4, canvas.clientWidth / canvas.height, 0.1, 100);
+        mat4.ortho(projection,
+            (-canvas.clientWidth / 2) * zoom, (canvas.clientWidth / 2) * zoom,
+            (-canvas.clientHeight / 2) * zoom, (canvas.clientHeight / 2) * zoom, -1000, 1000);
 
         const view = mat4.create();
         const tx = this.camera.translation.x;

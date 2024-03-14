@@ -87,8 +87,8 @@ export const SettingsSidebar = (props: Props) =>
             <BoxTitle label="Zoom">
                 <SliderComponent value={camera.zoom}
                                  setValue={val => camera.zoom = val}
-                                 minVal={0.1}
-                                 maxVal={100} />
+                                 minVal={0.0025}
+                                 maxVal={0.2} />
             </BoxTitle>
             <BoxTitle label="Translation">
                 <VectorComponent vector={{x: camera.translation.x, y: camera.translation.y}}
