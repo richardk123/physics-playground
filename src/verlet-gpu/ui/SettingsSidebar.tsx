@@ -95,8 +95,8 @@ export const SettingsSidebar = (props: Props) =>
             <BoxTitle label="Rotation">
                 <SliderComponent value={camera.getRotation()}
                                  setValue={val => camera.setRotation(val)}
-                                 minVal={-180}
-                                 maxVal={180} />
+                                 minVal={-Math.PI}
+                                 maxVal={Math.PI} />
             </BoxTitle>
         </AccordionComponent>
     </Card>
