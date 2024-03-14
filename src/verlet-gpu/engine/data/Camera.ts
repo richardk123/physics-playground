@@ -10,6 +10,6 @@ export class Camera
     {
         this.translation = {x: 0, y: 0}
         this.rotation = 0;
-        this.zoom = 0.2;
+        this.zoom = 0.00256292;
     }
 }

@@ -21,11 +21,14 @@ export class Solver
     public points: Points;
     private worldBoundingBox: BoundingBox;
     private camera: Camera;
+    private canvas: HTMLCanvasElement;
     public simulationDuration: number = 0;
 
     private constructor(gpu: GPUData,
-                        settings: SolverSettings)
+                        settings: SolverSettings,
+                        canvas: HTMLCanvasElement)
     {
+        this.canvas = canvas;
         this.gpu = gpu;
         this.settings = settings;
         this.points = Points.create(settings.maxParticleCount);
@@ -37,7 +40,7 @@ export class Solver
                         settings: SolverSettings)
     {
         const gpuData = await initPipeline(canvas);
-        return new Solver(gpuData, settings);
+        return new Solver(gpuData, settings, canvas);
     }
 
     public simulate()
@@ -51,6 +54,8 @@ export class Solver
         const canvas = this.gpu.canvas;
         const cameraBuffer = this.gpu.cameraBuffer;
 
+        console.log(canvas.clientHeight);
+
         // Compute camera matrices
         const projection = mat4.create();
         const zoom = this.camera.zoom;
@@ -61,7 +66,7 @@ export class Solver
         const view = mat4.create();
         const tx = this.camera.translation.x;
         const ty = this.camera.translation.y;
-        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, 1]);
+        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, -1]);
 
         const model = mat4.create();
         mat4.rotate(model, model, this.camera.rotation, [-1, 0, 0]);
@@ -102,5 +107,10 @@ export class Solver
     public getCamera(): Camera
     {
         return this.camera;
+    }
+
+    public getSimulationSize(): Vec2d
+    {
+        return {x: this.canvas.clientWidth * this.camera.zoom, y: this.canvas.clientHeight * this.camera.zoom};
     }
 }

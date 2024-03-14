@@ -7,6 +7,7 @@ import {AccordionComponent} from "./components/AccordionComponent";
 import {Engine} from "../engine/Engine";
 import {BoxTitle} from "./components/BoxTitle";
 import {Camera} from "../engine/data/Camera";
+import {Typography} from "@mui/material";
 
 interface Props
 {
@@ -87,8 +88,12 @@ export const SettingsSidebar = (props: Props) =>
             <BoxTitle label="Zoom">
                 <SliderComponent value={camera.zoom}
                                  setValue={val => camera.zoom = val}
-                                 minVal={0.0025}
+                                 minVal={0.0012484}
                                  maxVal={0.2} />
+                <Typography variant="caption">
+                    Simulation w: {(Math.floor(engine.getSimulationSize().x * 100) / 100).toFixed(2)}
+                    h: {(Math.floor(engine.getSimulationSize().y * 100) / 100).toFixed(2)}
+                </Typography>
             </BoxTitle>
             <BoxTitle label="Translation">
                 <VectorComponent vector={{x: camera.translation.x, y: camera.translation.y}}

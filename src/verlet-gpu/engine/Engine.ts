@@ -68,4 +68,9 @@ export class Engine
     {
         return this.solver.getCamera();
     }
+
+    public getSimulationSize(): Vec2d
+    {
+        return this.solver.getSimulationSize();
+    }
 }
