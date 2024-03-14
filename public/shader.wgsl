@@ -16,8 +16,8 @@ fn vs(@builtin(vertex_index) vertexIndex : u32) -> VertexOutput
     var out: VertexOutput;
     let pos = array(
       vec2f( 0.0,  1.0),  // top center
-      vec2f(0.86605, -0.5),  // bottom left
-      vec2f(-0.86605, -0.5)   // bottom right
+      vec2f(0.866025, -0.5),  // bottom left
+      vec2f(-0.866025, -0.5)   // bottom right
     );
 
     // Perform matrix-vector multiplication manually
@@ -38,8 +38,7 @@ fn fs(in: VertexOutput) -> @location(0) vec4f
 {
     if (dot(in.localSpace, in.localSpace) > .25)
     {
-//        discard;
-        return vec4f(.1, .1, .1, 1.0);
+        discard;
     }
     return vec4f(1.0, .1, .1, 1.0);
 }

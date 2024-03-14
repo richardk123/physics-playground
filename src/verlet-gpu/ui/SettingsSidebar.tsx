@@ -88,7 +88,7 @@ export const SettingsSidebar = (props: Props) =>
             <BoxTitle label="Zoom">
                 <SliderComponent value={camera.zoom}
                                  setValue={val => camera.zoom = val}
-                                 minVal={0.0012484}
+                                 minVal={0.001248439450687}
                                  maxVal={0.2} />
                 <Typography variant="caption">
                     Simulation w: {(Math.floor(engine.getSimulationSize().x * 100) / 100).toFixed(2)}
