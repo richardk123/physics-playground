@@ -91,8 +91,8 @@ export const SettingsSidebar = (props: Props) =>
                                  minVal={0.001248439450687}
                                  maxVal={0.2} />
                 <Typography variant="caption">
-                    Simulation w: {(Math.floor(engine.getSimulationSize().x * 100) / 100).toFixed(2)}
-                    h: {(Math.floor(engine.getSimulationSize().y * 100) / 100).toFixed(2)}
+                    Simulation w: {engine.getSimulationSize().x.toFixed(2)}
+                    h: {engine.getSimulationSize().y.toFixed(2)}
                 </Typography>
             </BoxTitle>
             <BoxTitle label="Translation">
