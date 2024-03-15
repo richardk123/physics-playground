@@ -1,3 +1,5 @@
+import {SolverSettings} from "./Solver";
+
 export interface GPUData
 {
     adapter : GPUAdapter;
@@ -7,9 +9,11 @@ export interface GPUData
     bindGroup: GPUBindGroup;
     pipeline: GPURenderPipeline;
     cameraBuffer: GPUBuffer;
+    pointsPositionBuffer: GPUBuffer,
     canvas: HTMLCanvasElement;
 }
-export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
+export async function initPipeline(canvas: HTMLCanvasElement,
+                                   settings: SolverSettings): Promise<GPUData>
 {
     const adapter : GPUAdapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
     const device : GPUDevice = <GPUDevice> await adapter?.requestDevice();
@@ -22,8 +26,10 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
         format: presentationFormat,
     });
 
-    const shader = await fetch('/physics-playground/shader.wgsl')
-        .then((r) => r.text());
+    const shader = await (fetch('/physics-playground/shader.wgsl')
+        .then((r) => r.text()));
+
+    console.log(shader);
 
     const module = device.createShaderModule({
         code: shader
@@ -38,6 +44,13 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
                     type: "uniform",
                 }
             },
+            {
+                binding: 1,
+                visibility: GPUShaderStage.VERTEX,
+                buffer: {
+                    type: "read-only-storage",
+                }
+            }
         ] as GPUBindGroupLayoutEntry[]
     });
 
@@ -65,11 +78,18 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
+    const pointsPositionBuffer = device.createBuffer({
+        label: 'points position buffer',
+        size: settings.maxParticleCount * 2 * 4,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    })
+
     const bindGroup = device.createBindGroup({
         label: 'triangle bind group',
-        layout: pipeline.getBindGroupLayout(0),
+        layout: bindGroupLayout,
         entries: [
             { binding: 0, resource: { buffer: cameraBuffer }},
+            { binding: 1, resource: { buffer: pointsPositionBuffer}}
         ],
     });
 
@@ -81,6 +101,7 @@ export async function initPipeline(canvas: HTMLCanvasElement): Promise<GPUData>
         device: device,
         format: format,
         canvas: canvas,
+        pointsPositionBuffer: pointsPositionBuffer,
         cameraBuffer: cameraBuffer,
     };
 }

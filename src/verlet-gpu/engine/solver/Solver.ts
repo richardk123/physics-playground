@@ -1,9 +1,9 @@
 import {GPUData, initPipeline} from "./GPUPipeline";
-import {Vec2d} from "../../../unified-particle-physics/engine/data/Vec2d";
 import {Points} from "../data/Points";
 import {BoundingBox} from "../data/BoundingBox";
 import {mat3, mat4} from "gl-matrix";
 import {Camera} from "../data/Camera";
+import {Vec2d} from "../data/Vec2d";
 
 export interface SolverSettings
 {
@@ -39,8 +39,17 @@ export class Solver
     static async create(canvas: HTMLCanvasElement,
                         settings: SolverSettings)
     {
-        const gpuData = await initPipeline(canvas);
+        const gpuData = await initPipeline(canvas, settings);
         return new Solver(gpuData, settings, canvas);
+    }
+
+    public initStaticData()
+    {
+        const device = this.gpu.device;
+        const pointsPositionBuffer = this.gpu.pointsPositionBuffer;
+
+        // points buffer
+        device.queue.writeBuffer(pointsPositionBuffer, 0, this.points.positionCurrent);
     }
 
     public simulate()
@@ -54,8 +63,6 @@ export class Solver
         const canvas = this.gpu.canvas;
         const cameraBuffer = this.gpu.cameraBuffer;
 
-        console.log(canvas.clientHeight);
-
         // Compute camera matrices
         const projection = mat4.create();
         const zoom = this.camera.zoom;
@@ -66,10 +73,10 @@ export class Solver
         const view = mat4.create();
         const tx = this.camera.translation.x;
         const ty = this.camera.translation.y;
-        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, -1]);
+        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, 1]);
 
         const model = mat4.create();
-        mat4.rotate(model, model, this.camera.rotation, [-1, 0, 0]);
+        mat4.rotate(model, model, this.camera.rotation, [1, 0, 0]);
 
         // copy the values from JavaScript to the GPU
         device.queue.writeBuffer(cameraBuffer, 0, <ArrayBuffer>model);
@@ -91,7 +98,7 @@ export class Solver
         });
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
-        renderpass.draw(3);
+        renderpass.draw(3, this.points.count);
         renderpass.end();
 
         device.queue.submit([commandEncoder.finish()]);

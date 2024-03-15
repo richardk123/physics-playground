@@ -1,13 +1,13 @@
 import {Solver, SolverSettings} from "./solver/Solver";
-import {Vec2d} from "../../unified-particle-physics/engine/data/Vec2d";
 import {BoundingBox} from "./data/BoundingBox";
 import {Camera} from "./data/Camera";
-import {Colors} from "../../unified-particle-physics/engine/data/Color";
+import {Vec2d} from "./data/Vec2d";
+import {Colors} from "./data/Color";
 
 export const DEFAULT_ENGINE_SETTINGS: SolverSettings = {
     pointDiameter: 1,
     gravity: {x: 0, y: -10},
-    maxParticleCount: 10000,
+    maxParticleCount: 1000000,
     deltaTime: 1 / 60,
     subStepCount: 4,
 };
@@ -43,7 +43,13 @@ export class Engine
         }
     }
 
-    public simulate(): void
+    public start(): void
+    {
+        this.solver.initStaticData();
+        this.simulate();
+    }
+
+    private simulate()
     {
         this.solver.simulate();
         requestAnimationFrame(this.simulate.bind(this));

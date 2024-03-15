@@ -16,15 +16,14 @@ interface Props
 export const SettingsSidebar = (props: Props) =>
 {
     const [increment, setIncrement] = useState(0);
-    const [simulationDuration, setSimulationDuration] = useState(0);
+    const [simulationDuration, setSimulationDuration] = useState("0");
     const [pointCount, setPointCount] = useState(0);
 
     useEffect(() =>
     {
         const sub = timer(100).subscribe(() =>
         {
-            const DIGITS = 100;
-            setSimulationDuration(Math.floor(props.engine.solver.simulationDuration * DIGITS) / DIGITS);
+            setSimulationDuration(props.engine.solver.simulationDuration.toFixed(2));
             setPointCount(props.engine.solver.points.count);
             setIncrement(increment + 1);
         });
@@ -89,7 +88,7 @@ export const SettingsSidebar = (props: Props) =>
                 <SliderComponent value={camera.zoom}
                                  setValue={val => camera.zoom = val}
                                  minVal={0.001248439450687}
-                                 maxVal={0.2} />
+                                 maxVal={1.2} />
                 <Typography variant="caption">
                     Simulation w: {engine.getSimulationSize().x.toFixed(2)}
                     h: {engine.getSimulationSize().y.toFixed(2)}

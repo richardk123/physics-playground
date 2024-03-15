@@ -28,9 +28,8 @@ export const Sidebar = () =>
             {createLink("/verlet02", "Verlet Integration optimalized")}
             {createLink("/xpdb", "XPDB")}
             {createLink("/xpdb2", "XPDB optimalized")}
-            {createLink("/verlet-gpu", "Verlet gpu")}
             {createLink("/fluid-sim", "Fluid simulation")}
-            {createLink("/unified-particle-physics", "Unified particle physics")}
+            {createLink("/verlet-gpu", "Verlet gpu")}
         </List>
     </Card>);
 }

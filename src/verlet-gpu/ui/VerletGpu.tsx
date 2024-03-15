@@ -12,9 +12,9 @@ export const VerletGpu = () =>
         Engine.create(canvasRef.current!)
             .then(e =>
             {
-                e.createRectangle(0, 0, 10, 10);
+                e.createRectangle(-500, -500, 1000, 1000);
                 setEngine(e);
-                e.simulate();
+                e.start();
             });
     }, []);
 

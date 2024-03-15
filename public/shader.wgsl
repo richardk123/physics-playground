@@ -10,8 +10,10 @@ struct VertexOutput {
 }
 
 @group(0) @binding(0) var<uniform> transformUBO: TransformData;
+@group(0) @binding(1) var<storage, read> pointPositions: array<vec2<f32>>;
 @vertex
-fn vs(@builtin(vertex_index) vertexIndex : u32) -> VertexOutput
+fn vs(@builtin(vertex_index) vertexIndex : u32,
+      @builtin(instance_index) instanceIndex: u32) -> VertexOutput
 {
     var out: VertexOutput;
     let pos = array(
@@ -20,11 +22,13 @@ fn vs(@builtin(vertex_index) vertexIndex : u32) -> VertexOutput
       vec2f(-0.866025, -0.5)   // bottom right
     );
 
+    let vertexPos = pointPositions[instanceIndex] + pos[vertexIndex];
+
     // Perform matrix-vector multiplication manually
     let transformedPos = transformUBO.projection * transformUBO.view * transformUBO.model * vec4<f32>(
-        0.1,
-        pos[vertexIndex].x,
-        pos[vertexIndex].y,
+        0.0,
+        vertexPos.x,
+        vertexPos.y,
         1.0
     );
 
@@ -38,7 +42,8 @@ fn fs(in: VertexOutput) -> @location(0) vec4f
 {
     if (dot(in.localSpace, in.localSpace) > .25)
     {
-        discard;
+        return vec4f(.1, .1, .1, 1.0);
+//        discard;
     }
     return vec4f(1.0, .1, .1, 1.0);
 }
