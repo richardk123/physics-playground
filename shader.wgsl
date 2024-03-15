@@ -1,32 +1,48 @@
-struct Fragment {
-    @builtin(position) Position : vec4<f32>,
-    @location(0) Color : vec4<f32>
+struct TransformData {
+    model: mat4x4<f32>,
+    view: mat4x4<f32>,
+    projection: mat4x4<f32>,
 };
 
+struct VertexOutput {
+    @builtin(position) transformedPos: vec4<f32>,
+    @location(0) localSpace: vec2<f32>,
+}
+
+@group(0) @binding(0) var<uniform> transformUBO: TransformData;
+@group(0) @binding(1) var<storage, read> pointPositions: array<vec2<f32>>;
 @vertex
-fn vs_main(@builtin(vertex_index) v_id: u32) -> Fragment {
-
-    //pre-bake positions and colors, for now.
-    var positions = array<vec2<f32>, 3> (
-        vec2<f32>( 0.0,  0.5),
-        vec2<f32>(-0.5, -0.5),
-        vec2<f32>( 0.5, -0.5)
+fn vs(@builtin(vertex_index) vertexIndex : u32,
+      @builtin(instance_index) instanceIndex: u32) -> VertexOutput
+{
+    var out: VertexOutput;
+    let pos = array(
+      vec2f( 0.0,  1.0),  // top center
+      vec2f(0.866025, -0.5),  // bottom left
+      vec2f(-0.866025, -0.5)   // bottom right
     );
 
-    var colors = array<vec3<f32>, 3> (
-        vec3<f32>(1.0, 0.0, 0.0),
-        vec3<f32>(0.0, 1.0, 0.0),
-        vec3<f32>(0.0, 0.0, 1.0)
+    let vertexPos = pointPositions[instanceIndex] + pos[vertexIndex];
+
+    // Perform matrix-vector multiplication manually
+    let transformedPos = transformUBO.projection * transformUBO.view * transformUBO.model * vec4<f32>(
+        0.0,
+        vertexPos.x,
+        vertexPos.y,
+        1.0
     );
 
-    var output : Fragment;
-    output.Position = vec4<f32>(positions[v_id], 0.0, 1.0);
-    output.Color = vec4<f32>(colors[v_id], 1.0);
-
-    return output;
+    out.transformedPos = transformedPos;
+    out.localSpace = pos[vertexIndex];
+    return out;
 }
 
 @fragment
-fn fs_main(@location(0) Color: vec4<f32>) -> @location(0) vec4<f32> {
-    return Color;
+fn fs(in: VertexOutput) -> @location(0) vec4f
+{
+    if (dot(in.localSpace, in.localSpace) > .25)
+    {
+        discard;
+    }
+    return vec4f(1.0, .1, .1, 1.0);
 }
