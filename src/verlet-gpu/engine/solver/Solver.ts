@@ -1,55 +1,33 @@
 import {GPUData, initPipeline} from "./GPUPipeline";
-import {Points} from "../data/Points";
-import {BoundingBox} from "../data/BoundingBox";
-import {mat3, mat4} from "gl-matrix";
-import {Camera} from "../data/Camera";
+import {BoundingBox} from "./buffer/BoundingBoxBuffer";
 import {Vec2d} from "../data/Vec2d";
+import {SolverSettings} from "./buffer/SolverSettingsBuffer";
+import {Camera} from "./buffer/CameraBuffer";
 
-export interface SolverSettings
-{
-    pointDiameter: number;
-    maxParticleCount: number;
-    gravity: Vec2d;
-    deltaTime: number;
-    subStepCount: number;
-}
 
 export class Solver
 {
-    private gpu: GPUData;
-    public settings: SolverSettings;
-    public points: Points;
-    private worldBoundingBox: BoundingBox;
-    private camera: Camera;
-    private canvas: HTMLCanvasElement;
+    public gpu: GPUData;
     public simulationDuration: number = 0;
 
-    private constructor(gpu: GPUData,
-                        settings: SolverSettings,
-                        canvas: HTMLCanvasElement)
+    private constructor(gpu: GPUData)
     {
-        this.canvas = canvas;
         this.gpu = gpu;
-        this.settings = settings;
-        this.points = Points.create(settings.maxParticleCount);
-        this.worldBoundingBox = new BoundingBox({x: 0, y: 0}, {x: 100, y: 100});
-        this.camera = new Camera();
     }
 
     static async create(canvas: HTMLCanvasElement,
-                        settings: SolverSettings)
+                        settings: SolverSettings,
+                        camera: Camera,
+                        boundingBox: BoundingBox)
     {
-        const gpuData = await initPipeline(canvas, settings);
-        return new Solver(gpuData, settings, canvas);
+        const gpuData = await initPipeline(canvas, settings, camera, boundingBox);
+        return new Solver(gpuData);
     }
 
     public initStaticData()
     {
         const device = this.gpu.device;
-        const pointsPositionBuffer = this.gpu.pointsPositionBuffer;
-
-        // points buffer
-        device.queue.writeBuffer(pointsPositionBuffer, 0, this.points.positionCurrent);
+        this.gpu.pointsBuffer.writeBuffer(device)
     }
 
     public simulate()
@@ -61,27 +39,9 @@ export class Solver
         const pipeline = this.gpu.pipeline;
         const bindGroup = this.gpu.bindGroup;
         const canvas = this.gpu.canvas;
-        const cameraBuffer = this.gpu.cameraBuffer;
 
-        // Compute camera matrices
-        const projection = mat4.create();
-        const zoom = this.camera.zoom;
-        mat4.ortho(projection,
-            (-canvas.clientWidth / 2) * zoom, (canvas.clientWidth / 2) * zoom,
-            (-canvas.clientHeight / 2) * zoom, (canvas.clientHeight / 2) * zoom, -1000, 1000);
-
-        const view = mat4.create();
-        const tx = this.camera.translation.x;
-        const ty = this.camera.translation.y;
-        mat4.lookAt(view, [1, tx, ty], [0, tx, ty], [0, 0, 1]);
-
-        const model = mat4.create();
-        mat4.rotate(model, model, this.camera.rotation, [1, 0, 0]);
-
-        // copy the values from JavaScript to the GPU
-        device.queue.writeBuffer(cameraBuffer, 0, <ArrayBuffer>model);
-        device.queue.writeBuffer(cameraBuffer, 64, <ArrayBuffer>view);
-        device.queue.writeBuffer(cameraBuffer, 128, <ArrayBuffer>projection);
+        // camera matrices
+        this.gpu.cameraBuffer.writeBuffer(canvas, device);
 
         //command encoder: records draw commands for submission
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
@@ -98,7 +58,7 @@ export class Solver
         });
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
-        renderpass.draw(3, this.points.count);
+        renderpass.draw(3, this.gpu.pointsBuffer.points.count);
         renderpass.end();
 
         device.queue.submit([commandEncoder.finish()]);
@@ -106,18 +66,10 @@ export class Solver
         this.simulationDuration = performance.now() - t;
     }
 
-    public getWorldBoundingBox(): BoundingBox
-    {
-        return this.worldBoundingBox;
-    }
-
-    public getCamera(): Camera
-    {
-        return this.camera;
-    }
-
     public getSimulationSize(): Vec2d
     {
-        return {x: this.canvas.clientWidth * this.camera.zoom, y: this.canvas.clientHeight * this.camera.zoom};
+        const camera = this.gpu.cameraBuffer.camera;
+        const canvas = this.gpu.canvas;
+        return {x: canvas.clientWidth * camera.zoom, y: canvas.clientHeight * camera.zoom};
     }
 }

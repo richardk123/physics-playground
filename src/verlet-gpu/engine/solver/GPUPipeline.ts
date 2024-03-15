@@ -1,4 +1,7 @@
-import {SolverSettings} from "./Solver";
+import {SolverSettings, SolverSettingsBuffer} from "./buffer/SolverSettingsBuffer";
+import {Camera, CameraBuffer} from "./buffer/CameraBuffer";
+import {BoundingBox, BoundingBoxBuffer} from "./buffer/BoundingBoxBuffer";
+import {PointsBuffer} from "./buffer/Points";
 
 export interface GPUData
 {
@@ -8,18 +11,27 @@ export interface GPUData
     format : GPUTextureFormat;
     bindGroup: GPUBindGroup;
     pipeline: GPURenderPipeline;
-    cameraBuffer: GPUBuffer;
-    pointsPositionBuffer: GPUBuffer,
     canvas: HTMLCanvasElement;
+    pointsBuffer: PointsBuffer,
+    cameraBuffer: CameraBuffer;
+    boundingBoxBuffer: BoundingBoxBuffer;
+    solverSettingsBuffer: SolverSettingsBuffer;
 }
 export async function initPipeline(canvas: HTMLCanvasElement,
-                                   settings: SolverSettings): Promise<GPUData>
+                                   settings: SolverSettings,
+                                   camera: Camera,
+                                   boundingBox: BoundingBox): Promise<GPUData>
 {
     const adapter : GPUAdapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
     const device : GPUDevice = <GPUDevice> await adapter?.requestDevice();
     const context : GPUCanvasContext = <GPUCanvasContext> canvas.getContext("webgpu");
     const format : GPUTextureFormat = navigator.gpu.getPreferredCanvasFormat();
     const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
+    const cameraBuffer = new CameraBuffer(camera, device);
+    const pointsBuffer = new PointsBuffer(settings.maxParticleCount, device);
+    const boundingBoxBuffer = new BoundingBoxBuffer(boundingBox, device);
+    const solverSettingsBuffer = new SolverSettingsBuffer(settings, device)
 
     context.configure({
         device,
@@ -70,24 +82,12 @@ export async function initPipeline(canvas: HTMLCanvasElement,
         },
     });
 
-    const cameraBuffer = device.createBuffer({
-        label: 'camera buffer',
-        size: 64 * 3,
-        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    const pointsPositionBuffer = device.createBuffer({
-        label: 'points position buffer',
-        size: settings.maxParticleCount * 2 * 4,
-        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    })
-
     const bindGroup = device.createBindGroup({
         label: 'triangle bind group',
         layout: bindGroupLayout,
         entries: [
-            { binding: 0, resource: { buffer: cameraBuffer }},
-            { binding: 1, resource: { buffer: pointsPositionBuffer}}
+            { binding: 0, resource: { buffer: cameraBuffer.buffer }},
+            { binding: 1, resource: { buffer: pointsBuffer.buffer }}
         ],
     });
 
@@ -99,7 +99,9 @@ export async function initPipeline(canvas: HTMLCanvasElement,
         device: device,
         format: format,
         canvas: canvas,
-        pointsPositionBuffer: pointsPositionBuffer,
+        pointsBuffer: pointsBuffer,
         cameraBuffer: cameraBuffer,
+        boundingBoxBuffer: boundingBoxBuffer,
+        solverSettingsBuffer: solverSettingsBuffer,
     };
 }

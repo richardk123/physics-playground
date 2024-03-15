@@ -6,8 +6,8 @@ import {SliderComponent} from "./components/SliderComponent";
 import {AccordionComponent} from "./components/AccordionComponent";
 import {Engine} from "../engine/Engine";
 import {BoxTitle} from "./components/BoxTitle";
-import {Camera} from "../engine/data/Camera";
 import {Typography} from "@mui/material";
+import {Camera} from "../engine/solver/buffer/CameraBuffer";
 
 interface Props
 {
@@ -24,7 +24,7 @@ export const SettingsSidebar = (props: Props) =>
         const sub = timer(100).subscribe(() =>
         {
             setSimulationDuration(props.engine.solver.simulationDuration.toFixed(2));
-            setPointCount(props.engine.solver.points.count);
+            setPointCount(props.engine.solver.gpu.pointsBuffer.points.count);
             setIncrement(increment + 1);
         });
 
@@ -42,44 +42,38 @@ export const SettingsSidebar = (props: Props) =>
         <AccordionComponent expanded={true} label="Simulation settings">
             <BoxTitle label="Simulations per second">
                 <SliderComponent value={1 / simSettings.deltaTime}
-                                 setValue={val => engine.setSettings({...simSettings, deltaTime: 1 / val})}
+                                 setValue={val => simSettings.deltaTime = 1 / val}
                                  step={1}
                                  minVal={30}
                                  maxVal={120} />
             </BoxTitle>
-            <BoxTitle label="Point diameter">
-                <SliderComponent value={simSettings.pointDiameter}
-                                 setValue={val => engine.setSettings({...simSettings, pointDiameter: val})}
-                                 minVal={0.1}
-                                 maxVal={10} />
-            </BoxTitle>
             <BoxTitle label="Sub-step count">
                 <SliderComponent value={simSettings.subStepCount}
-                                 setValue={val => engine.setSettings({...simSettings, subStepCount: val})}
+                                 setValue={val => simSettings.subStepCount = val}
                                  step={1}
                                  minVal={0}
                                  maxVal={20} />
             </BoxTitle>
             <BoxTitle label="Gravity">
                 <SliderComponent value={simSettings.gravity.x}
-                                 setValue={val => engine.setSettings({...simSettings, gravity: {x: val, y: simSettings.gravity.y}})}
+                                 setValue={val => simSettings.gravity.x = val}
                                  minVal={-20}
                                  maxVal={20} />
                 <SliderComponent value={simSettings.gravity.y}
-                                 setValue={val => engine.setSettings({...simSettings, gravity: {x: simSettings.gravity.x, y: val}})}
+                                 setValue={val => simSettings.gravity.y = val}
                                  minVal={-20}
                                  maxVal={20} />
             </BoxTitle>
             <BoxTitle label="Bounding box">
-                <VectorComponent vector={{x: bb.getCorners().bottomLeft.x, y: bb.getCorners().bottomLeft.y}}
+                <VectorComponent vector={{x: bb.bottomLeft.x, y: bb.bottomLeft.y}}
                                  change={(v) =>
                                  {
-                                     bb.update(v, bb.getCorners().topRight)
+                                     bb.bottomLeft = v;
                                  }}/>
-                <VectorComponent vector={{x: bb.getCorners().topRight.x, y: bb.getCorners().topRight.y}}
+                <VectorComponent vector={{x: bb.topRight.x, y: bb.topRight.y}}
                                  change={(v) =>
                                  {
-                                     bb.update(bb.getCorners().bottomLeft, v);
+                                     bb.topRight = v;
                                  }}/>
             </BoxTitle>
         </AccordionComponent>

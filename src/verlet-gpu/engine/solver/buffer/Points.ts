@@ -1,4 +1,4 @@
-import {Color} from "./Color";
+import {Color} from "../../data/Color";
 
 export class Points
 {
@@ -9,7 +9,7 @@ export class Points
     public color: Float32Array;
     public count: number;
 
-    private constructor(maxParticleCount: number)
+    constructor(maxParticleCount: number)
     {
         this.positionCurrent = new Float32Array(maxParticleCount * 2);
         this.positionPrevious = new Float32Array(maxParticleCount * 2);
@@ -17,11 +17,6 @@ export class Points
         this.massInverse = new Float32Array(maxParticleCount);
         this.color = new Float32Array(maxParticleCount * 3);
         this.count = 0;
-    }
-
-    public static create(maxParticleCount: number): Points
-    {
-        return new Points(maxParticleCount);
     }
 
     public addPoint(x: number, y: number, mass: number, color: Color)
@@ -41,4 +36,28 @@ export class Points
 
         return index;
     }
+}
+
+export class PointsBuffer
+{
+    public points: Points;
+    public buffer: GPUBuffer;
+
+    constructor(maxParticleCount: number, device: GPUDevice)
+    {
+        this.points = new Points(maxParticleCount);
+
+        this.buffer = device.createBuffer({
+            label: 'points position buffer',
+            size: maxParticleCount * 2 * 4,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+    }
+
+    public writeBuffer(device: GPUDevice)
+    {
+        // points buffer
+        device.queue.writeBuffer(this.buffer, 0, this.points.positionCurrent);
+    }
+
 }

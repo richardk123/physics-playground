@@ -1,16 +1,9 @@
-import {Solver, SolverSettings} from "./solver/Solver";
-import {BoundingBox} from "./data/BoundingBox";
-import {Camera} from "./data/Camera";
+import {Solver} from "./solver/Solver";
+import {BoundingBox, DEFAULT_BOUNDING_BOX_SETTINGS} from "./solver/buffer/BoundingBoxBuffer";
 import {Vec2d} from "./data/Vec2d";
 import {Colors} from "./data/Color";
-
-export const DEFAULT_ENGINE_SETTINGS: SolverSettings = {
-    pointDiameter: 1,
-    gravity: {x: 0, y: -10},
-    maxParticleCount: 1000000,
-    deltaTime: 1 / 60,
-    subStepCount: 4,
-};
+import {DEFAULT_SOLVER_SETTINGS, SolverSettings} from "./solver/buffer/SolverSettingsBuffer";
+import {Camera, DEFAULT_CAMERA_SETTING} from "./solver/buffer/CameraBuffer";
 
 export class Engine
 {
@@ -22,10 +15,11 @@ export class Engine
     }
 
     static async create(canvas: HTMLCanvasElement,
-                        settings?: SolverSettings): Promise<Engine>
+                        settings = DEFAULT_SOLVER_SETTINGS,
+                        camera = DEFAULT_CAMERA_SETTING,
+                        boundingBox = DEFAULT_BOUNDING_BOX_SETTINGS): Promise<Engine>
     {
-        const s = settings || DEFAULT_ENGINE_SETTINGS;
-        const solver = await Solver.create(canvas, s);
+        const solver = await Solver.create(canvas, settings, camera, boundingBox);
         return new Engine(solver);
     }
 
@@ -38,7 +32,7 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.solver.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color);
+                this.solver.gpu.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color);
             }
         }
     }
@@ -57,22 +51,17 @@ export class Engine
 
     public getSettings(): SolverSettings
     {
-        return {...this.solver.settings};
-    }
-
-    public setSettings(settings: SolverSettings)
-    {
-        this.solver.settings = settings;
+        return this.solver.gpu.solverSettingsBuffer.settings;
     }
 
     public getWorldBoundingBox(): BoundingBox
     {
-        return this.solver.getWorldBoundingBox();
+        return this.solver.gpu.boundingBoxBuffer.boundingBox;
     }
 
     public getCamera(): Camera
     {
-        return this.solver.getCamera();
+        return this.solver.gpu.cameraBuffer.camera;
     }
 
     public getSimulationSize(): Vec2d

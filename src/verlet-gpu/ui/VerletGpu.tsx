@@ -10,11 +10,11 @@ export const VerletGpu = () =>
     useEffect(function ()
     {
         Engine.create(canvasRef.current!)
-            .then(e =>
+            .then(engine =>
             {
-                e.createRectangle(-500, -500, 1000, 1000);
-                setEngine(e);
-                e.start();
+                setEngine(engine);
+                engine.createRectangle(-500, -500, 1000, 1000);
+                engine.start();
             });
     }, []);
 
