@@ -1,3 +1,9 @@
+var<private> TRIANGLE: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
+      vec2f( 0.0,  1.0),  // top center
+      vec2f(0.866025, -0.5),  // bottom right
+      vec2f(-0.866025, -0.5)   // bottom left
+);
+
 struct TransformData {
     model: mat4x4<f32>,
     view: mat4x4<f32>,
@@ -16,24 +22,14 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
       @builtin(instance_index) instanceIndex: u32) -> VertexOutput
 {
     var out: VertexOutput;
-    let pos = array(
-      vec2f( 0.0,  1.0),  // top center
-      vec2f(0.866025, -0.5),  // bottom left
-      vec2f(-0.866025, -0.5)   // bottom right
-    );
+    let vertexPos = pointPositions[instanceIndex] + TRIANGLE[vertexIndex];
 
-    let vertexPos = pointPositions[instanceIndex] + pos[vertexIndex];
-
-    // Perform matrix-vector multiplication manually
-    let transformedPos = transformUBO.projection * transformUBO.view * transformUBO.model * vec4<f32>(
-        0.0,
-        vertexPos.x,
-        vertexPos.y,
-        1.0
-    );
+    let transformedPos = transformUBO.projection *
+        transformUBO.view *
+        transformUBO.model * vec4<f32>(0.0, vertexPos.x, vertexPos.y, 1.0);
 
     out.transformedPos = transformedPos;
-    out.localSpace = pos[vertexIndex];
+    out.localSpace = TRIANGLE[vertexIndex];
     return out;
 }
 
@@ -42,8 +38,7 @@ fn fs(in: VertexOutput) -> @location(0) vec4f
 {
     if (dot(in.localSpace, in.localSpace) > .25)
     {
-        return vec4f(.1, .1, .1, 1.0);
-//        discard;
+        discard;
     }
     return vec4f(1.0, .1, .1, 1.0);
 }

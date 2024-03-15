@@ -29,8 +29,6 @@ export async function initPipeline(canvas: HTMLCanvasElement,
     const shader = await (fetch('/physics-playground/shader.wgsl')
         .then((r) => r.text()));
 
-    console.log(shader);
-
     const module = device.createShaderModule({
         code: shader
     });
