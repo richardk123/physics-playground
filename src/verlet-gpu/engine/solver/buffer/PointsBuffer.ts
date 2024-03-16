@@ -12,10 +12,15 @@ export class Points
     constructor(maxParticleCount: number)
     {
         this.positionCurrent = new Float32Array(maxParticleCount * 2);
+        this.positionCurrent.fill(0);
         this.positionPrevious = new Float32Array(maxParticleCount * 2);
+        this.positionPrevious.fill(0)
         this.velocity = new Float32Array(maxParticleCount * 2);
+        this.velocity.fill(0);
         this.massInverse = new Float32Array(maxParticleCount);
+        this.massInverse.fill(0)
         this.color = new Float32Array(maxParticleCount * 3);
+        this.color.fill(0);
         this.count = 0;
     }
 
@@ -41,13 +46,25 @@ export class Points
 export class PointsBuffer
 {
     public points: Points;
-    public buffer: GPUBuffer;
+    public positionCurrentBuffer: GPUBuffer;
+    public positionPreviousBuffer: GPUBuffer;
+    public velocityBuffer: GPUBuffer;
 
     constructor(maxParticleCount: number, device: GPUDevice)
     {
         this.points = new Points(maxParticleCount);
 
-        this.buffer = device.createBuffer({
+        this.positionCurrentBuffer = device.createBuffer({
+            label: 'points position buffer',
+            size: maxParticleCount * 2 * 4,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        this.positionPreviousBuffer = device.createBuffer({
+            label: 'points position buffer',
+            size: maxParticleCount * 2 * 4,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        this.velocityBuffer = device.createBuffer({
             label: 'points position buffer',
             size: maxParticleCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -56,8 +73,9 @@ export class PointsBuffer
 
     public writeBuffer(device: GPUDevice)
     {
-        // points buffer
-        device.queue.writeBuffer(this.buffer, 0, this.points.positionCurrent);
+        device.queue.writeBuffer(this.positionCurrentBuffer, 0, this.points.positionCurrent);
+        device.queue.writeBuffer(this.positionPreviousBuffer, 0, this.points.positionPrevious);
+        device.queue.writeBuffer(this.velocityBuffer, 0, this.points.velocity);
     }
 
 }

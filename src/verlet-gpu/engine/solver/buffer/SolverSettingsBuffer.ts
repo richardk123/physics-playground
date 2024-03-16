@@ -19,22 +19,28 @@ export class SolverSettingsBuffer
 {
     public settings: SolverSettings;
     public buffer: GPUBuffer;
+    readonly data: Float32Array;
 
     constructor(settings: SolverSettings,
                 device : GPUDevice)
     {
         this.settings = settings;
+        this.data = new Float32Array(4);
 
-        //TODO:
         this.buffer = device.createBuffer({
             label: 'solver settings buffer',
-            size: 64 * 3,
+            size: 16, // deltaTime + gravity
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
     }
 
     public writeBuffer(device : GPUDevice)
     {
-        //TODO:
+        this.data[0] = this.settings.gravity.x;
+        this.data[1] = this.settings.gravity.y;
+        this.data[2] = this.settings.deltaTime;
+        this.data[3] = 0;
+
+        device.queue.writeBuffer(this.buffer, 0, this.data);
     }
 }

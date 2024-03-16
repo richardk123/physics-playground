@@ -24,7 +24,7 @@ export const SettingsSidebar = (props: Props) =>
         const sub = timer(100).subscribe(() =>
         {
             setSimulationDuration(props.engine.solver.simulationDuration.toFixed(2));
-            setPointCount(props.engine.solver.gpu.pointsBuffer.points.count);
+            setPointCount(props.engine.solver.pointsBuffer.points.count);
             setIncrement(increment + 1);
         });
 

@@ -32,7 +32,7 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.solver.gpu.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color);
+                this.solver.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color);
             }
         }
     }
@@ -51,17 +51,17 @@ export class Engine
 
     public getSettings(): SolverSettings
     {
-        return this.solver.gpu.solverSettingsBuffer.settings;
+        return this.solver.settingsBuffer.settings;
     }
 
     public getWorldBoundingBox(): BoundingBox
     {
-        return this.solver.gpu.boundingBoxBuffer.boundingBox;
+        return this.solver.renderPipeline.boundingBoxBuffer.boundingBox;
     }
 
     public getCamera(): Camera
     {
-        return this.solver.gpu.cameraBuffer.camera;
+        return this.solver.renderPipeline.cameraBuffer.camera;
     }
 
     public getSimulationSize(): Vec2d
