@@ -14,13 +14,14 @@ export interface BoundingBox
 export class BoundingBoxBuffer
 {
     public boundingBox: BoundingBox;
-
     public buffer: GPUBuffer;
+    readonly data: Float32Array;
 
     constructor(boundingBox: BoundingBox,
                 device : GPUDevice)
     {
         this.boundingBox = boundingBox;
+        this.data = new Float32Array(4);
 
         this.buffer = device.createBuffer({
             label: 'bounding-box buffer',
@@ -32,7 +33,12 @@ export class BoundingBoxBuffer
 
     public writeBuffer(device : GPUDevice)
     {
-        //TODO:
+        this.data[0] = this.boundingBox.bottomLeft.x;
+        this.data[1] = this.boundingBox.bottomLeft.y;
+        this.data[2] = this.boundingBox.topRight.x;
+        this.data[3] = this.boundingBox.topRight.y;
+
+        device.queue.writeBuffer(this.buffer, 0, this.data);
     }
 
 }

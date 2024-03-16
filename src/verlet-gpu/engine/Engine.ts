@@ -1,7 +1,7 @@
 import {Solver} from "./solver/Solver";
 import {BoundingBox, DEFAULT_BOUNDING_BOX_SETTINGS} from "./solver/buffer/BoundingBoxBuffer";
 import {Vec2d} from "./data/Vec2d";
-import {Colors} from "./data/Color";
+import {Color, Colors} from "./data/Color";
 import {DEFAULT_SOLVER_SETTINGS, SolverSettings} from "./solver/buffer/SolverSettingsBuffer";
 import {Camera, DEFAULT_CAMERA_SETTING} from "./solver/buffer/CameraBuffer";
 
@@ -32,7 +32,8 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.solver.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, color);
+                const c: Color = {r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0};
+                this.solver.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, c);
             }
         }
     }
@@ -56,7 +57,7 @@ export class Engine
 
     public getWorldBoundingBox(): BoundingBox
     {
-        return this.solver.renderPipeline.boundingBoxBuffer.boundingBox;
+        return this.solver.boundingBoxBuffer.boundingBox;
     }
 
     public getCamera(): Camera

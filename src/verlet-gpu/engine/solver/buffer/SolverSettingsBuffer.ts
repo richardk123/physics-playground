@@ -36,8 +36,8 @@ export class SolverSettingsBuffer
 
     public writeBuffer(device : GPUDevice)
     {
-        this.data[0] = this.settings.gravity.x;
-        this.data[1] = this.settings.gravity.y;
+        this.data[0] = Math.sign(this.settings.gravity.x) * this.settings.gravity.x * this.settings.gravity.x;
+        this.data[1] = Math.sign(this.settings.gravity.y) * this.settings.gravity.y * this.settings.gravity.y;
         this.data[2] = this.settings.deltaTime;
         this.data[3] = 0;
 

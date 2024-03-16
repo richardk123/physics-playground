@@ -1,6 +1,7 @@
 import {GPUData} from "./GPUInit";
 import {PointsBuffer} from "../buffer/PointsBuffer";
 import {SolverSettingsBuffer} from "../buffer/SolverSettingsBuffer";
+import {BoundingBoxBuffer} from "../buffer/BoundingBoxBuffer";
 
 export interface ComputePreSolvePipeline
 {
@@ -10,7 +11,8 @@ export interface ComputePreSolvePipeline
 
 export async function initComputePreSolvePipeline(gpuData: GPUData,
                                                   settingsBuffer: SolverSettingsBuffer,
-                                                  pointsBuffer: PointsBuffer): Promise<ComputePreSolvePipeline>
+                                                  pointsBuffer: PointsBuffer,
+                                                  boundingBoxBuffer: BoundingBoxBuffer): Promise<ComputePreSolvePipeline>
 {
     const device : GPUDevice = gpuData.device;
 
@@ -27,7 +29,7 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
                 binding: 1,
                 visibility: GPUShaderStage.COMPUTE,
                 buffer: {
-                    type: "storage",
+                    type: "uniform",
                 }
             },
             {
@@ -39,6 +41,13 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
             },
             {
                 binding: 3,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: {
+                    type: "storage",
+                }
+            },
+            {
+                binding: 4,
                 visibility: GPUShaderStage.COMPUTE,
                 buffer: {
                     type: "storage",
@@ -72,9 +81,10 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
         layout: bindGroupLayout,
         entries: [
             { binding: 0, resource: { buffer: settingsBuffer.buffer }},
-            { binding: 1, resource: { buffer: pointsBuffer.positionCurrentBuffer }},
-            { binding: 2, resource: { buffer: pointsBuffer.positionPreviousBuffer }},
-            { binding: 3, resource: { buffer: pointsBuffer.velocityBuffer }},
+            { binding: 1, resource: { buffer: boundingBoxBuffer.buffer }},
+            { binding: 2, resource: { buffer: pointsBuffer.positionCurrentBuffer }},
+            { binding: 3, resource: { buffer: pointsBuffer.positionPreviousBuffer }},
+            { binding: 4, resource: { buffer: pointsBuffer.velocityBuffer }},
         ],
     });
 

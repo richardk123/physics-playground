@@ -1,6 +1,4 @@
-import {SolverSettings, SolverSettingsBuffer} from "../buffer/SolverSettingsBuffer";
 import {Camera, CameraBuffer} from "../buffer/CameraBuffer";
-import {BoundingBox, BoundingBoxBuffer} from "../buffer/BoundingBoxBuffer";
 import {PointsBuffer} from "../buffer/PointsBuffer";
 import {GPUData} from "./GPUInit";
 
@@ -9,18 +7,15 @@ export interface RenderPipeline
     bindGroup: GPUBindGroup;
     pipeline: GPURenderPipeline;
     cameraBuffer: CameraBuffer;
-    boundingBoxBuffer: BoundingBoxBuffer;
 }
 export async function initRenderPipeline(gpuData: GPUData,
                                          camera: Camera,
-                                         boundingBox: BoundingBox,
                                          pointsBuffer: PointsBuffer): Promise<RenderPipeline>
 {
     const device : GPUDevice = gpuData.device;
     const presentationFormat = gpuData.presentationFormat;
 
     const cameraBuffer = new CameraBuffer(camera, device);
-    const boundingBoxBuffer = new BoundingBoxBuffer(boundingBox, device);
 
     const bindGroupLayout = device.createBindGroupLayout({
         entries: [
@@ -87,6 +82,5 @@ export async function initRenderPipeline(gpuData: GPUData,
         pipeline: pipeline,
         bindGroup: bindGroup,
         cameraBuffer: cameraBuffer,
-        boundingBoxBuffer: boundingBoxBuffer,
     };
 }
