@@ -66,7 +66,8 @@ export class Solver
         this.settingsBuffer.writeBuffer(this.gpuData.device);
 
         this.preSolve();
-        // this.postSolve();
+        this.postSolve();
+
         this.render();
 
         this.simulationDuration = performance.now() - t;
@@ -124,11 +125,8 @@ export class Solver
         // camera matrices
         this.renderPipeline.cameraBuffer.writeBuffer(canvas, device);
 
-        //command encoder: records draw commands for submission
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
-        //texture view: image view to the color buffer in this case
         const textureView : GPUTextureView = context.getCurrentTexture().createView();
-        //renderpass: holds draw commands, allocated from command encoder
         const renderpass : GPURenderPassEncoder = commandEncoder.beginRenderPass({
             colorAttachments: [{
                 view: textureView,

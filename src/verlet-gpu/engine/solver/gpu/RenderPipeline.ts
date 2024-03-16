@@ -37,6 +37,13 @@ export async function initRenderPipeline(gpuData: GPUData,
                 buffer: {
                     type: "read-only-storage",
                 }
+            },
+            {
+                binding: 2,
+                visibility: GPUShaderStage.VERTEX,
+                buffer: {
+                    type: "read-only-storage",
+                }
             }
         ] as GPUBindGroupLayoutEntry[]
     });
@@ -45,7 +52,7 @@ export async function initRenderPipeline(gpuData: GPUData,
         bindGroupLayouts: [bindGroupLayout]
     });
 
-    const shaderCode = await (fetch('/physics-playground/shader.wgsl')
+    const shaderCode = await (fetch('/physics-playground/renderShader.wgsl')
         .then((r) => r.text()));
 
     const module = device.createShaderModule({
@@ -71,7 +78,8 @@ export async function initRenderPipeline(gpuData: GPUData,
         layout: bindGroupLayout,
         entries: [
             { binding: 0, resource: { buffer: cameraBuffer.buffer }},
-            { binding: 1, resource: { buffer: pointsBuffer.positionCurrentBuffer }}
+            { binding: 1, resource: { buffer: pointsBuffer.positionCurrentBuffer }},
+            { binding: 2, resource: { buffer: pointsBuffer.colorBuffer }},
         ],
     });
 

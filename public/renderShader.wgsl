@@ -13,16 +13,18 @@ struct TransformData {
 struct VertexOutput {
     @builtin(position) transformedPos: vec4<f32>,
     @location(0) localSpace: vec2<f32>,
+    @location(1) color: vec4<f32>,
 }
 
 @group(0) @binding(0) var<uniform> transformUBO: TransformData;
-@group(0) @binding(1) var<storage, read> pointPositions: array<vec2<f32>>;
+@group(0) @binding(1) var<storage, read> positions: array<vec2<f32>>;
+@group(0) @binding(2) var<storage, read> colors: array<vec4<f32>>;
 @vertex
 fn vs(@builtin(vertex_index) vertexIndex : u32,
       @builtin(instance_index) instanceIndex: u32) -> VertexOutput
 {
     var out: VertexOutput;
-    let vertexPos = pointPositions[instanceIndex] + TRIANGLE[vertexIndex];
+    let vertexPos = positions[instanceIndex] + TRIANGLE[vertexIndex];
 
     let transformedPos = transformUBO.projection *
         transformUBO.view *
@@ -30,6 +32,7 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
 
     out.transformedPos = transformedPos;
     out.localSpace = TRIANGLE[vertexIndex];
+    out.color = colors[instanceIndex];
     return out;
 }
 
@@ -40,5 +43,5 @@ fn fs(in: VertexOutput) -> @location(0) vec4f
     {
         discard;
     }
-    return vec4f(1.0, .1, .1, 1.0);
+    return in.color;
 }

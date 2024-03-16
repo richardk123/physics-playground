@@ -12,7 +12,7 @@ struct Settings
 @workgroup_size(1)
 fn computeSomething(@builtin(global_invocation_id) global_invocation_id : vec3<u32>)
 {
-//    let inverseDt = 1 / settings.deltaTime;
+    let inverseDt = 1 / settings.deltaTime;
 //     update velocity
-//    velocities[global_invocation_id.x] = (pointsCurrentPosition[global_invocation_id.x] - pointsPreviousPosition[global_invocation_id.x]) * inverseDt;
+    velocities[global_invocation_id.x] = (pointsCurrentPosition[global_invocation_id.x] - pointsPreviousPosition[global_invocation_id.x]) * inverseDt;
 }

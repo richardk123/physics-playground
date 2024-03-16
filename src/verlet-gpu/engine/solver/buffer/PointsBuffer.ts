@@ -19,7 +19,7 @@ export class Points
         this.velocity.fill(0);
         this.massInverse = new Float32Array(maxParticleCount);
         this.massInverse.fill(0)
-        this.color = new Float32Array(maxParticleCount * 3);
+        this.color = new Float32Array(maxParticleCount * 4);
         this.color.fill(0);
         this.count = 0;
     }
@@ -33,9 +33,10 @@ export class Points
 
         this.massInverse[index] = 1 / mass;
 
-        this.color[index * 3 + 0] = color.r;
-        this.color[index * 3 + 1] = color.g;
-        this.color[index * 3 + 2] = color.b;
+        this.color[index * 4 + 0] = color.r;
+        this.color[index * 4 + 1] = color.g;
+        this.color[index * 4 + 2] = color.b;
+        this.color[index * 4 + 3] = color.a;
 
         this.count += 1;
 
@@ -49,24 +50,30 @@ export class PointsBuffer
     public positionCurrentBuffer: GPUBuffer;
     public positionPreviousBuffer: GPUBuffer;
     public velocityBuffer: GPUBuffer;
+    public colorBuffer: GPUBuffer;
 
     constructor(maxParticleCount: number, device: GPUDevice)
     {
         this.points = new Points(maxParticleCount);
 
         this.positionCurrentBuffer = device.createBuffer({
-            label: 'points position buffer',
+            label: 'points current position buffer',
             size: maxParticleCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
         this.positionPreviousBuffer = device.createBuffer({
-            label: 'points position buffer',
+            label: 'points previous position buffer',
             size: maxParticleCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
         this.velocityBuffer = device.createBuffer({
-            label: 'points position buffer',
+            label: 'points velocity buffer',
             size: maxParticleCount * 2 * 4,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        this.colorBuffer = device.createBuffer({
+            label: 'points color buffer',
+            size: maxParticleCount * 4 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
     }
@@ -76,6 +83,7 @@ export class PointsBuffer
         device.queue.writeBuffer(this.positionCurrentBuffer, 0, this.points.positionCurrent);
         device.queue.writeBuffer(this.positionPreviousBuffer, 0, this.points.positionPrevious);
         device.queue.writeBuffer(this.velocityBuffer, 0, this.points.velocity);
+        device.queue.writeBuffer(this.colorBuffer, 0, this.points.color);
     }
 
 }

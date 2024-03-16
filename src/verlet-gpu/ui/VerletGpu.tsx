@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Engine} from "../engine/Engine";
 import {SettingsSidebar} from "./SettingsSidebar";
+import {Color} from "../engine/data/Color";
 
 export const VerletGpu = () =>
 {
@@ -18,9 +19,16 @@ export const VerletGpu = () =>
                 engine.getWorldBoundingBox().topRight.y = 50;
                 engine.getWorldBoundingBox().bottomLeft.x = -50;
                 engine.getWorldBoundingBox().bottomLeft.y = -50;
-                engine.getCamera().zoom = 0.162
-                ;
-                engine.createRectangle(-50, -50, 100, 100);
+                engine.getCamera().zoom = 0.182;
+
+                // for (let i = -50; i < 50; i++)
+                // {
+                //     const color: Color = {r: ((50 + i) + 0.001) / 100, g: 0.1, b: 0.1, a: 1.0};
+                //     engine.createRectangle(i, -50, 1, 100, 1, color);
+                // }
+
+                const size = 255;
+                engine.createRectangle(-size / 2, -size / 2, size, size);
 
                 engine.start();
             });
