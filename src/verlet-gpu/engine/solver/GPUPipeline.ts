@@ -1,7 +1,7 @@
 import {SolverSettings, SolverSettingsBuffer} from "./buffer/SolverSettingsBuffer";
 import {Camera, CameraBuffer} from "./buffer/CameraBuffer";
 import {BoundingBox, BoundingBoxBuffer} from "./buffer/BoundingBoxBuffer";
-import {PointsBuffer} from "./buffer/Points";
+import {PointsBuffer} from "./buffer/PointsBuffer";
 
 export interface GPUData
 {

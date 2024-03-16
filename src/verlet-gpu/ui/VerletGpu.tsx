@@ -13,7 +13,15 @@ export const VerletGpu = () =>
             .then(engine =>
             {
                 setEngine(engine);
-                engine.createRectangle(-500, -500, 1000, 1000);
+
+                engine.getWorldBoundingBox().topRight.x = 50;
+                engine.getWorldBoundingBox().topRight.y = 50;
+                engine.getWorldBoundingBox().bottomLeft.x = -50;
+                engine.getWorldBoundingBox().bottomLeft.y = -50;
+                engine.getCamera().zoom = 0.162
+                ;
+                engine.createRectangle(-50, -50, 100, 100);
+
                 engine.start();
             });
     }, []);

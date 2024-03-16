@@ -22,10 +22,9 @@ export class BoundingBoxBuffer
     {
         this.boundingBox = boundingBox;
 
-        //TODO:
         this.buffer = device.createBuffer({
             label: 'bounding-box buffer',
-            size: 64 * 3,
+            size: 4 * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
     }
