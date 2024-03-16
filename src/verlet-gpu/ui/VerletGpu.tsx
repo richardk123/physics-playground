@@ -19,7 +19,7 @@ export const VerletGpu = () =>
                 engine.getWorldBoundingBox().topRight.y = 50;
                 engine.getWorldBoundingBox().bottomLeft.x = -50;
                 engine.getWorldBoundingBox().bottomLeft.y = -50;
-                engine.getCamera().zoom = 0.182;
+                engine.getCamera().zoom = 0.001;
 
                 // for (let i = -50; i < 50; i++)
                 // {
@@ -27,7 +27,7 @@ export const VerletGpu = () =>
                 //     engine.createRectangle(i, -50, 1, 100, 1, color);
                 // }
 
-                const size = 255;
+                const size = 1000;
                 engine.createRectangle(-size / 2, -size / 2, size, size);
 
                 engine.start();

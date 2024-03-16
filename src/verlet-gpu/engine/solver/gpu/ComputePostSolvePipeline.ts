@@ -63,7 +63,7 @@ export async function initComputePostSolvePipeline(gpuData: GPUData,
         layout: pipelineLayout,
         compute: {
             module,
-            entryPoint: 'computeSomething',
+            entryPoint: 'postSolve',
         },
     });
 

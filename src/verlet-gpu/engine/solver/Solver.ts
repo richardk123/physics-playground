@@ -85,7 +85,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(this.pointsBuffer.points.count);
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / 16));
         pass.end();
 
         // Finish encoding and submit the commands
@@ -105,7 +105,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(this.pointsBuffer.points.count);
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / 16));
         pass.end();
 
         // Finish encoding and submit the commands

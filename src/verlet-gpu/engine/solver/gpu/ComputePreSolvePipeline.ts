@@ -63,7 +63,7 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
         layout: pipelineLayout,
         compute: {
             module,
-            entryPoint: 'computeSomething',
+            entryPoint: 'preSolve',
         },
     });
 
