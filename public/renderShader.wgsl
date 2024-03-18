@@ -1,4 +1,4 @@
-var<private> TRIANGLE: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
+const TRIANGLE: array<vec2<f32>, 3> = array<vec2<f32>, 3>(
       vec2f( 0.0,  1.0),  // top center
       vec2f(0.866025, -0.5),  // bottom right
       vec2f(-0.866025, -0.5)   // bottom left

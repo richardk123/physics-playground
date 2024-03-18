@@ -1,6 +1,7 @@
 import {GPUData} from "./GPUInit";
 import {PointsBuffer} from "../buffer/PointsBuffer";
 import {SolverSettingsBuffer} from "../buffer/SolverSettingsBuffer";
+import {loadShaderAndPutCommonCode} from "./common/ShaderCommon";
 
 export interface ComputePostSolvePipeline
 {
@@ -51,8 +52,7 @@ export async function initComputePostSolvePipeline(gpuData: GPUData,
         bindGroupLayouts: [bindGroupLayout]
     });
 
-    const shaderCode = await (fetch('/physics-playground/postSolveShader.wgsl')
-        .then((r) => r.text()));
+    const shaderCode = await loadShaderAndPutCommonCode('/physics-playground/postSolveShader.wgsl', gpuData.maxBlockSize);
 
     const module = device.createShaderModule({
         code: shaderCode

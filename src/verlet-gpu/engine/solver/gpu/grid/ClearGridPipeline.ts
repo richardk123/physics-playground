@@ -1,17 +1,16 @@
-import {GPUData} from "./GPUInit";
-import {PointsBuffer} from "../buffer/PointsBuffer";
-import {SolverSettingsBuffer} from "../buffer/SolverSettingsBuffer";
-import {loadShaderAndPutCommonCode} from "./common/ShaderCommon";
+import {GPUData} from "../GPUInit";
+import {SolverSettingsBuffer} from "../../buffer/SolverSettingsBuffer";
+import {PointsBuffer} from "../../buffer/PointsBuffer";
 
-export interface ComputePreSolvePipeline
+export interface CreateGridPipeline
 {
     pipeline: GPUComputePipeline;
     bindGroup: GPUBindGroup;
 }
 
-export async function initComputePreSolvePipeline(gpuData: GPUData,
-                                                  settingsBuffer: SolverSettingsBuffer,
-                                                  pointsBuffer: PointsBuffer): Promise<ComputePreSolvePipeline>
+export async function initCreateGridPipeline(gpuData: GPUData,
+                                             settingsBuffer: SolverSettingsBuffer,
+                                             pointsBuffer: PointsBuffer): Promise<CreateGridPipeline>
 {
     const device : GPUDevice = gpuData.device;
 
@@ -52,7 +51,8 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
         bindGroupLayouts: [bindGroupLayout]
     });
 
-    const shaderCode = await loadShaderAndPutCommonCode('/physics-playground/preSolveShader.wgsl', gpuData.maxBlockSize);
+    const shaderCode = await (fetch('/physics-playground/postSolveShader.wgsl')
+        .then((r) => r.text()));
 
     const module = device.createShaderModule({
         code: shaderCode
@@ -63,7 +63,7 @@ export async function initComputePreSolvePipeline(gpuData: GPUData,
         layout: pipelineLayout,
         compute: {
             module,
-            entryPoint: 'preSolve',
+            entryPoint: 'postSolve',
         },
     });
 

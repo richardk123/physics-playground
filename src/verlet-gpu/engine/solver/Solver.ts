@@ -1,4 +1,3 @@
-import {BoundingBox, BoundingBoxBuffer} from "./buffer/BoundingBoxBuffer";
 import {Vec2d} from "../data/Vec2d";
 import {SolverSettings, SolverSettingsBuffer} from "./buffer/SolverSettingsBuffer";
 import {Camera} from "./buffer/CameraBuffer";
@@ -19,15 +18,13 @@ export class Solver
 
     public pointsBuffer: PointsBuffer;
     public settingsBuffer: SolverSettingsBuffer;
-    public boundingBoxBuffer: BoundingBoxBuffer;
 
     private constructor(gpuData: GPUData,
                         renderPipeline: RenderPipeline,
                         preSolvePipeline: ComputePreSolvePipeline,
                         postSolvePipeline: ComputePostSolvePipeline,
                         pointsBuffer: PointsBuffer,
-                        settingsBuffer: SolverSettingsBuffer,
-                        boundingBoxBuffer: BoundingBoxBuffer)
+                        settingsBuffer: SolverSettingsBuffer)
     {
         this.gpuData = gpuData;
         this.renderPipeline = renderPipeline;
@@ -35,30 +32,27 @@ export class Solver
         this.preSolvePipeline = preSolvePipeline;
         this.settingsBuffer = settingsBuffer;
         this.postSolvePipeline = postSolvePipeline;
-        this.boundingBoxBuffer = boundingBoxBuffer;
     }
 
     static async create(canvas: HTMLCanvasElement,
                         settings: SolverSettings,
-                        camera: Camera,
-                        boundingBox: BoundingBox)
+                        camera: Camera)
     {
 
         const gpuData = await initGpu(canvas);
 
         const settingsBuffer = new SolverSettingsBuffer(settings, gpuData.device);
         const pointsBuffer = new PointsBuffer(settings.maxParticleCount, gpuData.device);
-        const boundingBoxBuffer = new BoundingBoxBuffer(boundingBox, gpuData.device);
 
         const renderPipeline = await initRenderPipeline(gpuData, camera, pointsBuffer);
         const preSolvePipeline = await initComputePreSolvePipeline(gpuData,
-            settingsBuffer, pointsBuffer, boundingBoxBuffer);
+            settingsBuffer, pointsBuffer);
         const postSolvePipeline = await initComputePostSolvePipeline(gpuData,
             settingsBuffer, pointsBuffer);
 
         return new Solver(gpuData,
             renderPipeline, preSolvePipeline, postSolvePipeline,
-            pointsBuffer, settingsBuffer, boundingBoxBuffer);
+            pointsBuffer, settingsBuffer);
     }
 
     public initStaticData()
@@ -72,7 +66,6 @@ export class Solver
 
         // write buffers
         this.settingsBuffer.writeBuffer(this.gpuData.device);
-        this.boundingBoxBuffer.writeBuffer(this.gpuData.device);
 
         this.preSolve();
         this.postSolve();
@@ -94,7 +87,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / 16));
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / this.gpuData.maxBlockSize));
         pass.end();
 
         // Finish encoding and submit the commands
@@ -114,7 +107,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / 16));
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / this.gpuData.maxBlockSize));
         pass.end();
 
         // Finish encoding and submit the commands

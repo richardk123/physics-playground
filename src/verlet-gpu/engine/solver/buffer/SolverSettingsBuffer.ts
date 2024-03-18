@@ -5,7 +5,18 @@ export const DEFAULT_SOLVER_SETTINGS: SolverSettings = {
     gravity: {x: 0, y: -10},
     deltaTime: 1 / 60,
     subStepCount: 4,
+    boundingBox: {
+        bottomLeft: {x: 0, y: 0},
+        topRight: {x: 100, y: 100},
+    },
 };
+
+
+export interface BoundingBox
+{
+    bottomLeft: Vec2d;
+    topRight: Vec2d
+}
 
 export interface SolverSettings
 {
@@ -13,6 +24,7 @@ export interface SolverSettings
     gravity: Vec2d;
     deltaTime: number;
     subStepCount: number;
+    boundingBox: BoundingBox;
 }
 
 export class SolverSettingsBuffer
@@ -25,11 +37,11 @@ export class SolverSettingsBuffer
                 device : GPUDevice)
     {
         this.settings = settings;
-        this.data = new Float32Array(4);
+        this.data = new Float32Array(8);
 
         this.buffer = device.createBuffer({
             label: 'solver settings buffer',
-            size: 16, // deltaTime + gravity
+            size: 32, // deltaTime + gravity
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
     }
@@ -39,7 +51,11 @@ export class SolverSettingsBuffer
         this.data[0] = Math.sign(this.settings.gravity.x) * this.settings.gravity.x * this.settings.gravity.x;
         this.data[1] = Math.sign(this.settings.gravity.y) * this.settings.gravity.y * this.settings.gravity.y;
         this.data[2] = this.settings.deltaTime;
-        this.data[3] = 0;
+        this.data[3] = 0; // padding
+        this.data[4] = this.settings.boundingBox.bottomLeft.x;
+        this.data[5] = this.settings.boundingBox.bottomLeft.y;
+        this.data[6] = this.settings.boundingBox.topRight.x;
+        this.data[7] = this.settings.boundingBox.topRight.y;
 
         device.queue.writeBuffer(this.buffer, 0, this.data);
     }

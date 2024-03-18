@@ -22,6 +22,7 @@ export const VerletGpu = () =>
                 engine.getWorldBoundingBox().topRight.y = bbSize / 2;
                 engine.getWorldBoundingBox().bottomLeft.x = -bbSize / 2;
                 engine.getWorldBoundingBox().bottomLeft.y = -bbSize / 2;
+                engine.getSettings().gravity.y = 0;
                 engine.getCamera().zoom = 1.5;
 
                 // for (let i = -50; i < 50; i++)
