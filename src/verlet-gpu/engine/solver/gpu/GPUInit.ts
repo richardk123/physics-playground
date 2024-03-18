@@ -7,7 +7,6 @@ export interface GPUData
     presentationFormat: GPUTextureFormat;
     canvas: HTMLCanvasElement;
     maxBlockSize: number;
-
 }
 
 export async function initGpu(canvas: HTMLCanvasElement): Promise<GPUData>
@@ -25,8 +24,6 @@ export async function initGpu(canvas: HTMLCanvasElement): Promise<GPUData>
 
     const maxBlockSize = adapter.limits.maxComputeWorkgroupSizeX;
 
-    console.log(`maxBlockSize: ${maxBlockSize}`);
-
     return {
         adapter: adapter,
         device: device,
@@ -34,7 +31,6 @@ export async function initGpu(canvas: HTMLCanvasElement): Promise<GPUData>
         format: format,
         presentationFormat: presentationFormat,
         canvas: canvas,
-        // TODO:?
-        maxBlockSize: Math.min(256, maxBlockSize),
+        maxBlockSize: maxBlockSize,
     };
 }

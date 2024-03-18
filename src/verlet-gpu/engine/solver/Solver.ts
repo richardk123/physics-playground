@@ -6,6 +6,7 @@ import {initRenderPipeline, RenderPipeline} from "./gpu/RenderPipeline";
 import {PointsBuffer} from "./buffer/PointsBuffer";
 import {ComputePreSolvePipeline, initComputePreSolvePipeline} from "./gpu/ComputePreSolvePipeline";
 import {ComputePostSolvePipeline, initComputePostSolvePipeline} from "./gpu/ComputePostSolvePipeline";
+import {WORKGROUP_SIZE} from "./gpu/common/ShaderCommon";
 
 
 export class Solver
@@ -87,7 +88,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / this.gpuData.maxBlockSize));
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / WORKGROUP_SIZE));
         pass.end();
 
         // Finish encoding and submit the commands
@@ -107,7 +108,7 @@ export class Solver
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
-        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / this.gpuData.maxBlockSize));
+        pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / WORKGROUP_SIZE));
         pass.end();
 
         // Finish encoding and submit the commands
