@@ -60,7 +60,7 @@ export class Engine
 
     public getCamera(): Camera
     {
-        return this.solver.renderPipeline.cameraBuffer.camera;
+        return this.solver.renderShader.cameraBuffer.camera;
     }
 
     public getSimulationSize(): Vec2d
