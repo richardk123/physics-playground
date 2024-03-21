@@ -15,15 +15,21 @@ export const VerletGpu = () =>
             {
                 setEngine(engine);
 
-                const size = 1000;
+                const size = 2;
                 const bbSize = size + 5;
 
-                engine.getWorldBoundingBox().topRight.x = bbSize / 2;
-                engine.getWorldBoundingBox().topRight.y = bbSize / 2;
-                engine.getWorldBoundingBox().bottomLeft.x = -bbSize / 2;
-                engine.getWorldBoundingBox().bottomLeft.y = -bbSize / 2;
-                engine.getSettings().gravity.y = 0;
-                engine.getCamera().zoom = 1.5;
+                engine.getWorldBoundingBox().topRight.x = bbSize;
+                engine.getWorldBoundingBox().topRight.y = bbSize;
+                engine.getWorldBoundingBox().bottomLeft.x = 0;
+                engine.getWorldBoundingBox().bottomLeft.y = 0;
+                engine.getCamera().translation.x = bbSize / 2;
+                engine.getCamera().translation.y = bbSize / 2;
+                engine.getSettings().gravity.y = -10;
+                engine.getSettings().gridCellSize = 1;
+                engine.getSettings().deltaTime = 1 / 60;
+                engine.getCamera().zoom = 0.038;
+                // engine.getCamera().zoom = 1.5;
+                // engine.getCamera().zoom = 0.03;
 
                 // for (let i = -50; i < 50; i++)
                 // {
@@ -31,9 +37,13 @@ export const VerletGpu = () =>
                 //     engine.createRectangle(i, -50, 1, 100, 1, color);
                 // }
 
-                engine.createRectangle(-size / 2, -size / 2, size, size);
+                engine.createRectangle(0, 0, size, size);
+                // engine.createRectangle(0, 0, 1, 2);
 
-                engine.start();
+                engine.start().then(e =>
+                {
+                    console.log("start");
+                });
             });
     }, []);
 

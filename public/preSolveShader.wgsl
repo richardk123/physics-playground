@@ -9,6 +9,11 @@ struct Settings
     gravity: vec2<f32>,
     deltaTime: f32,
     boundingBox: BoundingBox,
+    gridCellSize: f32,
+    pointsCount: u32,
+    gridTotalCells: u32,
+    gridSizeX: u32,
+    gridSizeY: u32,
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;

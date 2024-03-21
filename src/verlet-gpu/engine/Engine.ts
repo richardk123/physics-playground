@@ -31,20 +31,20 @@ export class Engine
             for (let x = 0; x < width; x++)
             {
                 const c: Color = {r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0};
-                this.solver.pointsBuffer.points.addPoint(bottomLeftX + x, bottomLeftY + y, mass, c);
+                this.solver.pointsBuffer.points.addPoint(bottomLeftX + x * .5, bottomLeftY + y * .5, mass, c);
             }
         }
     }
 
-    public start(): void
+    public async start()
     {
         this.solver.initStaticData();
-        this.simulate();
+        await this.simulate();
     }
 
-    private simulate()
+    private async simulate()
     {
-        this.solver.simulate();
+        await this.solver.simulate();
         requestAnimationFrame(this.simulate.bind(this));
     }
 

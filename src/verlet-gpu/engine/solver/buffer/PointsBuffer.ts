@@ -51,29 +51,31 @@ export class PointsBuffer
     public positionPreviousBuffer: GPUBuffer;
     public velocityBuffer: GPUBuffer;
     public colorBuffer: GPUBuffer;
+    public maxPointsCount: number;
 
-    constructor(maxParticleCount: number, device: GPUDevice)
+    constructor(maxPointsCount: number, device: GPUDevice)
     {
-        this.points = new Points(maxParticleCount);
+        this.maxPointsCount = maxPointsCount;
+        this.points = new Points(maxPointsCount);
 
         this.positionCurrentBuffer = device.createBuffer({
             label: 'points current position buffer',
-            size: maxParticleCount * 2 * 4,
+            size: maxPointsCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
         this.positionPreviousBuffer = device.createBuffer({
             label: 'points previous position buffer',
-            size: maxParticleCount * 2 * 4,
+            size: maxPointsCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
         this.velocityBuffer = device.createBuffer({
             label: 'points velocity buffer',
-            size: maxParticleCount * 2 * 4,
+            size: maxPointsCount * 2 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
         this.colorBuffer = device.createBuffer({
             label: 'points color buffer',
-            size: maxParticleCount * 4 * 4,
+            size: maxPointsCount * 4 * 4,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
         });
     }

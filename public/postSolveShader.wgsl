@@ -9,6 +9,11 @@ struct Settings
     gravity: vec2<f32>,
     deltaTime: f32,
     boundingBox: BoundingBox,
+    gridCellSize: f32,
+    pointsCount: u32,
+    gridTotalCells: u32,
+    gridSizeX: u32,
+    gridSizeY: u32,
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
@@ -19,7 +24,7 @@ struct Settings
 @workgroup_size(${maxBlockSize})
 fn postSolve(@builtin(global_invocation_id) id: vec3<u32>)
 {
-    let inverseDt = 1 / settings.deltaTime;
+    let inverseDt: f32 = 1 / settings.deltaTime;
 //     update velocity
     velocities[id.x] = (positionsCurrent[id.x] - positionsPrevious[id.x]) * inverseDt;
 }

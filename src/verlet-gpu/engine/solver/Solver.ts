@@ -6,30 +6,38 @@ import {PointsBuffer} from "./buffer/PointsBuffer";
 import {PostSolveComputeShader} from "./gpu/PostSolveComputeShader";
 import {PreSolveComputeShader} from "./gpu/PreSolveComputeShader";
 import {RenderShader} from "./gpu/RenderShader";
+import {GridComputeShader} from "./gpu/grid/GridComputeShader";
+import {CollisionComputeShader} from "./gpu/collision/CollisionComputeShader";
 
 
 export class Solver
 {
     public gpuData: GPUData;
     public simulationDuration: number = 0;
+
     public renderShader: RenderShader;
     private preSolveComputeShader: PreSolveComputeShader;
+    private collisionComputeShader: CollisionComputeShader;
     private postSolveComputeShader: PostSolveComputeShader;
-
+    private gridComputeShader: GridComputeShader;
     public pointsBuffer: PointsBuffer;
     public settingsBuffer: SolverSettingsBuffer;
 
     private constructor(gpuData: GPUData,
+                        gridComputeShader: GridComputeShader,
                         renderShader: RenderShader,
                         preSolveComputeShader: PreSolveComputeShader,
+                        collisionComputeShader: CollisionComputeShader,
                         postSolveComputeShader: PostSolveComputeShader,
                         pointsBuffer: PointsBuffer,
                         settingsBuffer: SolverSettingsBuffer)
     {
         this.gpuData = gpuData;
+        this.gridComputeShader = gridComputeShader;
         this.renderShader = renderShader;
         this.pointsBuffer = pointsBuffer;
         this.preSolveComputeShader = preSolveComputeShader;
+        this.collisionComputeShader = collisionComputeShader;
         this.settingsBuffer = settingsBuffer;
         this.postSolveComputeShader = postSolveComputeShader;
     }
@@ -44,12 +52,17 @@ export class Solver
         const settingsBuffer = new SolverSettingsBuffer(settings, gpuData.device);
         const pointsBuffer = new PointsBuffer(settings.maxParticleCount, gpuData.device);
 
-        const renderShader = await RenderShader.create(gpuData, camera, pointsBuffer);
+        const gridComputeShader = await GridComputeShader.create(gpuData, settingsBuffer, pointsBuffer);
+        const collisionComputeShader = await CollisionComputeShader.create(gpuData, settingsBuffer, pointsBuffer,
+            gridComputeShader.cellsCountBuffer,
+            gridComputeShader.bucketBuffer);
+
         const preSolveComputeShader = await PreSolveComputeShader.create(gpuData, settingsBuffer, pointsBuffer);
         const postSolveComputeShader = await PostSolveComputeShader.create(gpuData, settingsBuffer, pointsBuffer);
+        const renderShader = await RenderShader.create(gpuData, camera, pointsBuffer);
 
-        return new Solver(gpuData,
-            renderShader, preSolveComputeShader, postSolveComputeShader,
+        return new Solver(gpuData, gridComputeShader, renderShader,
+            preSolveComputeShader, collisionComputeShader, postSolveComputeShader,
             pointsBuffer, settingsBuffer);
     }
 
@@ -58,16 +71,21 @@ export class Solver
         this.pointsBuffer.writeBuffer(this.gpuData.device);
     }
 
-    public simulate()
+    public async simulate()
     {
         const t = performance.now();
 
         // write buffers
-        this.settingsBuffer.writeBuffer(this.gpuData.device);
+        this.settingsBuffer.writeBuffer(this.gpuData.device, this.pointsBuffer.points.count);
 
-        this.preSolveComputeShader.submit();
-        this.postSolveComputeShader.submit();
-        this.renderShader.submit();
+        for (let i = 0; i < this.settingsBuffer.settings.subStepCount; i++)
+        {
+            this.preSolveComputeShader.submit();
+            await this.gridComputeShader.submit();
+            await this.collisionComputeShader.submit();
+            this.postSolveComputeShader.submit();
+            this.renderShader.submit();
+        }
 
         this.simulationDuration = performance.now() - t;
     }
