@@ -105,7 +105,7 @@ export class ApplyCollisionComputeShader
             gpuData.maxBlockSize);
 
         return new ApplyCollisionComputeShader(gpuData, shaderCode,
-            pointsBuffer, updatePositionCounterBuffer, updatePositionBucketBuffer, settingsBuffer);
+            pointsBuffer, updatePositionBucketBuffer, updatePositionCounterBuffer, settingsBuffer);
     }
 
     public submit(pointsCount: number)

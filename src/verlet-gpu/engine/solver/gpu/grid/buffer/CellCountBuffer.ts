@@ -2,7 +2,6 @@ export class CellCountBuffer
 {
     public buffer: GPUBuffer;
     public bufferRead: GPUBuffer;
-    private size = 0;
 
     constructor(device: GPUDevice,
                 totalGridCellsCount: number)
@@ -23,5 +22,13 @@ export class CellCountBuffer
     public copy(encoder: GPUCommandEncoder, size: number)
     {
         encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, size * 4);
+    }
+
+    public async read(size: number)
+    {
+        await this.bufferRead.mapAsync(GPUMapMode.READ);
+        console.log("cellCountBuffer")
+        console.log(new Int32Array(this.bufferRead.getMappedRange(0, size * 4)));
+        this.bufferRead.unmap();
     }
 }

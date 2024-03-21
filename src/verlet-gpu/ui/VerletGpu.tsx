@@ -15,8 +15,8 @@ export const VerletGpu = () =>
             {
                 setEngine(engine);
 
-                const size = 2;
-                const bbSize = size + 5;
+                const size = 4;
+                const bbSize = 2 + size;
 
                 engine.getWorldBoundingBox().topRight.x = bbSize;
                 engine.getWorldBoundingBox().topRight.y = bbSize;
@@ -37,8 +37,8 @@ export const VerletGpu = () =>
                 //     engine.createRectangle(i, -50, 1, 100, 1, color);
                 // }
 
-                engine.createRectangle(0, 0, size, size);
-                // engine.createRectangle(0, 0, 1, 2);
+                engine.createRectangle(0, 2, size, size);
+                // engine.createRectangle(0, 5, 10, 2);
 
                 engine.start().then(e =>
                 {

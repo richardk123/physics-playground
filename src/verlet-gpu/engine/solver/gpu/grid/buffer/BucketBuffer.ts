@@ -22,6 +22,14 @@ export class BucketBuffer
 
     public copy(encoder: GPUCommandEncoder, size: number)
     {
-        encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, size * 4);
+        encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, size * 4 * 8);
+    }
+
+    public async read(count: number)
+    {
+        await this.bufferRead.mapAsync(GPUMapMode.READ);
+        console.log("bucketBuffer")
+        console.log(new Int32Array(this.bufferRead.getMappedRange(0, count * 4 * 8)));
+        this.bufferRead.unmap();
     }
 }

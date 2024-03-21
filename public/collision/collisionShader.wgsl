@@ -46,51 +46,23 @@ fn collision(@builtin(global_invocation_id) id: vec3<u32>)
 
     for (var j : u32 = 0; j < cellPointCount; j++)
     {
-        let anotherPointIndex = buckets[(gridID * 8) + j];
+        let anotherPointIndex: u32 = buckets[(gridID * 8) + j];
         var anotherPoint = position[anotherPointIndex];
 
         let d = distance(point, anotherPoint);
 
-        if (d < 1.0 && d > 0.0)
+        if (d < 1.0 && d > 0.0 && index != anotherPointIndex)
         {
             let normal = normalize(point - anotherPoint);
-            let corr = ((1 - d) * 0.5f) * 0.5;
+            let corr = ((1 - d) * 0.4f) * 0.5;
+            let posUpdate1 : vec2<f32> = normal * -corr;
+            let posUpdate2 : vec2<f32> = normal * corr;
 
-            let bucketId1 = (gridID * 8) + (atomicAdd(&updatePositionCounter[index], 1));
-            updatePositionBuckets[bucketId1] = normal * corr;
+            let bucketId1 = (index * 8) + atomicAdd(&updatePositionCounter[index], 1);
+            updatePositionBuckets[bucketId1] = posUpdate1;
 
-            let bucketId2 = (gridID * 8) + (atomicAdd(&updatePositionCounter[anotherPointIndex], 1));
-            updatePositionBuckets[bucketId2] = normal * -corr;
+            let bucketId2 = (anotherPointIndex * 8) + atomicAdd(&updatePositionCounter[anotherPointIndex], 1);
+            updatePositionBuckets[bucketId1] = posUpdate2;
         }
     }
-//
-//    for (var x = -1; x < 2; x++)
-//    {
-//        for(var y = -1; y < 2; y++)
-//        {
-//            let gridPoint = vec2(point.x + f32(x), point.y + f32(y));
-//            let gridID = getGridID(gridPoint);
-//            let cellPointCount = cellsCount[gridID];
-//
-//            for (var j : u32 = 0; j < cellPointCount; j++)
-//            {
-//                let anotherPointIndex = buckets[(gridID * 8) + j];
-//                var anotherPoint = position[anotherPointIndex];
-//
-//                let d = distance(point, anotherPoint);
-//
-//                if (d < 1 && d > 0)
-//                {
-//                    let normal = normalize(point - anotherPoint);
-//                    let corr = (1 - d) * 0.5f;
-//
-//                    let bucketId1 = (gridID * 8) + (atomicAdd(&updatePositionCounter[index], 1) - 1);
-//                    updatePositionBuckets[bucketId1] = normal * corr;
-//
-//                    let bucketId2 = (gridID * 8) + (atomicAdd(&updatePositionCounter[anotherPointIndex], 1) - 1);
-//                    updatePositionBuckets[bucketId2] = normal * -corr;
-//                }
-//            }
-//        }
-//    }
 }

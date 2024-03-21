@@ -23,4 +23,21 @@ export class UpdatePositionBucketBuffer
     {
         encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, size * 4 * 8 * 2);
     }
+
+    private aggregateArray(array: Float32Array, count: number) {
+        const result = [];
+        for (let i = 0; i < array.length; i += count) {
+            result.push([array[i], array[i + 1]]);
+        }
+        return result;
+    }
+
+    public async read(count: number)
+    {
+        await this.bufferRead.mapAsync(GPUMapMode.READ);
+        console.log("updatePositionBucketBuffer");
+        const a = new Float32Array(this.bufferRead.getMappedRange(0, count * 4 * 8 * 2));
+        console.log(this.aggregateArray(a, 2));
+        this.bufferRead.unmap();
+    }
 }

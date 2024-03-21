@@ -89,7 +89,7 @@ export class ClearCollisionComputeShader
                         updatePositionCounterBuffer: UpdatePositionCounterBuffer)
     {
         const shaderCode = await loadShaderAndPutCommonCode('/physics-playground/collision/clearCollisionShader.wgsl', gpuData.maxBlockSize);
-        return new ClearCollisionComputeShader(gpuData, shaderCode, updatePositionCounterBuffer, updatePositionBucketBuffer, settingsBuffer);
+        return new ClearCollisionComputeShader(gpuData, shaderCode, updatePositionBucketBuffer, updatePositionCounterBuffer, settingsBuffer);
     }
 
     public submit(pointsCount: number)

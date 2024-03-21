@@ -159,15 +159,8 @@ export class SolveCollisionComputeShader
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
-
-        await this.updatePositionCounterBuffer.bufferRead.mapAsync(GPUMapMode.READ);
-        console.log("updatePositionCounterBuffer");
-        console.log(new Int32Array(this.updatePositionCounterBuffer.bufferRead.getMappedRange(0, pointsCount * 4)));
-        this.updatePositionCounterBuffer.bufferRead.unmap();
-
-        await this.updatePositionBucketBuffer.bufferRead.mapAsync(GPUMapMode.READ);
-        console.log("updatePositionBucketBuffer");
-        console.log(new Float32Array(this.updatePositionBucketBuffer.bufferRead.getMappedRange(0, pointsCount * 4 * 2)));
-        this.updatePositionBucketBuffer.bufferRead.unmap();
+        // debug
+        await this.updatePositionCounterBuffer.read(pointsCount);
+        await this.updatePositionBucketBuffer.read(pointsCount);
     }
 }

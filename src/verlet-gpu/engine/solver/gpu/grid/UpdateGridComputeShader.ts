@@ -130,15 +130,9 @@ export class UpdateGridComputeShader
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
-        await this.cellCountBuffer.bufferRead.mapAsync(GPUMapMode.READ);
-        console.log("cellCountBuffer")
-        console.log(new Int32Array(this.cellCountBuffer.bufferRead.getMappedRange(0, pointsCount * 4)));
-        this.cellCountBuffer.bufferRead.unmap();
-
-        await this.bucketBuffer.bufferRead.mapAsync(GPUMapMode.READ);
-        console.log("bucketBuffer")
-        console.log(new Int32Array(this.bucketBuffer.bufferRead.getMappedRange(0, this.settingsBuffer.getTotalGridCellCount() * 4 * 8)));
-        this.bucketBuffer.bufferRead.unmap();
+        // debug
+        await this.cellCountBuffer.read(this.settingsBuffer.getTotalGridCellCount());
+        await this.bucketBuffer.read(this.settingsBuffer.getTotalGridCellCount());
 
     }
 }
