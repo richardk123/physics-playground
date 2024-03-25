@@ -1,16 +1,16 @@
 import {Vec2d} from "../../data/Vec2d";
-import {PointsBuffer} from "./PointsBuffer";
 
 export const DEFAULT_SOLVER_SETTINGS: SolverSettings = {
     maxParticleCount: 1000000,
     gravity: {x: 0, y: -10},
     deltaTime: 1 / 60,
-    subStepCount: 4,
+    subStepCount: 8,
     gridCellSize: 1,
     boundingBox: {
         bottomLeft: {x: 0, y: 0},
-        topRight: {x: 100, y: 100},
+        topRight: {x: 12, y: 12},
     },
+    debug: false,
 };
 
 
@@ -28,6 +28,7 @@ export interface SolverSettings
     subStepCount: number;
     gridCellSize: number,
     boundingBox: BoundingBox;
+    debug: boolean;
 }
 
 export class SolverSettingsBuffer

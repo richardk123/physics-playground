@@ -48,6 +48,8 @@ export class PointsBuffer
 {
     public points: Points;
     public positionCurrentBuffer: GPUBuffer;
+    public positionCurrentBufferRead: GPUBuffer;
+
     public positionPreviousBuffer: GPUBuffer;
     public velocityBuffer: GPUBuffer;
     public colorBuffer: GPUBuffer;
@@ -61,8 +63,14 @@ export class PointsBuffer
         this.positionCurrentBuffer = device.createBuffer({
             label: 'points current position buffer',
             size: maxPointsCount * 2 * 4,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
         });
+        this.positionCurrentBufferRead = device.createBuffer({
+            label: 'points current position read',
+            size: maxPointsCount * 2 * 4,
+            usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+        });
+
         this.positionPreviousBuffer = device.createBuffer({
             label: 'points previous position buffer',
             size: maxPointsCount * 2 * 4,
@@ -86,6 +94,19 @@ export class PointsBuffer
         device.queue.writeBuffer(this.positionPreviousBuffer, 0, this.points.positionPrevious);
         device.queue.writeBuffer(this.velocityBuffer, 0, this.points.velocity);
         device.queue.writeBuffer(this.colorBuffer, 0, this.points.color);
+    }
+
+    public copy(encoder: GPUCommandEncoder, pointsCount: number)
+    {
+        encoder.copyBufferToBuffer(this.positionCurrentBuffer, 0, this.positionCurrentBufferRead, 0, pointsCount * 2 * 4);
+    }
+
+    public async read(pointsCount: number)
+    {
+        await this.positionCurrentBufferRead.mapAsync(GPUMapMode.READ);
+        console.log("points buffer");
+        console.log(new Float32Array(this.positionCurrentBufferRead.getMappedRange(0, pointsCount * 2 * 4 )));
+        this.positionCurrentBufferRead.unmap();
     }
 
 }

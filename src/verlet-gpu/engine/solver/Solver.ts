@@ -74,18 +74,21 @@ export class Solver
     public async simulate()
     {
         const t = performance.now();
-
         // write buffers
         this.settingsBuffer.writeBuffer(this.gpuData.device, this.pointsBuffer.points.count);
-
         for (let i = 0; i < this.settingsBuffer.settings.subStepCount; i++)
         {
-            this.preSolveComputeShader.submit();
+            if (this.settingsBuffer.settings.debug)
+            {
+                console.log("================================================");
+            }
+            await this.preSolveComputeShader.submit();
             await this.gridComputeShader.submit();
             await this.collisionComputeShader.submit();
             this.postSolveComputeShader.submit();
-            this.renderShader.submit();
         }
+
+        this.renderShader.submit();
 
         this.simulationDuration = performance.now() - t;
     }

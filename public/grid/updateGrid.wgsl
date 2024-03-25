@@ -17,8 +17,8 @@ struct Settings
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
-  let x = u32(floor(p.x / f32(settings.gridCellSize)));
-  let y = u32(floor(p.y / f32(settings.gridCellSize)));
+  let x = u32(floor(p.x / settings.gridCellSize));
+  let y = u32(floor(p.y / settings.gridCellSize));
   return (settings.gridSizeX * y) + x;
 }
 
@@ -38,6 +38,6 @@ fn updateGrid(@builtin(global_invocation_id) id : vec3<u32>)
   }
 
   let gridID = getGridID(points[pointIndex]);
-  let bucketId = (gridID * 8) + (atomicAdd(&cellsCount[gridID], 1));
+  let bucketId: u32 = (gridID * 8) + (atomicAdd(&cellsCount[gridID], 1));
   buckets[bucketId] = pointIndex;
 }

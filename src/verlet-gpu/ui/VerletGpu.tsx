@@ -15,7 +15,7 @@ export const VerletGpu = () =>
             {
                 setEngine(engine);
 
-                const size = 4;
+                const size = 10;
                 const bbSize = 2 + size;
 
                 engine.getWorldBoundingBox().topRight.x = bbSize;
@@ -27,18 +27,22 @@ export const VerletGpu = () =>
                 engine.getSettings().gravity.y = -10;
                 engine.getSettings().gridCellSize = 1;
                 engine.getSettings().deltaTime = 1 / 60;
+                engine.getSettings().subStepCount = 1;
+                engine.getSettings().debug = true;
                 engine.getCamera().zoom = 0.038;
                 // engine.getCamera().zoom = 1.5;
                 // engine.getCamera().zoom = 0.03;
 
-                // for (let i = -50; i < 50; i++)
+                // for (let i = 0; i < 50; i++)
                 // {
-                //     const color: Color = {r: ((50 + i) + 0.001) / 100, g: 0.1, b: 0.1, a: 1.0};
-                //     engine.createRectangle(i, -50, 1, 100, 1, color);
+                //     engine.addPoint(12, 12);
                 // }
 
-                engine.createRectangle(0, 2, size, size);
-                // engine.createRectangle(0, 5, 10, 2);
+                engine.addPoint(0, 0);
+                engine.addPoint(0, 2);
+
+                // engine.createRectangle(0, 2, size, size);
+                // engine.createRectangle(0, 0, 1, 2);
 
                 engine.start().then(e =>
                 {

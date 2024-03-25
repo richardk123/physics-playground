@@ -96,14 +96,14 @@ export class UpdateGridComputeShader
     }
 
     static async create(gpuData: GPUData,
-                        gridOffsetBuffer: CellCountBuffer,
+                        cellCountBuffer: CellCountBuffer,
                         gridBuffer: BucketBuffer,
                         pointsBuffer: PointsBuffer,
                         settingsBuffer: SolverSettingsBuffer)
     {
         const shaderCode = await loadShaderAndPutCommonCode('/physics-playground/grid/updateGrid.wgsl', gpuData.maxBlockSize);
 
-        return new UpdateGridComputeShader(gpuData, shaderCode, gridOffsetBuffer, gridBuffer, pointsBuffer, settingsBuffer);
+        return new UpdateGridComputeShader(gpuData, shaderCode, cellCountBuffer, gridBuffer, pointsBuffer, settingsBuffer);
     }
 
     public async submit()
@@ -123,16 +123,22 @@ export class UpdateGridComputeShader
         pass.end();
 
         // debug
-        this.cellCountBuffer.copy(encoder, pointsCount);
-        this.bucketBuffer.copy(encoder, this.settingsBuffer.getTotalGridCellCount());
+        if (this.settingsBuffer.settings.debug)
+        {
+            this.cellCountBuffer.copy(encoder);
+            this.bucketBuffer.copy(encoder);
+        }
 
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
         // debug
-        await this.cellCountBuffer.read(this.settingsBuffer.getTotalGridCellCount());
-        await this.bucketBuffer.read(this.settingsBuffer.getTotalGridCellCount());
+        if (this.settingsBuffer.settings.debug)
+        {
+            await this.cellCountBuffer.read();
+            await this.bucketBuffer.read();
+        }
 
     }
 }

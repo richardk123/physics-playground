@@ -152,15 +152,21 @@ export class SolveCollisionComputeShader
         pass.end();
 
         // debug
-        this.updatePositionCounterBuffer.copy(encoder, pointsCount);
-        this.updatePositionBucketBuffer.copy(encoder, pointsCount);
+        if (this.settingsBuffer.settings.debug)
+        {
+            this.updatePositionCounterBuffer.copy(encoder, pointsCount);
+            this.updatePositionBucketBuffer.copy(encoder, pointsCount);
+        }
 
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
         // debug
-        await this.updatePositionCounterBuffer.read(pointsCount);
-        await this.updatePositionBucketBuffer.read(pointsCount);
+        if (this.settingsBuffer.settings.debug)
+        {
+            await this.updatePositionCounterBuffer.read(pointsCount);
+            await this.updatePositionBucketBuffer.read(pointsCount);
+        }
     }
 }

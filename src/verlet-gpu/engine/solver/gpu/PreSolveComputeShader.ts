@@ -73,7 +73,7 @@ export class PreSolveComputeShader
         });
 
         const bindGroup = device.createBindGroup({
-            label: 'triangle bind group',
+            label: 'preSolve bind group',
             layout: bindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: settingsBuffer.buffer }},
@@ -95,7 +95,7 @@ export class PreSolveComputeShader
         return new PreSolveComputeShader(gpuData, shaderCode, settingsBuffer, pointsBuffer);
     }
 
-    public submit()
+    public async submit()
     {
         const device = this.gpuData.device;
         const pipeline = this.pipeline;
@@ -110,8 +110,21 @@ export class PreSolveComputeShader
         pass.dispatchWorkgroups(Math.ceil(this.pointsBuffer.points.count / WORKGROUP_SIZE));
         pass.end();
 
+        // debug
+        if (this.settingsBuffer.settings.debug)
+        {
+            this.pointsBuffer.copy(encoder, this.pointsBuffer.points.count);
+        }
+
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
+
+
+        // debug
+        if (this.settingsBuffer.settings.debug)
+        {
+            await this.pointsBuffer.read(this.pointsBuffer.points.count);
+        }
     }
 }

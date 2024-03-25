@@ -36,6 +36,12 @@ export class Engine
         }
     }
 
+    public addPoint(x: number, y: number)
+    {
+        const c: Color = {r: Math.random(), g: Math.random(), b: Math.random(), a: 1.0};
+        this.solver.pointsBuffer.points.addPoint(x + Math.random() * 0.1, y + Math.random() * 0.1, 1, c);
+    }
+
     public async start()
     {
         this.solver.initStaticData();
