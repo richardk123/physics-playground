@@ -7,6 +7,7 @@ import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
 import {VerletGpu} from "./verlet-gpu/ui/VerletGpu";
 import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
+import {SimpleGpu} from "./simple-gpu/ui/SimpleGpu";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="/xpdb" element={<VisualizationXPDB />} />
             <Route path="/xpdb2" element={<VisualizationXPDB2 />} />
             <Route path="/verlet-gpu" element={<VerletGpu />} />
+            <Route path="/simple-gpu" element={<SimpleGpu />} />
             <Route path="/fluid-sim" element={<VisualizationFluidSim />} />
           </Route>
         </Routes>

@@ -139,6 +139,5 @@ export class UpdateGridComputeShader
             await this.cellCountBuffer.read();
             await this.bucketBuffer.read();
         }
-
     }
 }
