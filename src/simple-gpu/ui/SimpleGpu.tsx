@@ -50,7 +50,7 @@ export const SimpleGpu = () =>
             </div>
             <div className="flex h-1/2">
                 <div className="w-1/2 h-full bg-gray-200">
-                    <GridDebugRenderer engine={engine} />
+                    {engine && <GridDebugRenderer engine={engine} />}
                 </div>
                 <div className="w-1/2 h-full bg-gray-300">
                 </div>

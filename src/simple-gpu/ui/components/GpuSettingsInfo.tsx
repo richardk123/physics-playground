@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {SettingsGpuData} from "../../engine/data/EngineSettings";
 import {timer} from "rxjs";
 import {Card} from "@material-tailwind/react";
+import {Camera} from "../../engine/data/Camera";
 
 interface Props
 {
@@ -13,13 +14,15 @@ export const GpuSettingsInfo = (props: Props) =>
 {
     const [increment, setIncrement] = useState(0);
     const [gpuSettings, setGpuSettings] = useState<SettingsGpuData | undefined>();
+    const [camera, setCamera] = useState<Camera | undefined>();
 
     useEffect(() =>
     {
         const sub = timer(100).subscribe(() =>
         {
-                const gpuSettings = props.engine?.solver.settingsBuffer.gpuData;
-                setGpuSettings(gpuSettings);
+            const gpuSettings = props.engine?.solver.settingsBuffer.gpuData;
+            setGpuSettings(gpuSettings);
+            setCamera(props.engine?.renderer.cameraBuffer.camera);
             setIncrement(increment + 1);
         });
 
@@ -30,5 +33,8 @@ export const GpuSettingsInfo = (props: Props) =>
         <p>Particle count: {gpuSettings?.particleCount}</p>
         <p>Grid size x: {gpuSettings?.gridSizeX}</p>
         <p>Grid size y: {gpuSettings?.gridSizeY}</p>
+        <p>Translation x: {camera?.translation.x.toFixed(2)}</p>
+        <p>Translation y: {camera?.translation.y.toFixed(2)}</p>
+        <p>Zoom: {camera?.zoom.toFixed(5)}</p>
     </Card>
 }
