@@ -48,7 +48,7 @@ export class Buffer
     }
 
 
-    public async printBuffer()
+    public async readBuffer(): Promise<ArrayBuffer>
     {
         const device = this.engine.device;
         const encoder = device.createCommandEncoder({ label: `${this.name} builtin encoder` });
@@ -60,8 +60,11 @@ export class Buffer
 
         await this.bufferRead.mapAsync(GPUMapMode.READ);
 
-        const result = new Float32Array(this.bufferRead.getMappedRange(0, this.buffer.size))
-        console.log(result);
+        const buffer = this.bufferRead.getMappedRange(0, this.buffer.size);
+        // Copy the buffer using slice
+        const copiedBuffer = buffer.slice(0);
         this.bufferRead.unmap();
+
+        return copiedBuffer;
     }
 }

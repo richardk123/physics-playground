@@ -9,6 +9,13 @@ export interface EngineSettings
     gridSizeY: number;
 }
 
+export interface SettingsGpuData
+{
+    particleCount: number,
+    gridSizeX: number,
+    gridSizeY: number,
+}
+
 export class EngineSettingsBuffer
 {
     public buffer: Buffer;
@@ -40,5 +47,17 @@ export class EngineSettingsBuffer
         this.floatData[2] = this.settings.gridSizeY;
         this.floatData[3] = 0;
         this.buffer.writeBuffer(this.data)
+    }
+
+    public async read(): Promise<SettingsGpuData>
+    {
+        const data = await this.buffer.readBuffer();
+        const floatData = new Float32Array(data);
+        const intData = new Int32Array(data);
+        return {
+            particleCount: intData[0],
+            gridSizeX: floatData[1],
+            gridSizeY: floatData[2],
+        }
     }
 }

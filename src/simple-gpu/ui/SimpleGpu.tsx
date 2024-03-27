@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import {Engine} from "../engine/Engine";
 import {EngineSettings} from "../engine/data/EngineSettings";
 import {SimulationControls} from "./components/SimulationControls";
+import {GpuSettingsInfo} from "./components/GpuSettingsInfo";
+import {Camera} from "../engine/data/Camera";
 
 export const SimpleGpu = () =>
 {
@@ -15,13 +17,21 @@ export const SimpleGpu = () =>
             gridSizeY: 100,
             gridSizeX: 100,
         }
+        const camera: Camera = {
+            zoom: 0.1,
+            translation: {x: 0, y: 0},
+            rotation: 0,
+        }
 
-        Engine.create(canvasRef.current!, settings)
+        Engine.create(canvasRef.current!, settings, camera)
             .then(engine =>
             {
                 setEngine(engine);
 
                 engine.addPoint(0, 0);
+                engine.addPoint(2, 1);
+
+                engine.next();
             })
     }, []);
 
@@ -33,6 +43,7 @@ export const SimpleGpu = () =>
         </div>
         <div className="w-64 text-white">
             <SimulationControls engine={engine} />
+            <GpuSettingsInfo engine={engine} />
         </div>
     </div>;
 }

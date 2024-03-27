@@ -1,29 +1,39 @@
 import {Solver} from "./Solver";
-import {Particles} from "./data/Particles";
-import {EngineSettings} from "./data/EngineSettings";
+import {Particles, ParticlesBuffer} from "./data/Particles";
+import {EngineSettings, EngineSettingsBuffer} from "./data/EngineSettings";
 import {GPUEngine} from "./common/GPUEngine";
+import {Renderer} from "./Renderer";
+import {Camera} from "./data/Camera";
 
 export class Engine
 {
     private engine: GPUEngine;
     public solver: Solver;
-    public running = false;
+    public renderer: Renderer;
+    public running = true;
 
     constructor(engine: GPUEngine,
-                solver: Solver)
+                solver: Solver,
+                renderer: Renderer)
     {
         this.engine = engine;
         this.solver = solver;
+        this.renderer = renderer;
     }
 
     static async create(canvas: HTMLCanvasElement,
-                        settings: EngineSettings)
+                        settings: EngineSettings,
+                        camera: Camera)
     {
-        const particles = new Particles(settings.maxParticleCount);
         const engine = await GPUEngine.create(canvas);
-        const solver = await Solver.create(engine, settings, particles);
+        const particles = new Particles(settings.maxParticleCount);
 
-        return new Engine(engine, solver);
+        const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
+        const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
+
+        const solver = await Solver.create(engine, particlesBuffer, settingsBuffer);
+        const renderer = await Renderer.create(engine, camera, particlesBuffer);
+        return new Engine(engine, solver, renderer);
     }
 
 
@@ -47,7 +57,6 @@ export class Engine
     public async start()
     {
         this.running = true;
-        this.solver.initStaticData();
         await this.simulate();
     }
 
@@ -59,6 +68,7 @@ export class Engine
     public async next()
     {
         await this.solver.simulate();
+        this.renderer.render();
     }
 
     private async simulate()

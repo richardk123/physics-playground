@@ -1,5 +1,6 @@
 import {GPUEngine} from "../common/GPUEngine";
 import {Buffer} from "../common/Buffer";
+import {EngineSettings} from "./EngineSettings";
 
 export class Particles
 {
@@ -7,6 +8,8 @@ export class Particles
     public positionPrevious: Float32Array;
     public velocity: Float32Array;
     public count: number;
+    // data has been changed, buffer needs to be written
+    public dataChanged: boolean = true;
 
     constructor(maxParticleCount: number)
     {
@@ -27,7 +30,7 @@ export class Particles
         this.positionCurrent[index * 2 + 1] = y;
 
         this.count += 1;
-
+        this.dataChanged = true;
         return index;
     }
 }
@@ -39,11 +42,13 @@ export class ParticlesBuffer
     public positionPreviousBuffer: Buffer;
     public velocityBuffer: Buffer;
 
-    constructor(engine: GPUEngine, maxParticleCount: number)
+    constructor(engine: GPUEngine,
+                settings: EngineSettings,
+                particles: Particles)
     {
-        this.particles = new Particles(maxParticleCount);
+        this.particles = particles;
 
-        const maxParticleBufferSize = maxParticleCount * 4 * 2;
+        const maxParticleBufferSize = settings.maxParticleCount * 4 * 2;
 
         this.positionCurrentBuffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
         this.positionPreviousBuffer = engine.createBuffer("previous-position", maxParticleBufferSize, "storage");
@@ -52,9 +57,13 @@ export class ParticlesBuffer
 
     public write()
     {
-        const particleBufferSize = this.particles.count * 4 * 2;
-        this.positionCurrentBuffer.writeBuffer(this.particles.positionCurrent, 0, 0, particleBufferSize);
-        this.positionPreviousBuffer.writeBuffer(this.particles.positionPrevious, 0, 0, particleBufferSize);
-        this.velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
+        if (this.particles.dataChanged)
+        {
+            const particleBufferSize = this.particles.count * 4 * 2;
+            this.positionCurrentBuffer.writeBuffer(this.particles.positionCurrent, 0, 0, particleBufferSize);
+            this.positionPreviousBuffer.writeBuffer(this.particles.positionPrevious, 0, 0, particleBufferSize);
+            this.velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
+            this.particles.dataChanged = false;
+        }
     }
 }

@@ -8,7 +8,7 @@ export class Solver
 
     // buffers
     public particlesBuffer: ParticlesBuffer;
-    private settingsBuffer: EngineSettingsBuffer;
+    public settingsBuffer: EngineSettingsBuffer;
 
     // compute shaders
     private preSolve: ComputeShader;
@@ -26,11 +26,9 @@ export class Solver
     }
 
     public static async create(engine: GPUEngine,
-                               settings: EngineSettings,
-                               particles: Particles)
+                               particlesBuffer: ParticlesBuffer,
+                               settingsBuffer: EngineSettingsBuffer)
     {
-        const particlesBuffer = new ParticlesBuffer(engine, settings.maxParticleCount);
-        const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
 
         const preSolve = await engine.createComputeShader("preSolve")
             .addBuffer(settingsBuffer.buffer, "uniform")
@@ -49,19 +47,13 @@ export class Solver
         return new Solver(particlesBuffer, settingsBuffer, preSolve, postSolve);
     }
 
-    public initStaticData()
-    {
-        this.particlesBuffer.write();
-    }
-
     public async simulate()
     {
         this.settingsBuffer.write();
+        this.particlesBuffer.write();
 
         const particleCount = this.particlesBuffer.particles.count;
         this.preSolve.dispatch(Math.ceil(particleCount / 256));
         this.postSolve.dispatch(Math.ceil(particleCount / 256));
-
-        await this.settingsBuffer.buffer.printBuffer();
     }
 }
