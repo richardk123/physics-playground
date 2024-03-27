@@ -4,7 +4,6 @@ import {Particles} from "./Particles";
 
 export interface EngineSettings
 {
-    debug: boolean;
     maxParticleCount: number;
     gridSizeX: number;
     gridSizeY: number;
@@ -22,6 +21,7 @@ export class EngineSettingsBuffer
     public buffer: Buffer;
     public settings: EngineSettings;
     private particles: Particles;
+    public gpuData: SettingsGpuData;
 
     readonly floatData: Float32Array;
     readonly intData: Uint32Array;
@@ -39,6 +39,7 @@ export class EngineSettingsBuffer
 
         this.floatData = new Float32Array(this.data);
         this.intData = new Uint32Array(this.data);
+        this.gpuData = {particleCount: 0, gridSizeY: 0, gridSizeX: 0};
     }
 
     public write()
@@ -50,12 +51,12 @@ export class EngineSettingsBuffer
         this.buffer.writeBuffer(this.data)
     }
 
-    public async read(): Promise<SettingsGpuData>
+    public async loadFromGpu()
     {
         const data = await this.buffer.readBuffer();
         const floatData = new Float32Array(data);
         const intData = new Int32Array(data);
-        return {
+        this.gpuData = {
             particleCount: intData[0],
             gridSizeX: floatData[1],
             gridSizeY: floatData[2],

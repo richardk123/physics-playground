@@ -7,7 +7,7 @@ export class Renderer
     private engine: GPUEngine;
 
     private particlesBuffer: ParticlesBuffer;
-    private cameraBuffer: CameraBuffer;
+    public cameraBuffer: CameraBuffer;
 
     private pipeline: GPURenderPipeline;
     private bindGroup: GPUBindGroup;

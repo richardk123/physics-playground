@@ -16,13 +16,10 @@ export const GpuSettingsInfo = (props: Props) =>
 
     useEffect(() =>
     {
-        const sub = timer(100).subscribe(async () =>
+        const sub = timer(100).subscribe(() =>
         {
-            if (props.engine?.solver.settingsBuffer.settings.debug)
-            {
-                const gpuSettings = await props.engine?.solver.settingsBuffer.read();
+                const gpuSettings = props.engine?.solver.settingsBuffer.gpuData;
                 setGpuSettings(gpuSettings);
-            }
             setIncrement(increment + 1);
         });
 

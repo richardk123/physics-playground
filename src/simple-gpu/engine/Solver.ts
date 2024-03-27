@@ -55,5 +55,8 @@ export class Solver
         const particleCount = this.particlesBuffer.particles.count;
         this.preSolve.dispatch(Math.ceil(particleCount / 256));
         this.postSolve.dispatch(Math.ceil(particleCount / 256));
+
+        await this.particlesBuffer.loadFromGpu();
+        await this.settingsBuffer.loadFromGpu()
     }
 }

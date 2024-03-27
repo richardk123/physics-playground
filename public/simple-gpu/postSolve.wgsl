@@ -13,7 +13,7 @@ struct Settings
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
-    let dt: f32 = 0.016;
+    let inverseDt: f32 = 60;
     // update velocity
-    velocities[id.x] += (positionsCurrent[id.x] - positionsPrevious[id.x]) * dt;
+    velocities[id.x] = (positionsCurrent[id.x] - positionsPrevious[id.x]) * inverseDt;
 }

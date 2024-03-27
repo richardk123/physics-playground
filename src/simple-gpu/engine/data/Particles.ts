@@ -11,15 +11,32 @@ export class Particles
     // data has been changed, buffer needs to be written
     public dataChanged: boolean = true;
 
-    constructor(maxParticleCount: number)
+    private constructor(positionCurrent: ArrayBuffer,
+                        positionPrevious: ArrayBuffer,
+                        velocity: ArrayBuffer,
+                        count: number)
     {
-        this.positionCurrent = new Float32Array(maxParticleCount * 2);
-        this.positionCurrent.fill(0);
-        this.positionPrevious = new Float32Array(maxParticleCount * 2);
-        this.positionPrevious.fill(0)
-        this.velocity = new Float32Array(maxParticleCount * 2);
-        this.velocity.fill(0);
-        this.count = 0;
+        this.positionCurrent = new Float32Array(positionCurrent);
+        this.positionPrevious = new Float32Array(positionPrevious);
+        this.velocity = new Float32Array(velocity);
+
+        this.count = count;
+    }
+
+    static create(maxParticleCount: number)
+    {
+        const positionCurrent = new ArrayBuffer(maxParticleCount * 4 * 2);
+        const positionPrevious = new ArrayBuffer(maxParticleCount * 4 * 2);
+        const velocity = new ArrayBuffer(maxParticleCount * 4 * 2);
+        return new Particles(positionCurrent, positionPrevious, velocity, 0);
+    }
+
+    static createFromBuffer(positionCurrent: ArrayBuffer,
+                            positionPrevious: ArrayBuffer,
+                            velocity: ArrayBuffer,
+                            count: number)
+    {
+        return new Particles(positionCurrent, positionPrevious, velocity, count);
     }
 
     public addPoint(x: number, y: number)
@@ -38,6 +55,7 @@ export class Particles
 export class ParticlesBuffer
 {
     public particles: Particles;
+    public gpuParticles: Particles;
     public positionCurrentBuffer: Buffer;
     public positionPreviousBuffer: Buffer;
     public velocityBuffer: Buffer;
@@ -53,6 +71,7 @@ export class ParticlesBuffer
         this.positionCurrentBuffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
         this.positionPreviousBuffer = engine.createBuffer("previous-position", maxParticleBufferSize, "storage");
         this.velocityBuffer = engine.createBuffer("velocity", maxParticleBufferSize, "storage");
+        this.gpuParticles = Particles.create(0);
     }
 
     public write()
@@ -65,5 +84,15 @@ export class ParticlesBuffer
             this.velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
             this.particles.dataChanged = false;
         }
+    }
+
+    public async loadFromGpu()
+    {
+        const positionCurrentData = await this.positionCurrentBuffer.readBuffer();
+        const positionPreviousData = await this.positionPreviousBuffer.readBuffer();
+        const velocityData = await this.velocityBuffer.readBuffer();
+
+        const particleCount = this.particles.count;
+        this.gpuParticles = Particles.createFromBuffer(positionCurrentData, positionPreviousData, velocityData, particleCount);
     }
 }

@@ -26,7 +26,7 @@ export class Engine
                         camera: Camera)
     {
         const engine = await GPUEngine.create(canvas);
-        const particles = new Particles(settings.maxParticleCount);
+        const particles = Particles.create(settings.maxParticleCount);
 
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
