@@ -1,9 +1,10 @@
-import {Solver} from "./Solver";
+import {Solver, Solvers} from "./Solver";
 import {Particles, ParticlesBuffer} from "./data/Particles";
 import {EngineSettings, EngineSettingsBuffer} from "./data/EngineSettings";
 import {GPUEngine} from "./common/GPUEngine";
 import {Renderer} from "./Renderer";
 import {Camera} from "./data/Camera";
+import {GridBuffer} from "./data/Grid";
 
 export class Engine
 {
@@ -30,8 +31,9 @@ export class Engine
 
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
+        const gridBuffer = new GridBuffer(engine, settings);
 
-        const solver = await Solver.create(engine, particlesBuffer, settingsBuffer);
+        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer, gridBuffer);
         const renderer = await Renderer.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);
     }

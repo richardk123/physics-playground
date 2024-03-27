@@ -1,35 +1,23 @@
 import {GPUEngine} from "./common/GPUEngine";
-import {EngineSettings, EngineSettingsBuffer} from "./data/EngineSettings";
-import {Particles, ParticlesBuffer} from "./data/Particles";
-import {ComputeShader} from "./common/ComputeShader";
+import {EngineSettingsBuffer} from "./data/EngineSettings";
+import {ParticlesBuffer} from "./data/Particles";
+import {GridBuffer} from "./data/Grid";
 
-export class Solver
+export interface Solver
 {
+    simulate: () => Promise<void>;
+    particlesBuffer: ParticlesBuffer;
+    settingsBuffer: EngineSettingsBuffer;
+    gridBuffer: GridBuffer;
+}
 
-    // buffers
-    public particlesBuffer: ParticlesBuffer;
-    public settingsBuffer: EngineSettingsBuffer;
-
-    // compute shaders
-    private preSolve: ComputeShader;
-    private postSolve: ComputeShader;
-
-    private constructor(particlesBuffer: ParticlesBuffer,
-                        settingsBuffer: EngineSettingsBuffer,
-                        preSolve: ComputeShader,
-                        postSolve: ComputeShader)
-    {
-        this.particlesBuffer = particlesBuffer;
-        this.settingsBuffer = settingsBuffer;
-        this.preSolve = preSolve;
-        this.postSolve = postSolve;
-    }
-
+export class Solvers
+{
     public static async create(engine: GPUEngine,
                                particlesBuffer: ParticlesBuffer,
-                               settingsBuffer: EngineSettingsBuffer)
+                               settingsBuffer: EngineSettingsBuffer,
+                               gridBuffer: GridBuffer): Promise<Solver>
     {
-
         const preSolve = await engine.createComputeShader("preSolve")
             .addBuffer(settingsBuffer.buffer, "uniform")
             .addBuffer(particlesBuffer.positionCurrentBuffer, "storage")
@@ -44,19 +32,39 @@ export class Solver
             .addBuffer(particlesBuffer.velocityBuffer, "storage")
             .build();
 
-        return new Solver(particlesBuffer, settingsBuffer, preSolve, postSolve);
-    }
+        const gridClear = await engine.createComputeShader("gridClear")
+            .addBuffer(settingsBuffer.buffer, "uniform")
+            .addBuffer(gridBuffer.cellParticleCountBuffer, "storage")
+            .addBuffer(gridBuffer.cellParticleIndexesBuffer, "storage")
+            .build();
 
-    public async simulate()
-    {
-        this.settingsBuffer.write();
-        this.particlesBuffer.write();
+        const gridUpdate = await engine.createComputeShader("gridUpdate")
+            .addBuffer(settingsBuffer.buffer, "uniform")
+            .addBuffer(gridBuffer.cellParticleCountBuffer, "storage")
+            .addBuffer(gridBuffer.cellParticleIndexesBuffer, "storage")
+            .addBuffer(particlesBuffer.positionCurrentBuffer, "read-only-storage")
+            .build();
 
-        const particleCount = this.particlesBuffer.particles.count;
-        this.preSolve.dispatch(Math.ceil(particleCount / 256));
-        this.postSolve.dispatch(Math.ceil(particleCount / 256));
+        return {
+            simulate: async (): Promise<void> =>
+            {
+                settingsBuffer.write();
+                particlesBuffer.write();
 
-        await this.particlesBuffer.loadFromGpu();
-        await this.settingsBuffer.loadFromGpu()
+                const particleCount = particlesBuffer.particles.count;
+
+                preSolve.dispatch(Math.ceil(particleCount / 256));
+                postSolve.dispatch(Math.ceil(particleCount / 256));
+                gridClear.dispatch(Math.ceil(gridBuffer.getNumberOfCells() / 256));
+                gridUpdate.dispatch(Math.ceil(particleCount / 256));
+
+                await particlesBuffer.loadFromGpu();
+                await settingsBuffer.loadFromGpu();
+                await gridBuffer.loadFromGpu();
+            },
+            particlesBuffer: particlesBuffer,
+            settingsBuffer: settingsBuffer,
+            gridBuffer: gridBuffer,
+        };
     }
 }

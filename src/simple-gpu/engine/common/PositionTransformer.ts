@@ -13,6 +13,11 @@ export class PositionTransformer
         this.canvas = canvas;
     }
 
+    public pos(p: Vec2d): Vec2d
+    {
+        return this.position(p.x, p.y);
+    }
+
     public position(x: number, y: number): Vec2d
     {
         const projection = mat4.create();

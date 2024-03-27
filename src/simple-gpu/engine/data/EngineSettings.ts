@@ -23,7 +23,6 @@ export class EngineSettingsBuffer
     private particles: Particles;
     public gpuData: SettingsGpuData;
 
-    readonly floatData: Float32Array;
     readonly intData: Uint32Array;
     readonly data: ArrayBuffer;
 
@@ -37,7 +36,6 @@ export class EngineSettingsBuffer
         this.buffer = engine.createBuffer("engine-settings", 16, "uniform");
         this.data = new ArrayBuffer(structSizeBytes);
 
-        this.floatData = new Float32Array(this.data);
         this.intData = new Uint32Array(this.data);
         this.gpuData = {particleCount: 0, gridSizeY: 0, gridSizeX: 0};
     }
@@ -45,21 +43,20 @@ export class EngineSettingsBuffer
     public write()
     {
         this.intData[0] = this.particles.count;
-        this.floatData[1] = this.settings.gridSizeX;
-        this.floatData[2] = this.settings.gridSizeY;
-        this.floatData[3] = 0;
+        this.intData[1] = this.settings.gridSizeX;
+        this.intData[2] = this.settings.gridSizeY;
+        this.intData[3] = 0;
         this.buffer.writeBuffer(this.data)
     }
 
     public async loadFromGpu()
     {
         const data = await this.buffer.readBuffer();
-        const floatData = new Float32Array(data);
         const intData = new Int32Array(data);
         this.gpuData = {
             particleCount: intData[0],
-            gridSizeX: floatData[1],
-            gridSizeY: floatData[2],
+            gridSizeX: intData[1],
+            gridSizeY: intData[2],
         }
     }
 }

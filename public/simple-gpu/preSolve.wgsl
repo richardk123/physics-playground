@@ -1,8 +1,8 @@
 struct Settings
 {
     particleCount: u32,
-    gridSizeX: f32,
-    gridSizeY: f32,
+    gridSizeX: u32,
+    gridSizeY: u32,
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
@@ -23,6 +23,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     // bounding box
     positionsCurrent[id.x].x = max(0, positionsCurrent[id.x].x);
     positionsCurrent[id.x].y = max(0, positionsCurrent[id.x].y);
-    positionsCurrent[id.x].x = min(settings.gridSizeX, positionsCurrent[id.x].x);
-    positionsCurrent[id.x].y = min(settings.gridSizeY, positionsCurrent[id.x].y);
+    positionsCurrent[id.x].x = min(f32(settings.gridSizeX), positionsCurrent[id.x].x);
+    positionsCurrent[id.x].y = min(f32(settings.gridSizeY), positionsCurrent[id.x].y);
 }
