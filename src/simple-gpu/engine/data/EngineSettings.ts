@@ -4,6 +4,7 @@ import {Particles} from "./Particles";
 
 export interface EngineSettings
 {
+    debug: boolean;
     maxParticleCount: number;
     gridSizeX: number;
     gridSizeY: number;

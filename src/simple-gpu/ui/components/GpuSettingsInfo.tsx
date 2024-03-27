@@ -18,8 +18,11 @@ export const GpuSettingsInfo = (props: Props) =>
     {
         const sub = timer(100).subscribe(async () =>
         {
-            const gpuSettings = await props.engine?.solver.settingsBuffer.read();
-            setGpuSettings(gpuSettings);
+            if (props.engine?.solver.settingsBuffer.settings.debug)
+            {
+                const gpuSettings = await props.engine?.solver.settingsBuffer.read();
+                setGpuSettings(gpuSettings);
+            }
             setIncrement(increment + 1);
         });
 

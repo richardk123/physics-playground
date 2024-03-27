@@ -13,6 +13,7 @@ export const SimpleGpu = () =>
     useEffect(() =>
     {
         const settings: EngineSettings = {
+            debug: false,
             maxParticleCount: 10000,
             gridSizeY: 100,
             gridSizeX: 100,
@@ -29,7 +30,7 @@ export const SimpleGpu = () =>
                 setEngine(engine);
 
                 engine.addPoint(0, 0);
-                engine.addPoint(2, 1);
+                engine.addPoint(2, 50);
 
                 engine.next();
             })
