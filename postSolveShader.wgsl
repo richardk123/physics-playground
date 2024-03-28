@@ -25,6 +25,6 @@ struct Settings
 fn postSolve(@builtin(global_invocation_id) id: vec3<u32>)
 {
     let inverseDt: f32 = 1 / settings.deltaTime;
-//     update velocity
+    // update velocity
     velocities[id.x] = (positionsCurrent[id.x] - positionsPrevious[id.x]) * inverseDt;
 }
