@@ -59,10 +59,9 @@ export class Transformer
             position(x: number, y: number): Vec2d
             {
                 const vertexPosVec4 = vec4.fromValues(0.0, x, y, 1.0);
-                const finalPos = vec4.create();
-                vec4.transformMat4(finalPos, vertexPosVec4, combinedMatrix);
+                vec4.transformMat4(vertexPosVec4, vertexPosVec4, combinedMatrix);
 
-                return {x: finalPos[0] * halfWidth + halfWidth, y: finalPos[1] * halfHeight + halfHeight};
+                return {x: vertexPosVec4[0] * halfWidth + halfWidth, y: vertexPosVec4[1] * halfHeight + halfHeight};
             },
             positionVec(p: Vec2d): Vec2d
             {
@@ -77,23 +76,23 @@ export class Transformer
 
     public toWorldSpace(): Transform
     {
-        const combinedMatrix = this.createCombinedMatrix();
+        const camera = this.camera;
+        const zoom = camera.zoom;
         const halfWidth = this.halfWidth;
         const halfHeight = this.halfHeight;
-        const zoom = this.camera.zoom;
 
         return {
             position(x: number, y: number): Vec2d
             {
-                // Calculate the inverse matrix
-                const inverseMatrix = mat4.create();
-                mat4.invert(inverseMatrix, combinedMatrix);
+                const worldHalfWidth = this.size(halfWidth);
+                const worldHalfHeight = this.size(halfHeight);
 
-                const vertexPosVec4 = vec4.fromValues(0.0, x, y, 1.0);
-                const finalPos = vec4.create();
-                vec4.transformMat4(finalPos, vertexPosVec4, combinedMatrix);
+                const worldSizeX = this.size(x);
+                const worldSizeY = this.size(y);
 
-                return {x: finalPos[0] * halfWidth + halfWidth, y: finalPos[1] * halfHeight + halfHeight};
+                const rx = camera.translation.x + (worldSizeX - worldHalfWidth);
+                const ry = camera.translation.y - (worldSizeY - worldHalfHeight);
+                return {x: rx, y: ry};
             },
             positionVec(p: Vec2d): Vec2d
             {

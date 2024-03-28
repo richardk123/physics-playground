@@ -3,7 +3,7 @@ import p5Types from "p5";
 import {Transformer} from "../../../engine/common/Transformer";
 import {P5Renderer} from "../../../../components/P5Renderer";
 import {Vec2d} from "../../../engine/data/Vec2d";
-import {dragAndDrop$, scroll$} from "../utils/CanvasUtils";
+import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 
 export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
 {
@@ -60,31 +60,8 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
         const camera = engine.renderer.cameraBuffer.camera;
-
-        const cameraTranslation = () =>
-        {
-            return {x: camera.translation.x, y: camera.translation.y};
-        }
-
-        dragAndDrop$(canvas, cameraTranslation, 0)
-            .subscribe((val) =>
-            {
-                const camera = engine.renderer.cameraBuffer.camera;
-                const transform = new Transformer(camera, canvas);
-
-                const moveX =   val.position[0] - val.endPosition[0];
-                const moveY =  val.endPosition[1] - val.position[1];
-
-                console.log(val.originalPosition.x);
-                camera.translation.x = val.originalPosition.x + transform.toWorldSpace().size(moveX);
-                camera.translation.y = val.originalPosition.y + transform.toWorldSpace().size(moveY);
-            });
-
-        scroll$(canvas)
-            .subscribe(e =>
-            {
-                camera.zoom +=  camera.zoom * (e * 0.01);
-            })
+        registerMoving(canvas, camera);
+        registerScrolling(canvas, camera);
     }
 
     return <P5Renderer render={render} setup={setup} />

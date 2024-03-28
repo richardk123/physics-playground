@@ -56,12 +56,6 @@ export class Engine
         this.solver.particlesBuffer.particles.addPoint(x, y);
     }
 
-    public async start()
-    {
-        this.running = true;
-        await this.simulate();
-    }
-
     public stop()
     {
         this.running = false;
@@ -73,11 +67,17 @@ export class Engine
         this.renderer.render();
     }
 
-    private async simulate()
+    public render()
+    {
+        this.renderer.render();
+        requestAnimationFrame(this.render.bind(this));
+    }
+
+    public async simulate()
     {
         if (this.running)
         {
-            await this.next()
+            await this.solver.simulate();
             requestAnimationFrame(this.simulate.bind(this));
         }
     }

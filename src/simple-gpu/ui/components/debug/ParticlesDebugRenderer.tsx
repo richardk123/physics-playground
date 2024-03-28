@@ -2,8 +2,9 @@ import {Engine} from "../../../engine/Engine";
 import {P5Renderer} from "../../../../components/P5Renderer";
 import p5Types from "p5";
 import {Transformer} from "../../../engine/common/Transformer";
+import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 
-export const ParticlesDebugRenderer = ({engine}: {engine?: Engine}) =>
+export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
 {
     const render = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
@@ -34,8 +35,11 @@ export const ParticlesDebugRenderer = ({engine}: {engine?: Engine}) =>
         }
     }
 
-    const setup = () =>
+    const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
+        const camera = engine.renderer.cameraBuffer.camera;
+        registerMoving(canvas, camera);
+        registerScrolling(canvas, camera);
     }
 
     return <P5Renderer render={render} setup={setup} />

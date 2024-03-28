@@ -6,6 +6,7 @@ import {GpuSettingsInfo} from "./components/GpuSettingsInfo";
 import {Camera} from "../engine/data/Camera";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
 import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
+import {registerMoving, registerScrolling} from "./components/utils/CanvasUtils";
 
 export const SimpleGpu = () =>
 {
@@ -21,11 +22,12 @@ export const SimpleGpu = () =>
         }
         const camera: Camera = {
             zoom: 0.05,
-            translation: {x: 12, y: 7},
+            translation: {x: 0, y: 0},
             rotation: 0,
         }
+        const canvas = canvasRef.current!;
 
-        Engine.create(canvasRef.current!, settings, camera)
+        Engine.create(canvas, settings, camera)
             .then(async engine =>
             {
                 setEngine(engine);
@@ -34,7 +36,11 @@ export const SimpleGpu = () =>
                 engine.addPoint(0, 10);
                 engine.addPoint(9, 10);
 
+                registerScrolling(canvas, camera);
+                registerMoving(canvas, camera);
+
                 await engine.next();
+                engine.render()
             })
     }, []);
 
@@ -45,7 +51,7 @@ export const SimpleGpu = () =>
                     <canvas className="w-full h-full" ref={canvasRef} width={1024} height={768}></canvas>
                 </div>
                 <div className="w-1/2 h-full bg-gray-300">
-                    <ParticlesDebugRenderer engine={engine} />
+                    {engine && <ParticlesDebugRenderer engine={engine} />}
                 </div>
             </div>
             <div className="flex h-1/2">

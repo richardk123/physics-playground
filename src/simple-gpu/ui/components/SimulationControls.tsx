@@ -16,7 +16,7 @@ export const SimulationControls = (props: Props) =>
     }
     const start = async () =>
     {
-        await props.engine!.start();
+        await props.engine!.simulate();
         setRunning(true);
     }
     const next = async () =>
