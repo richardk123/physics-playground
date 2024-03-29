@@ -13,7 +13,9 @@ fn getGridID(p: vec2<f32>) -> u32 {
 
 fn updatePoint(p: vec2<f32>, index: u32, gridOffsetX: f32, gridOffsetY: f32)
 {
-    let gridID = getGridID(vec2<f32>(p.x + gridOffsetX, p.y + gridOffsetY));
+    let offsetX = p.x + gridOffsetX;
+    let offsetY = p.y + gridOffsetY;
+    let gridID = getGridID(vec2<f32>(offsetX, offsetY));
     let cellPointCount = cellParticleCount[gridID];
 
     for (var j : u32 = 0; j < cellPointCount; j++)
@@ -23,9 +25,9 @@ fn updatePoint(p: vec2<f32>, index: u32, gridOffsetX: f32, gridOffsetY: f32)
 
         let d = distance(p, anotherPoint);
 
-        if (d < 1.0 && d > 0.0 && index != anotherPointIndex)
+        if (d < 1.0 && d > 0.0 && index != anotherPointIndex && offsetX > 0 && offsetY > 0)
         {
-            let normal = normalize(p - anotherPoint);
+            let normal = normalize(anotherPoint - p);
             let corr = ((1 - d) * 0.5f);
 
             let bucketId1 = (index * 8) + atomicAdd(&particleCollisionCount[index], 1);
@@ -56,15 +58,15 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
 
     let p = position[index];
 
-//    updatePoint(p, index, -1.0, -1.0);
-//    updatePoint(p, index, 0.0, -1.0);
-//    updatePoint(p, index, 1.0, -1.0);
+    updatePoint(p, index, -1.0, -1.0);
+    updatePoint(p, index, 0.0, -1.0);
+    updatePoint(p, index, 1.0, -1.0);
 
-//    updatePoint(p, index, -1.0, 0.0);
+    updatePoint(p, index, -1.0, 0.0);
     updatePoint(p, index, 0.0, 0.0);
-//    updatePoint(p, index, 1.0, 0.0);
+    updatePoint(p, index, 1.0, 0.0);
 
-//    updatePoint(p, index, -1.0, 1.0);
-//    updatePoint(p, index, 0.0, 1.0);
-//    updatePoint(p, index, 1.0, 1.0);
+    updatePoint(p, index, -1.0, 1.0);
+    updatePoint(p, index, 0.0, 1.0);
+    updatePoint(p, index, 1.0, 1.0);
 }

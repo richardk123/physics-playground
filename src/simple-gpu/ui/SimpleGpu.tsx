@@ -34,7 +34,8 @@ export const SimpleGpu = () =>
                 setEngine(engine);
 
                 engine.addPoint(2.5, 0);
-                engine.addPoint(2.5, 10);
+                engine.addPoint(2.6, 7);
+                engine.addPoint(2.4, 5);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
