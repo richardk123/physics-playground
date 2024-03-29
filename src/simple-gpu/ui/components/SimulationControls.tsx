@@ -4,20 +4,16 @@ import {useState} from "react";
 
 interface Props
 {
-    engine?: Engine;
+    engine: Engine;
 }
 export const SimulationControls = (props: Props) =>
 {
-    const [running, setRunning] = useState(props.engine?.running ?? false);
-    const stop = () =>
+    const [running, setRunning] = useState(props.engine.running);
+    const startStop = async () =>
     {
-        props.engine!.stop();
-        setRunning(false);
-    }
-    const start = async () =>
-    {
-        await props.engine!.simulate();
-        setRunning(true);
+        props.engine.running = !running;
+        setRunning(!running);
+        await props.engine.simulate();
     }
     const next = async () =>
     {
@@ -25,8 +21,7 @@ export const SimulationControls = (props: Props) =>
         setRunning(false);
     }
     return <>
-        <Button variant="filled" disabled={!running} onClick={stop}>Stop</Button>
-        <Button variant="filled" disabled={running} onClick={start}>Start</Button>
+        <Button variant="filled" onClick={startStop}>{running ? "Stop" : "Start"}</Button>
         <Button variant="filled" disabled={running} onClick={next}>Next</Button>
     </>
 }

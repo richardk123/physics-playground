@@ -7,6 +7,7 @@ import {Camera} from "../engine/data/Camera";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
 import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
 import {registerMoving, registerScrolling} from "./components/utils/CanvasUtils";
+import {CollisionDebugRenderer} from "./components/debug/CollisionDebugRenderer";
 
 export const SimpleGpu = () =>
 {
@@ -32,9 +33,8 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                engine.addPoint(0, 0);
-                engine.addPoint(0, 10);
-                engine.addPoint(9, 10);
+                engine.addPoint(2.5, 0);
+                engine.addPoint(2.5, 10);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
@@ -59,11 +59,12 @@ export const SimpleGpu = () =>
                     {engine && <GridDebugRenderer engine={engine} />}
                 </div>
                 <div className="w-1/2 h-full bg-gray-300">
+                    {engine && <CollisionDebugRenderer engine={engine} />}
                 </div>
             </div>
         </div>
         <div className="w-64 text-white">
-            <SimulationControls engine={engine} />
+            {engine && <SimulationControls engine={engine} />}
             <GpuSettingsInfo engine={engine} />
         </div>
     </div>;

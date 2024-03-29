@@ -5,13 +5,14 @@ import {GPUEngine} from "./common/GPUEngine";
 import {Renderer} from "./Renderer";
 import {Camera} from "./data/Camera";
 import {GridBuffer} from "./data/Grid";
+import {CollisionBuffer} from "./data/Collision";
 
 export class Engine
 {
     private engine: GPUEngine;
     public solver: Solver;
     public renderer: Renderer;
-    public running = true;
+    public running = false;
 
     constructor(engine: GPUEngine,
                 solver: Solver,
@@ -32,8 +33,9 @@ export class Engine
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
         const gridBuffer = new GridBuffer(engine, settings);
+        const collisionBuffer = new CollisionBuffer(engine, settings, particles);
 
-        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer, gridBuffer);
+        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer, gridBuffer, collisionBuffer);
         const renderer = await Renderer.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);
     }

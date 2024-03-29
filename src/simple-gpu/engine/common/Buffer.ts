@@ -48,19 +48,25 @@ export class Buffer
     }
 
 
-    public async readBuffer(): Promise<ArrayBuffer>
+    public async readBuffer(size?: number): Promise<ArrayBuffer>
     {
+        let s = size;
+        if (s === undefined)
+        {
+            s = this.buffer.size;
+        }
+
         const device = this.engine.device;
         const encoder = device.createCommandEncoder({ label: `${this.name} builtin encoder` });
 
-        encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, this.buffer.size);
+        encoder.copyBufferToBuffer(this.buffer, 0, this.bufferRead, 0, s);
 
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
         await this.bufferRead.mapAsync(GPUMapMode.READ);
 
-        const buffer = this.bufferRead.getMappedRange(0, this.buffer.size);
+        const buffer = this.bufferRead.getMappedRange(0, s);
         // Copy the buffer using slice
         const copiedBuffer = buffer.slice(0);
         this.bufferRead.unmap();
