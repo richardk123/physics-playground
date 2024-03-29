@@ -20,8 +20,8 @@ export const SimulationControls = (props: Props) =>
         await props.engine!.next();
         setRunning(false);
     }
-    return <>
+    return <div className="flex">
         <Button variant="filled" onClick={startStop}>{running ? "Stop" : "Start"}</Button>
         <Button variant="filled" disabled={running} onClick={next}>Next</Button>
-    </>
+    </div>
 }

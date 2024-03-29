@@ -2,7 +2,6 @@ import {Engine} from "../../engine/Engine";
 import React, {useEffect, useState} from "react";
 import {SettingsGpuData} from "../../engine/data/EngineSettings";
 import {timer} from "rxjs";
-import {Card} from "@material-tailwind/react";
 import {Camera} from "../../engine/data/Camera";
 
 interface Props
@@ -29,7 +28,7 @@ export const GpuSettingsInfo = (props: Props) =>
         return () => sub.unsubscribe();
     }, [increment]);
 
-    return <Card className="w-96 h-full">
+    return <div className="w-full h-full">
         <p>Particle count: {gpuSettings?.particleCount}</p>
         <p>Grid size x: {gpuSettings?.gridSizeX}</p>
         <p>Grid size y: {gpuSettings?.gridSizeY}</p>
@@ -37,5 +36,5 @@ export const GpuSettingsInfo = (props: Props) =>
         <p>Translation x: {camera?.translation.x.toFixed(2)}</p>
         <p>Translation y: {camera?.translation.y.toFixed(2)}</p>
         <p>Zoom: {camera?.zoom.toFixed(5)}</p>
-    </Card>
+    </div>
 }

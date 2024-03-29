@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {Engine} from "../engine/Engine";
 import {EngineSettings} from "../engine/data/EngineSettings";
-import {SimulationControls} from "./components/SimulationControls";
-import {GpuSettingsInfo} from "./components/GpuSettingsInfo";
 import {Camera} from "../engine/data/Camera";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
 import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
 import {registerMoving, registerScrolling} from "./components/utils/CanvasUtils";
 import {CollisionDebugRenderer} from "./components/debug/CollisionDebugRenderer";
+import {Sidebar} from "./components/Sidebar";
 
 export const SimpleGpu = () =>
 {
@@ -67,9 +66,8 @@ export const SimpleGpu = () =>
                 </div>
             </div>
         </div>
-        <div className="w-64 text-white">
-            {engine && <SimulationControls engine={engine} />}
-            <GpuSettingsInfo engine={engine} />
+        <div className="w-64 h-full text-white">
+            {engine && <Sidebar engine={engine}/>}
         </div>
     </div>;
 }
