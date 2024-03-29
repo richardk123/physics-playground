@@ -16,7 +16,7 @@ fn main(@builtin(global_invocation_id) id : vec3<u32>)
 {
   let index : u32 = id.x;
 
-  if (index > settings.particleCount)
+  if (index >= settings.particleCount)
   {
     return;
   }

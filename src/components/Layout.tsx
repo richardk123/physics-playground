@@ -11,8 +11,8 @@ export const Layout = () =>
                 <Sidebar />
             </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <main className="flex-1 overflow-x-hidden overflow-y-hidden p-4 h-full w-full">
+            <div className="flex-1 flex flex-col">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 h-full w-full">
                     <Outlet/>
                 </main>
             </div>

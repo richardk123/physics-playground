@@ -13,6 +13,11 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
         const settings = engine.solver.settingsBuffer.settings;
         const camera = engine.renderer.cameraBuffer.camera;
 
+        if (!settings.debug)
+        {
+            return;
+        }
+
         const transform = new Transformer(camera, canvas);
 
         // draw horizontal lines

@@ -16,17 +16,17 @@ export const SimpleGpu = () =>
     useEffect(() =>
     {
         const settings: EngineSettings = {
-            maxParticleCount: 10000,
-            gridSizeY: 500,
-            gridSizeX: 500,
-            subStepCount: 1,
+            maxParticleCount: 100000,
+            gridSizeY: 200,
+            gridSizeX: 200,
+            subStepCount: 30,
             deltaTime: 1 / 60,
             gravity: {x: 0, y: -10},
             debug: false,
         }
         const camera: Camera = {
-            zoom: 0.03051,
-            translation: {x: 5, y: 5},
+            zoom: 0.3051,
+            translation: {x: 50, y: 50},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -36,10 +36,7 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                // engine.addPoint(2, 0);
-                // engine.addPoint(2, 7);
-                // engine.addPoint(2, 5);
-                engine.createRectangle(0, 0, 50, 50);
+                engine.createRectangle(0, 0, 100, 100);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
@@ -49,15 +46,27 @@ export const SimpleGpu = () =>
             })
     }, []);
 
+    // return <div className="flex h-full bg-gray-200">
+    //     <div className="flex-1 flex flex-col h-full">
+    //         <div className="flex h-1/2">
+    //             <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+    //             {engine && <ParticlesDebugRenderer engine={engine} />}
+    //         </div>
+    //         <div className="flex h-1/2">
+    //             {engine && <ParticlesDebugRenderer engine={engine} />}
+    //             {engine && <GridDebugRenderer engine={engine} />}
+    //             {engine && <CollisionDebugRenderer engine={engine} />}
+    //         </div>
+    //     </div>
+    //     <div className="w-64 h-full text-white">
+    //         {engine && <Sidebar engine={engine}/>}
+    //     </div>
+    // </div>;
+
     return <div className="flex h-full bg-gray-200">
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
-            <div className="flex h-1/2">
-                    <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
-                    {engine && <ParticlesDebugRenderer engine={engine} />}
-            </div>
-            <div className="flex h-1/2">
-                {engine && <GridDebugRenderer engine={engine} />}
-                {engine && <CollisionDebugRenderer engine={engine} />}
+        <div className="flex-1 flex flex-col h-full">
+            <div className="flex h-full">
+                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
             </div>
         </div>
         <div className="w-64 h-full text-white">

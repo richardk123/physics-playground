@@ -91,14 +91,14 @@ export class Solvers
                     collisionApply.dispatch(Math.ceil(particleCount / 256));
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
-                }
 
-                if (settingsBuffer.settings.debug)
-                {
-                    await particlesBuffer.loadFromGpu();
-                    await settingsBuffer.loadFromGpu();
-                    await gridBuffer.loadFromGpu();
-                    await collisionBuffer.loadFromGpu();
+                    if (settingsBuffer.settings.debug)
+                    {
+                        await particlesBuffer.loadFromGpu();
+                        await settingsBuffer.loadFromGpu();
+                        await gridBuffer.loadFromGpu();
+                        await collisionBuffer.loadFromGpu();
+                    }
                 }
             },
             particlesBuffer: particlesBuffer,

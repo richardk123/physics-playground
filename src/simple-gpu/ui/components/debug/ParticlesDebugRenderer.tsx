@@ -11,8 +11,23 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
         if (engine)
         {
             const particles = engine.solver.particlesBuffer.gpuParticles;
+            const settings = engine.solver.settingsBuffer.settings;
             const camera = engine.renderer.cameraBuffer.camera;
             const transform = new Transformer(camera, canvas);
+
+            if (!settings.debug)
+            {
+                return;
+            }
+
+            // bounding box
+            const gridTopRight = transform.toClipSpace().position(settings.gridSizeX, settings.gridSizeY);
+            const gridBottomLeft = transform.toClipSpace().position(0, 0);
+
+            p5.line(gridBottomLeft.x, gridBottomLeft.y, gridTopRight.x, gridBottomLeft.y);
+            p5.line(gridBottomLeft.x, gridBottomLeft.y, gridBottomLeft.x, gridTopRight.y);
+            p5.line(gridBottomLeft.x, gridTopRight.y, gridTopRight.x, gridTopRight.y);
+            p5.line(gridTopRight.x, gridTopRight.y, gridTopRight.x, gridBottomLeft.y);
 
             // render particles
             for (let i = 0; i < particles.count; i++)
@@ -27,7 +42,10 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
                 const tPos = transform.toClipSpace().position(x, y);
                 const tSize = transform.toClipSpace().size(1);
                 const precision = 2;
+                p5.fill(0, 0);
                 p5.circle(tPos.x, tPos.y, tSize);
+
+                p5.fill(0, 255);
                 p5.text(`   cur: [${x.toFixed(precision)}, ${y.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y - tSize / 2);
                 p5.text(` prev: [${prevX.toFixed(precision)}, ${prevY.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y);
                 p5.text(`    vel: [${velocityX.toFixed(precision)}, ${velocityY.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y + tSize / 2);
