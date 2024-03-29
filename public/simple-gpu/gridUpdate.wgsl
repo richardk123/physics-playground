@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    dt: f32,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {

@@ -20,6 +20,9 @@ export const SimpleGpu = () =>
             maxParticleCount: 10000,
             gridSizeY: 10,
             gridSizeX: 10,
+            subStepCount: 4,
+            deltaTime: 1 / 60,
+            debug: true,
         }
         const camera: Camera = {
             zoom: 0.05,

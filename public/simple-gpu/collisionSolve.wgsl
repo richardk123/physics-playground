@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    dt: f32,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
@@ -25,7 +26,7 @@ fn updatePoint(p: vec2<f32>, index: u32, gridOffsetX: f32, gridOffsetY: f32)
 
         let d = distance(p, anotherPoint);
 
-        if (d < 1.0 && d > 0.0 && index != anotherPointIndex && offsetX > 0 && offsetY > 0)
+        if (d < 1.0 && d > 0.0 && index != anotherPointIndex && offsetX >= 0 && offsetY >= 0)
         {
             let normal = normalize(anotherPoint - p);
             let corr = ((1 - d) * 0.5f);

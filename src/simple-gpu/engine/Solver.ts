@@ -76,23 +76,30 @@ export class Solvers
                 settingsBuffer.write();
                 particlesBuffer.write();
 
+                const subStepCount = settingsBuffer.settings.subStepCount;
                 const particleCount = particlesBuffer.particles.count;
 
-                preSolve.dispatch(Math.ceil(particleCount / 256));
+                for (let i = 0; i < subStepCount; i++)
+                {
+                    preSolve.dispatch(Math.ceil(particleCount / 256));
 
-                gridClear.dispatch(Math.ceil(gridBuffer.getNumberOfCells() / 256));
-                gridUpdate.dispatch(Math.ceil(particleCount / 256));
+                    gridClear.dispatch(Math.ceil(gridBuffer.getNumberOfCells() / 256));
+                    gridUpdate.dispatch(Math.ceil(particleCount / 256));
 
-                collisionClear.dispatch(Math.ceil(particleCount / 256));
-                collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                collisionApply.dispatch(Math.ceil(particleCount / 256));
+                    collisionClear.dispatch(Math.ceil(particleCount / 256));
+                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                    collisionApply.dispatch(Math.ceil(particleCount / 256));
 
-                postSolve.dispatch(Math.ceil(particleCount / 256));
+                    postSolve.dispatch(Math.ceil(particleCount / 256));
+                }
 
-                await particlesBuffer.loadFromGpu();
-                await settingsBuffer.loadFromGpu();
-                await gridBuffer.loadFromGpu();
-                await collisionBuffer.loadFromGpu();
+                if (settingsBuffer.settings.debug)
+                {
+                    await particlesBuffer.loadFromGpu();
+                    await settingsBuffer.loadFromGpu();
+                    await gridBuffer.loadFromGpu();
+                    await collisionBuffer.loadFromGpu();
+                }
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,

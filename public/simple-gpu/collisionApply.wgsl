@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    dt: f32,
 }
 
 @binding(0) @group(0) var<uniform> settings : Settings;
