@@ -29,7 +29,7 @@ fn updatePoint(p: vec2<f32>, index: u32, gridOffsetX: f32, gridOffsetY: f32)
         if (d < 1.0 && d > 0.0 && index != anotherPointIndex && offsetX >= 0 && offsetY >= 0)
         {
             let normal = normalize(anotherPoint - p);
-            let corr = ((1 - d) * 0.5f);
+            let corr = ((1 - d) * 0.4f);
 
             let bucketId1 = (index * 8) + atomicAdd(&particleCollisionCount[index], 1);
             particleCollisionVelocities[bucketId1] = normal * -corr;

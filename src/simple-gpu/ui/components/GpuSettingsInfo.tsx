@@ -30,11 +30,10 @@ export const GpuSettingsInfo = (props: Props) =>
 
     return <div className="w-full h-full">
         <p>Particle count: {gpuSettings?.particleCount}</p>
-        <p>Grid size x: {gpuSettings?.gridSizeX}</p>
-        <p>Grid size y: {gpuSettings?.gridSizeY}</p>
+        <p>Grid size: {`[${gpuSettings?.gridSizeX}, ${gpuSettings?.gridSizeY}]`}</p>
         <p>Delta time: {gpuSettings?.deltaTime.toFixed(5)}</p>
-        <p>Translation x: {camera?.translation.x.toFixed(2)}</p>
-        <p>Translation y: {camera?.translation.y.toFixed(2)}</p>
+        <p>Gravity {`[${gpuSettings?.gravityX.toFixed(2)}, ${gpuSettings?.gravityY.toFixed(2)}]`}</p>
+        <p>Translation: {`[${camera?.translation.x.toFixed(2)}, ${camera?.translation.y.toFixed(2)}]`}</p>
         <p>Zoom: {camera?.zoom.toFixed(5)}</p>
     </div>
 }

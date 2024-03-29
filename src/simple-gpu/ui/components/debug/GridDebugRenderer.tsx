@@ -51,7 +51,7 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
                     particleIndexes.push(grid.cellParticleIndexes[i * 8 + j]);
                 }
 
-                p5.text(`[${particleIndexes.join(", ")}]`, p.x, p.y - transform.toClipSpace().size(0.5));
+                // p5.text(`[${particleIndexes.join(", ")}]`, p.x, p.y - transform.toClipSpace().size(0.5));
                 p5.text(particleCount.toFixed(0), p.x, p.y);
             }
         }

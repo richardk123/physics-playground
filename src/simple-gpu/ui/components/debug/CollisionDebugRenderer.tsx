@@ -41,7 +41,7 @@ export const CollisionDebugRenderer = ({engine}: {engine: Engine}) =>
 
                     particlePositions.push(`[${vx.toFixed(3)}, ${vy.toFixed(3)}]`)
                 }
-                p5.text(`[${particlePositions.join(", ")}]`, p.x, p.y - transform.toClipSpace().size(0.5));
+                // p5.text(`[${particlePositions.join(", ")}]`, p.x, p.y - transform.toClipSpace().size(0.5));
                 p5.text(collisionCount.toFixed(0), p.x, p.y);
             }
         }

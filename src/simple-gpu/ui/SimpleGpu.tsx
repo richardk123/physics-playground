@@ -17,15 +17,16 @@ export const SimpleGpu = () =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 10000,
-            gridSizeY: 10,
-            gridSizeX: 10,
-            subStepCount: 4,
+            gridSizeY: 500,
+            gridSizeX: 500,
+            subStepCount: 1,
             deltaTime: 1 / 60,
-            debug: true,
+            gravity: {x: 0, y: -10},
+            debug: false,
         }
         const camera: Camera = {
-            zoom: 0.05,
-            translation: {x: 0, y: 0},
+            zoom: 0.03051,
+            translation: {x: 5, y: 5},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -35,9 +36,10 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                engine.addPoint(2.5, 0);
-                engine.addPoint(2.6, 7);
-                engine.addPoint(2.4, 5);
+                // engine.addPoint(2, 0);
+                // engine.addPoint(2, 7);
+                // engine.addPoint(2, 5);
+                engine.createRectangle(0, 0, 50, 50);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);

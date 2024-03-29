@@ -4,6 +4,7 @@ struct Settings
     gridSizeX: u32,
     gridSizeY: u32,
     dt: f32,
+    gravity: vec2<f32>
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
@@ -15,7 +16,7 @@ struct Settings
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     // apply gravity
-    velocities[id.x] += vec2<f32>(0.0, -100.0) * settings.dt;
+    velocities[id.x] += settings.gravity * settings.dt;
     // update previous position with current position
     positionsPrevious[id.x] = positionsCurrent[id.x];
     // update current position with velocity

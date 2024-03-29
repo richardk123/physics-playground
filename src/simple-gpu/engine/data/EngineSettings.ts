@@ -1,6 +1,7 @@
 import {GPUEngine} from "../common/GPUEngine";
 import {Buffer} from "../common/Buffer";
 import {Particles} from "./Particles";
+import {Vec2d} from "./Vec2d";
 
 export interface EngineSettings
 {
@@ -9,6 +10,7 @@ export interface EngineSettings
     gridSizeY: number;
     subStepCount: number;
     deltaTime: number;
+    gravity: Vec2d;
     debug: boolean;
 }
 
@@ -18,6 +20,8 @@ export interface SettingsGpuData
     gridSizeX: number,
     gridSizeY: number,
     deltaTime: number;
+    gravityX: number;
+    gravityY: number;
 }
 
 export class EngineSettingsBuffer
@@ -37,13 +41,13 @@ export class EngineSettingsBuffer
     {
         this.settings = settings;
         this.particles = particles;
-        const structSizeBytes = 16;
+        const structSizeBytes = 24;
         this.buffer = engine.createBuffer("engine-settings", structSizeBytes, "uniform");
         this.data = new ArrayBuffer(structSizeBytes);
 
         this.intData = new Uint32Array(this.data);
         this.floatData = new Float32Array(this.data);
-        this.gpuData = {particleCount: 0, gridSizeY: 0, gridSizeX: 0, deltaTime: 0};
+        this.gpuData = {particleCount: 0, gridSizeY: 0, gridSizeX: 0, deltaTime: 0, gravityX: 0, gravityY: 0};
     }
 
     public write()
@@ -52,6 +56,8 @@ export class EngineSettingsBuffer
         this.intData[1] = this.settings.gridSizeX;
         this.intData[2] = this.settings.gridSizeY;
         this.floatData[3] = this.settings.deltaTime / this.settings.subStepCount;
+        this.floatData[4] = Math.sign(this.settings.gravity.x) * (this.settings.gravity.x * this.settings.gravity.x);
+        this.floatData[5] = Math.sign(this.settings.gravity.y) * (this.settings.gravity.y * this.settings.gravity.y);
         this.buffer.writeBuffer(this.data)
     }
 
@@ -65,6 +71,8 @@ export class EngineSettingsBuffer
             gridSizeX: intData[1],
             gridSizeY: intData[2],
             deltaTime: floatData[3],
+            gravityX: floatData[4],
+            gravityY: floatData[5],
         }
     }
 }
