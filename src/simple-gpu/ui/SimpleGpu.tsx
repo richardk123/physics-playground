@@ -52,20 +52,12 @@ export const SimpleGpu = () =>
     return <div className="flex h-full bg-gray-200">
         <div className="flex-1 flex flex-col h-full overflow-hidden">
             <div className="flex h-1/2">
-                <div className="w-1/2 h-full bg-gray-200">
-                    <canvas className="w-full h-full" ref={canvasRef} width={1024} height={768}></canvas>
-                </div>
-                <div className="w-1/2 h-full bg-gray-300">
+                    <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
                     {engine && <ParticlesDebugRenderer engine={engine} />}
-                </div>
             </div>
             <div className="flex h-1/2">
-                <div className="w-1/2 h-full bg-gray-200">
-                    {engine && <GridDebugRenderer engine={engine} />}
-                </div>
-                <div className="w-1/2 h-full bg-gray-300">
-                    {engine && <CollisionDebugRenderer engine={engine} />}
-                </div>
+                {engine && <GridDebugRenderer engine={engine} />}
+                {engine && <CollisionDebugRenderer engine={engine} />}
             </div>
         </div>
         <div className="w-64 h-full text-white">
