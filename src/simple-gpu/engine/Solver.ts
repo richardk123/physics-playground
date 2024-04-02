@@ -3,6 +3,7 @@ import {EngineSettingsBuffer} from "./data/EngineSettings";
 import {ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
 import {CollisionBuffer} from "./data/Collision";
+import {PrefixSumComputeShader} from "./data/PrefixSum";
 
 export interface Solver
 {
@@ -70,6 +71,8 @@ export class Solvers
             .addBuffer(collisionBuffer.particleCollisionVelocitiesBuffer, "read-only-storage")
             .build();
 
+        const prefixSum = await PrefixSumComputeShader.create(engine);
+
         return {
             simulate: async (): Promise<void> =>
             {
@@ -78,6 +81,8 @@ export class Solvers
 
                 const subStepCount = settingsBuffer.settings.subStepCount;
                 const particleCount = particlesBuffer.particles.count;
+
+                prefixSum.dispatch();
 
                 for (let i = 0; i < subStepCount; i++)
                 {
