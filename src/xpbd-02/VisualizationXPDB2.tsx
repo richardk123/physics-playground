@@ -18,7 +18,7 @@ export const VisualizationXPDB2 = () =>
     const bodies = new ParticleFormations(engine);
 
     renderer.lookAt(50, 50);
-    renderer.setSimulationWidth(200);
+    renderer.setSimulationWidth(150);
 
     createScene1(engine, bodies);
 

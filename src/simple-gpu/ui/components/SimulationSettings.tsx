@@ -1,4 +1,3 @@
-import {AccordionComponent} from "./common/AccordionComponent";
 import {BoxTitle} from "../../../verlet-gpu/ui/components/BoxTitle";
 import {SliderComponent} from "../../../verlet-gpu/ui/components/SliderComponent";
 import React from "react";

@@ -13,20 +13,22 @@ export const SimpleGpu = () =>
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [engine, setEngine] = useState<Engine | undefined>();
 
+    const count = 100;
+
     useEffect(() =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 100000,
-            gridSizeY: 200,
-            gridSizeX: 200,
+            gridSizeY: count * 2,
+            gridSizeX: count * 2,
             subStepCount: 30,
             deltaTime: 1 / 60,
             gravity: {x: 0, y: -10},
             debug: false,
         }
         const camera: Camera = {
-            zoom: 0.3051,
-            translation: {x: 50, y: 50},
+            zoom: 0.55,
+            translation: {x: count, y: count},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -36,7 +38,7 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                engine.createRectangle(0, 0, 100, 100);
+                engine.createRectangle(0, 0, count, count);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
@@ -53,7 +55,6 @@ export const SimpleGpu = () =>
     //             {engine && <ParticlesDebugRenderer engine={engine} />}
     //         </div>
     //         <div className="flex h-1/2">
-    //             {engine && <ParticlesDebugRenderer engine={engine} />}
     //             {engine && <GridDebugRenderer engine={engine} />}
     //             {engine && <CollisionDebugRenderer engine={engine} />}
     //         </div>
