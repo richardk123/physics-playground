@@ -6,6 +6,7 @@ import {Renderer} from "./Renderer";
 import {Camera} from "./data/Camera";
 import {GridBuffer} from "./data/Grid";
 import {CollisionBuffer} from "./data/Collision";
+import {PrefixSumBuffer} from "./data/PrefixSum";
 
 export class Engine
 {
@@ -33,9 +34,12 @@ export class Engine
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
         const gridBuffer = new GridBuffer(engine, settings);
+        const prefixSumBuffer = new PrefixSumBuffer(engine, settings);
         const collisionBuffer = new CollisionBuffer(engine, settings, particles);
 
-        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer, gridBuffer, collisionBuffer);
+        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer,
+            gridBuffer, prefixSumBuffer, collisionBuffer);
+
         const renderer = await Renderer.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);
     }
@@ -48,7 +52,7 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.addPoint(bottomLeftX + x * 2 + Math.random() * 0.1, bottomLeftY + y * 2 + Math.random() * 0.1);
+                this.addPoint(bottomLeftX + x, bottomLeftY + y);
             }
         }
     }

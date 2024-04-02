@@ -1,79 +1,64 @@
 import {Buffer} from "../common/Buffer";
 import {GPUEngine} from "../common/GPUEngine";
 import {ComputeShader} from "../common/ComputeShader";
-
-const COUNT = 4;
-
-export class PrefixSum
-{
-    public cellParticleCount: Uint32Array;
-
-    constructor()
-    {
-        this.cellParticleCount = new Uint32Array(COUNT);
-        this.cellParticleCount.fill(1);
-    }
-}
+import {EngineSettings} from "./EngineSettings";
+import {GridBuffer} from "./Grid";
 
 export class PrefixSumBuffer
 {
     public buffer1: Buffer;
     public buffer2: Buffer;
     public prefixSumSettings: Buffer;
-    private intData: Uint32Array;
-    private data: PrefixSum;
+    private data: Uint32Array;
+    private settings: EngineSettings;
 
-    constructor(engine: GPUEngine)
+    constructor(engine: GPUEngine,
+                settings: EngineSettings)
     {
-        this.data = new PrefixSum();
-
-        this.buffer1 = engine.createBuffer("prefix-sum-buffer1", COUNT * 4, "storage");
-        this.buffer1.writeBuffer(this.data.cellParticleCount);
-
-        this.buffer2 = engine.createBuffer("prefix-sum-buffer2", COUNT * 4, "storage");
-        // copy first
-        this.buffer2.writeBuffer(this.data.cellParticleCount, 0, 0, 4);
-
+        this.settings = settings;
+        this.buffer1 = engine.createBuffer("prefix-sum-buffer1", this.getNumberOfCells() * 4, "storage");
+        this.buffer2 = engine.createBuffer("prefix-sum-buffer2", this.getNumberOfCells() * 4, "storage");
         this.prefixSumSettings = engine.createBuffer("prefix-sum-settings", 16, "uniform");
-        this.intData = new Uint32Array(4);
+        this.data = new Uint32Array(4);
+    }
+
+    public getNumberOfCells()
+    {
+        return this.settings.gridSizeX * this.settings.gridSizeY;
     }
 
     public write(step: number)
     {
-        this.intData[0] = step;
-        this.intData[1] = COUNT;
-        this.intData[2] = 0;
-        this.intData[3] = 0;
+        this.data[0] = step;
+        this.data[1] = this.getNumberOfCells();
+        this.data[2] = 0;
+        this.data[3] = 0;
 
-        this.prefixSumSettings.writeBuffer(this.intData);
+        this.prefixSumSettings.writeBuffer(this.data);
     }
 
     public async printGPU(swap: boolean)
     {
         const b1 = new Uint32Array(await this.buffer1.readBuffer());
         const b2 = new Uint32Array(await this.buffer2.readBuffer());
-        const s = new Uint32Array(await this.prefixSumSettings.readBuffer());
 
         if (swap)
         {
             console.log(`buffer2 [${b2.join(", ")}]`);
-            console.log(`buffer1 [${b1.join(", ")}]`);
         }
         else
         {
             console.log(`buffer1 [${b1.join(", ")}]`);
-            console.log(`buffer2 [${b2.join(", ")}]`);
         }
-        console.log(`settings [${s.join(", ")}]`);
     }
 
-    public printExpected()
+    public printExpected(data: Uint32Array)
     {
         const result = [];
         let sum = 0;
 
-        for (let i = 0; i < this.data.cellParticleCount.length; i++) {
-            sum += this.data.cellParticleCount[i];
+        for (let i = 0; i < data.length; i++) {
+            sum += data[i];
             result.push(sum);
         }
 
@@ -85,25 +70,33 @@ export class PrefixSumComputeShader
 {
     public buffer: PrefixSumBuffer;
     public prefixSum: ComputeShader;
+    private swapBuffers: boolean;
 
     private constructor(prefixSum: ComputeShader,
                         buffer: PrefixSumBuffer)
     {
         this.prefixSum = prefixSum;
         this.buffer = buffer;
+        this.swapBuffers = false;
     }
 
-    public async dispatch()
+    public async dispatch(gridBuffer: GridBuffer)
     {
-        const rCount = Math.log2(COUNT);
-        let swapBuffers = false;
+        const numberOfCells = this.buffer.getNumberOfCells();
+        // copy cell particle count to buffer1
+        this.buffer.buffer1.copyFrom(gridBuffer.cellParticleCountBuffer, numberOfCells * 4);
+        // copy first value
+        this.buffer.buffer2.copyFrom(this.buffer.buffer1, 4);
+
+        const rCount = Math.log2(numberOfCells);
+        this.swapBuffers = false;
 
         for (let r = 1; r <= rCount; r++)
         {
             const step = Math.pow(2, r - 1);
             this.buffer.write(step);
 
-            if (swapBuffers)
+            if (this.swapBuffers)
             {
                 this.prefixSum.setBuffers([this.buffer.prefixSumSettings, this.buffer.buffer2, this.buffer.buffer1]);
             }
@@ -112,17 +105,34 @@ export class PrefixSumComputeShader
                 this.prefixSum.setBuffers([this.buffer.prefixSumSettings, this.buffer.buffer1, this.buffer.buffer2]);
             }
 
-            this.prefixSum.dispatch(Math.ceil(COUNT / 256));
-            await this.buffer.printGPU(swapBuffers);
-            swapBuffers = !swapBuffers;
+            this.prefixSum.dispatch(Math.ceil(numberOfCells / 256));
+
+            this.swapBuffers = !this.swapBuffers;
         }
 
-        this.buffer.printExpected();
+        await this.buffer.printGPU(this.swapBuffers);
+
+        // print expected
+        await gridBuffer.loadFromGpu();
+        this.buffer.printExpected(gridBuffer.gpuGrid.cellParticleCount);
     }
 
-    static async create(engine: GPUEngine)
+    public getPrefixSumBuffer(): Buffer
     {
-        const buffer = new PrefixSumBuffer(engine);
+        if (this.swapBuffers)
+        {
+            return this.buffer.buffer2;
+        }
+        else
+        {
+            return this.buffer.buffer1;
+        }
+    }
+
+    static async create(engine: GPUEngine,
+                        buffer: PrefixSumBuffer)
+    {
+
         const prefixSum = await engine.createComputeShader("prefixSum")
             .addBuffer(buffer.prefixSumSettings, "uniform")
             .addBuffer(buffer.buffer1, "read-only-storage")

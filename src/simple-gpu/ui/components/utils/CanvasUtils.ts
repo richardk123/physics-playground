@@ -41,7 +41,6 @@ export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera) =>
             const moveX =  val.position[0] - val.endPosition[0];
             const moveY =  val.endPosition[1] - val.position[1];
 
-            console.log(val.originalPosition.x);
             camera.translation.x = val.originalPosition.x + transform.toWorldSpace().size(moveX);
             camera.translation.y = val.originalPosition.y + transform.toWorldSpace().size(moveY);
         });

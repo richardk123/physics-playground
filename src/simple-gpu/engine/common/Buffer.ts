@@ -73,4 +73,14 @@ export class Buffer
 
         return copiedBuffer;
     }
+
+    public copyFrom(buffer: Buffer, size: number, sourceOffSet = 0, destinationOffset = 0)
+    {
+        const device = this.engine.device;
+        const encoder = device.createCommandEncoder({ label: `${this.name} builtin encoder` });
+        encoder.copyBufferToBuffer(buffer.buffer, sourceOffSet, this.buffer, destinationOffset, size);
+
+        const commandBuffer = encoder.finish();
+        device.queue.submit([commandBuffer]);
+    }
 }

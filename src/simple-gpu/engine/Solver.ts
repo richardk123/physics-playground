@@ -3,7 +3,7 @@ import {EngineSettingsBuffer} from "./data/EngineSettings";
 import {ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
 import {CollisionBuffer} from "./data/Collision";
-import {PrefixSumComputeShader} from "./data/PrefixSum";
+import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
 
 export interface Solver
 {
@@ -20,6 +20,7 @@ export class Solvers
                                particlesBuffer: ParticlesBuffer,
                                settingsBuffer: EngineSettingsBuffer,
                                gridBuffer: GridBuffer,
+                               prefixSumBuffer: PrefixSumBuffer,
                                collisionBuffer: CollisionBuffer): Promise<Solver>
     {
         const preSolve = await engine.createComputeShader("preSolve")
@@ -39,13 +40,12 @@ export class Solvers
         const gridClear = await engine.createComputeShader("gridClear")
             .addBuffer(settingsBuffer.buffer, "uniform")
             .addBuffer(gridBuffer.cellParticleCountBuffer, "storage")
-            .addBuffer(gridBuffer.cellParticleIndexesBuffer, "storage")
             .build();
 
         const gridUpdate = await engine.createComputeShader("gridUpdate")
             .addBuffer(settingsBuffer.buffer, "uniform")
             .addBuffer(gridBuffer.cellParticleCountBuffer, "storage")
-            .addBuffer(gridBuffer.cellParticleIndexesBuffer, "storage")
+            .addBuffer(gridBuffer.particleCellOffsetBuffer, "storage")
             .addBuffer(particlesBuffer.positionCurrentBuffer, "read-only-storage")
             .build();
 
@@ -59,7 +59,7 @@ export class Solvers
             .addBuffer(settingsBuffer.buffer, "uniform")
             .addBuffer(particlesBuffer.positionCurrentBuffer, "read-only-storage")
             .addBuffer(gridBuffer.cellParticleCountBuffer, "read-only-storage")
-            .addBuffer(gridBuffer.cellParticleIndexesBuffer, "read-only-storage")
+            .addBuffer(gridBuffer.particleCellOffsetBuffer, "read-only-storage")
             .addBuffer(collisionBuffer.particleCollisionCountBuffer, "storage")
             .addBuffer(collisionBuffer.particleCollisionVelocitiesBuffer, "storage")
             .build();
@@ -71,7 +71,7 @@ export class Solvers
             .addBuffer(collisionBuffer.particleCollisionVelocitiesBuffer, "read-only-storage")
             .build();
 
-        const prefixSum = await PrefixSumComputeShader.create(engine);
+        const prefixSum = await PrefixSumComputeShader.create(engine, prefixSumBuffer);
 
         return {
             simulate: async (): Promise<void> =>
@@ -81,15 +81,16 @@ export class Solvers
 
                 const subStepCount = settingsBuffer.settings.subStepCount;
                 const particleCount = particlesBuffer.particles.count;
-
-                prefixSum.dispatch();
+                const numberOfCells = settingsBuffer.settings.gridSizeX * settingsBuffer.settings.gridSizeY;
 
                 for (let i = 0; i < subStepCount; i++)
                 {
                     preSolve.dispatch(Math.ceil(particleCount / 256));
 
-                    gridClear.dispatch(Math.ceil(gridBuffer.getNumberOfCells() / 256));
+                    gridClear.dispatch(Math.ceil(numberOfCells / 256));
                     gridUpdate.dispatch(Math.ceil(particleCount / 256));
+
+                    await prefixSum.dispatch(gridBuffer);
 
                     collisionClear.dispatch(Math.ceil(particleCount / 256));
                     collisionSolve.dispatch(Math.ceil(particleCount / 256));

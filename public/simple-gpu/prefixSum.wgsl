@@ -11,10 +11,12 @@ struct Settings
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id : vec3<u32>)
 {
-    if (id.x >= settings.count - 1)
+    if (id.x > settings.count - 1)
     {
         return;
     }
+    output[id.x] = input[id.x];
+
     let index : u32 = id.x + settings.step;
     output[index] = input[index] + input[index - settings.step];
 }

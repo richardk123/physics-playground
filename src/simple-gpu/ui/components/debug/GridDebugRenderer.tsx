@@ -43,20 +43,15 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
             return { x, y };
         }
 
-        for (let i = 0; i < grid.numberOfCells; i++)
+        const numberOfCells = settings.gridSizeX * settings.gridSizeY;
+
+        for (let i = 0; i < numberOfCells; i++)
         {
             const p = transform.toClipSpace().positionVec(coordinateFromIndex(i));
             const particleCount= grid.cellParticleCount[i];
 
-            if (particleCount > 0)
+            if (particleCount !== undefined)
             {
-                const particleIndexes: number[] = [];
-                for (let j = 0; j < particleCount; j++)
-                {
-                    particleIndexes.push(grid.cellParticleIndexes[i * 8 + j]);
-                }
-
-                // p5.text(`[${particleIndexes.join(", ")}]`, p.x, p.y - transform.toClipSpace().size(0.5));
                 p5.text(particleCount.toFixed(0), p.x, p.y);
             }
         }
