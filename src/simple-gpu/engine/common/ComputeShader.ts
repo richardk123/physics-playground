@@ -3,7 +3,7 @@ import {Buffer} from "./Buffer";
 
 export interface BufferBinding
 {
-    buffer: Buffer,
+    bufferSupplier: () => Buffer,
     type: GPUBufferBindingType;
 }
 
@@ -21,9 +21,9 @@ export class ComputeShaderBuilder
         this.bufferBindings = [];
     }
 
-    public addBuffer(buffer: Buffer, type: GPUBufferBindingType): ComputeShaderBuilder
+    public addBuffer(bufferSupplier: () => Buffer, type: GPUBufferBindingType): ComputeShaderBuilder
     {
-        this.bufferBindings.push({buffer: buffer, type: type});
+        this.bufferBindings.push({bufferSupplier: bufferSupplier, type: type});
         return this;
     }
 
@@ -39,8 +39,8 @@ export class ComputeShader
     private engine: GPUEngine;
     private pipeline: GPUComputePipeline;
     private name: string;
-    private buffers: Buffer[];
     private bindGroupLayout: GPUBindGroupLayout;
+    private buffers: BufferBinding[];
 
     constructor(engine: GPUEngine,
                 shaderCode: string,
@@ -50,7 +50,7 @@ export class ComputeShader
         this.name = name;
         this.engine = engine;
         const device : GPUDevice = engine.device;
-        this.buffers = buffers.map(b => b.buffer);
+        this.buffers = buffers;
 
         const bindGroupLayoutEntries = buffers
             .map((b, index) =>
@@ -86,11 +86,6 @@ export class ComputeShader
         });
     }
 
-    public setBuffers(buffers: Buffer[])
-    {
-        this.buffers = buffers;
-    }
-
     public dispatch(x: GPUSize32, y?: GPUSize32, z?: GPUSize32)
     {
         const device = this.engine.device;
@@ -99,7 +94,7 @@ export class ComputeShader
         const bindGroupEntries = this.buffers
             .map((b, index) =>
             {
-                return {binding: index, resource: { buffer: b.buffer }} as GPUBindGroupEntry;
+                return {binding: index, resource: { buffer: b.bufferSupplier().buffer }} as GPUBindGroupEntry;
             });
 
         const bindGroup = device.createBindGroup({

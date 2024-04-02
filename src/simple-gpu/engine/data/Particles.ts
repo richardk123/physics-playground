@@ -52,10 +52,8 @@ export class Particles
     }
 }
 
-export class ParticlesBuffer
+class ParticleBufferHolder
 {
-    public particles: Particles;
-    public gpuParticles: Particles;
     public positionCurrentBuffer: Buffer;
     public positionPreviousBuffer: Buffer;
     public velocityBuffer: Buffer;
@@ -64,13 +62,32 @@ export class ParticlesBuffer
                 settings: EngineSettings,
                 particles: Particles)
     {
-        this.particles = particles;
-
         const maxParticleBufferSize = settings.maxParticleCount * 4 * 2;
-
         this.positionCurrentBuffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
         this.positionPreviousBuffer = engine.createBuffer("previous-position", maxParticleBufferSize, "storage");
         this.velocityBuffer = engine.createBuffer("velocity", maxParticleBufferSize, "storage");
+    }
+
+}
+
+export class ParticlesBuffer
+{
+    public particles: Particles;
+    public gpuParticles: Particles;
+    private buffer1: ParticleBufferHolder;
+    private buffer2: ParticleBufferHolder;
+    private swap: boolean;
+
+
+    constructor(engine: GPUEngine,
+                settings: EngineSettings,
+                particles: Particles)
+    {
+        this.swap = false;
+        this.particles = particles;
+
+        this.buffer1 = new ParticleBufferHolder(engine, settings, particles);
+        this.buffer2 = new ParticleBufferHolder(engine, settings, particles);
         this.gpuParticles = Particles.create(0);
     }
 
@@ -79,20 +96,77 @@ export class ParticlesBuffer
         if (this.particles.dataChanged)
         {
             const particleBufferSize = this.particles.count * 4 * 2;
-            this.positionCurrentBuffer.writeBuffer(this.particles.positionCurrent, 0, 0, particleBufferSize);
-            this.positionPreviousBuffer.writeBuffer(this.particles.positionPrevious, 0, 0, particleBufferSize);
-            this.velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
+            this.getCurrent().positionCurrentBuffer.writeBuffer(this.particles.positionCurrent, 0, 0, particleBufferSize);
+            this.getCurrent().positionPreviousBuffer.writeBuffer(this.particles.positionPrevious, 0, 0, particleBufferSize);
+            this.getCurrent().velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
             this.particles.dataChanged = false;
         }
     }
 
+    public swapBuffers()
+    {
+        this.swap = !this.swap;
+    }
+
+    public getCurrent()
+    {
+        if (this.swap)
+        {
+            return this.buffer2;
+        }
+        return this.buffer1;
+    }
+
+    public getSwapped()
+    {
+        if (this.swap)
+        {
+            return this.buffer1;
+        }
+        return this.buffer2;
+    }
+
     public async loadFromGpu()
     {
-        const positionCurrentData = await this.positionCurrentBuffer.readBuffer();
-        const positionPreviousData = await this.positionPreviousBuffer.readBuffer();
-        const velocityData = await this.velocityBuffer.readBuffer();
+        const positionCurrentData = await this.getCurrent().positionCurrentBuffer.readBuffer();
+        const positionPreviousData = await this.getCurrent().positionPreviousBuffer.readBuffer();
+        const velocityData = await this.getCurrent().velocityBuffer.readBuffer();
 
         const particleCount = this.particles.count;
         this.gpuParticles = Particles.createFromBuffer(positionCurrentData, positionPreviousData, velocityData, particleCount);
+    }
+
+    public async printParticlesFromGpu()
+    {
+        const particleSize = this.particles.count * 4 * 2;
+
+        const sourcePositionCurrentData = new Float32Array(await this.getCurrent().positionCurrentBuffer.readBuffer(particleSize));
+        const sourcePositionPreviousData = new Float32Array(await this.getCurrent().positionPreviousBuffer.readBuffer(particleSize));
+        const sourceVelocityData = new Float32Array(await this.getCurrent().velocityBuffer.readBuffer(particleSize));
+
+        const targetPositionCurrentData = new Float32Array(await this.getSwapped().positionCurrentBuffer.readBuffer(particleSize));
+        const targetPositionPreviousData = new Float32Array(await this.getSwapped().positionPreviousBuffer.readBuffer(particleSize));
+        const targetVelocityData = new Float32Array(await this.getSwapped().velocityBuffer.readBuffer(particleSize));
+
+        const toPairs = (array: Float32Array) =>
+        {
+            return array.reduce((acc: number[][], curr: number, index: number, array: Float32Array) =>
+            {
+                if (index % 2 === 0)
+                {
+                    acc.push([curr, array[index + 1]]);
+                }
+                return acc;
+            }, []);
+        }
+
+        const mapPair = (array: number[]) =>
+        {
+            return `[${array[0].toFixed(1)}, ${array[1].toFixed(1)}]`;
+        }
+        // already swapped
+        console.log(`source pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
+
+        console.log(`target pos cur: ${toPairs(sourcePositionCurrentData).map(mapPair).join(", ")}`);
     }
 }

@@ -11,6 +11,7 @@ export class PrefixSumBuffer
     public prefixSumSettings: Buffer;
     private data: Uint32Array;
     private settings: EngineSettings;
+    public swap: boolean;
 
     constructor(engine: GPUEngine,
                 settings: EngineSettings)
@@ -20,12 +21,38 @@ export class PrefixSumBuffer
         this.buffer2 = engine.createBuffer("prefix-sum-buffer2", this.getNumberOfCells() * 4, "storage");
         this.prefixSumSettings = engine.createBuffer("prefix-sum-settings", 16, "uniform");
         this.data = new Uint32Array(4);
+        this.swap = false;
     }
 
     public getNumberOfCells()
     {
         return this.settings.gridSizeX * this.settings.gridSizeY;
     }
+
+    public getCurrent(): Buffer
+    {
+        if (this.swap)
+        {
+            return this.buffer2;
+        }
+        else
+        {
+            return this.buffer1;
+        }
+    }
+
+    public getSwapped(): Buffer
+    {
+        if (this.swap)
+        {
+            return this.buffer1;
+        }
+        else
+        {
+            return this.buffer2;
+        }
+    }
+
 
     public write(step: number)
     {
@@ -37,19 +64,10 @@ export class PrefixSumBuffer
         this.prefixSumSettings.writeBuffer(this.data);
     }
 
-    public async printGPU(swap: boolean)
+    public async printGPU()
     {
-        const b1 = new Uint32Array(await this.buffer1.readBuffer());
-        const b2 = new Uint32Array(await this.buffer2.readBuffer());
-
-        if (swap)
-        {
-            console.log(`buffer2 [${b2.join(", ")}]`);
-        }
-        else
-        {
-            console.log(`buffer1 [${b1.join(", ")}]`);
-        }
+        const current = new Uint32Array(await this.getCurrent().readBuffer());
+        console.log(`prefixSum result [${current.join(", ")}]`);
     }
 
     public printExpected(data: Uint32Array)
@@ -70,17 +88,15 @@ export class PrefixSumComputeShader
 {
     public buffer: PrefixSumBuffer;
     public prefixSum: ComputeShader;
-    private swapBuffers: boolean;
 
     private constructor(prefixSum: ComputeShader,
                         buffer: PrefixSumBuffer)
     {
         this.prefixSum = prefixSum;
         this.buffer = buffer;
-        this.swapBuffers = false;
     }
 
-    public async dispatch(gridBuffer: GridBuffer)
+    public dispatch(gridBuffer: GridBuffer)
     {
         const numberOfCells = this.buffer.getNumberOfCells();
         // copy cell particle count to buffer1
@@ -88,45 +104,28 @@ export class PrefixSumComputeShader
         // copy first value
         this.buffer.buffer2.copyFrom(this.buffer.buffer1, 4);
 
-        const rCount = Math.log2(numberOfCells);
-        this.swapBuffers = false;
+        // TODO: ceil? maybe floor?
+        const rCount = Math.ceil(Math.log2(numberOfCells));
+        this.buffer.swap = false;
 
         for (let r = 1; r <= rCount; r++)
         {
             const step = Math.pow(2, r - 1);
             this.buffer.write(step);
 
-            if (this.swapBuffers)
-            {
-                this.prefixSum.setBuffers([this.buffer.prefixSumSettings, this.buffer.buffer2, this.buffer.buffer1]);
-            }
-            else
-            {
-                this.prefixSum.setBuffers([this.buffer.prefixSumSettings, this.buffer.buffer1, this.buffer.buffer2]);
-            }
-
             this.prefixSum.dispatch(Math.ceil(numberOfCells / 256));
 
-            this.swapBuffers = !this.swapBuffers;
+            this.buffer.swap = !this.buffer.swap;
         }
 
-        await this.buffer.printGPU(this.swapBuffers);
-
-        // print expected
-        await gridBuffer.loadFromGpu();
-        this.buffer.printExpected(gridBuffer.gpuGrid.cellParticleCount);
+        // await this.buffer.printGPU();
+        // await gridBuffer.loadFromGpu();
+        // this.buffer.printExpected(gridBuffer.gpuGrid.cellParticleCount);
     }
 
-    public getPrefixSumBuffer(): Buffer
+    public async printGPUData()
     {
-        if (this.swapBuffers)
-        {
-            return this.buffer.buffer2;
-        }
-        else
-        {
-            return this.buffer.buffer1;
-        }
+        await this.buffer.printGPU();
     }
 
     static async create(engine: GPUEngine,
@@ -134,9 +133,9 @@ export class PrefixSumComputeShader
     {
 
         const prefixSum = await engine.createComputeShader("prefixSum")
-            .addBuffer(buffer.prefixSumSettings, "uniform")
-            .addBuffer(buffer.buffer1, "read-only-storage")
-            .addBuffer(buffer.buffer2, "storage")
+            .addBuffer(() => buffer.prefixSumSettings, "uniform")
+            .addBuffer(() => buffer.getCurrent(), "read-only-storage")
+            .addBuffer(() => buffer.getSwapped(), "storage")
             .build();
 
         return new PrefixSumComputeShader(prefixSum, buffer);

@@ -12,7 +12,5 @@ struct Settings
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id : vec3<u32>)
 {
-  let index : u32 = id.x;
-
-  cellParticleCount[index] = 0;
+    cellParticleCount[id.x] = 0u;
 }
