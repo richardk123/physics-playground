@@ -37,7 +37,7 @@ fn updatePoint(p: vec2<f32>, index: u32,  yOffset: f32)
             let corr = ((1.0 - d) * 0.5);
 
 //            let updateCount = atomicAdd(&particleUpdateCount[index], 1);
-            //position[index] += normal * -corr;
+//            position[index] += normal * -corr;
         }
     }
 }
@@ -45,7 +45,7 @@ fn updatePoint(p: vec2<f32>, index: u32,  yOffset: f32)
 @binding(0) @group(0) var<uniform> settings: Settings;
 @binding(1) @group(0) var<storage, read_write> position: array<vec2<f32>>;
 @binding(2) @group(0) var<storage, read> prefixSum : array<u32>;
-//@binding(3) @group(0) var<storage, read_write> particleUpdateCount : array<atomic<u32>>;
+@binding(3) @group(0) var<storage, read_write> particleUpdateCount : array<atomic<u32>>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)

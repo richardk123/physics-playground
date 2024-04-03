@@ -52,7 +52,7 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.addPoint(bottomLeftX + x * 2, bottomLeftY + y * 2);
+                this.addPoint(bottomLeftX + x * 2 + Math.random() * 0.1, bottomLeftY + y * 2 + Math.random() * 0.1);
             }
         }
     }

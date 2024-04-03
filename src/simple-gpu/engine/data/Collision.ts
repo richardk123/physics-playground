@@ -16,7 +16,7 @@ export class Collision
 
 export class CollisionBuffer
 {
-    // public particleUpdateCountBuffer: Buffer;
+    public particleUpdateCountBuffer: Buffer;
     public gpuCollision: Collision;
     private particles: Particles;
 
@@ -26,8 +26,8 @@ export class CollisionBuffer
     {
         const maxParticleCount = settings.maxParticleCount;
 
-        // this.particleUpdateCountBuffer = engine.createBuffer("particleUpdateCount",
-        //     maxParticleCount * 4, "storage");
+        this.particleUpdateCountBuffer = engine.createBuffer("particleUpdateCount",
+            maxParticleCount * 4, "storage");
 
         this.gpuCollision = new Collision(new ArrayBuffer(0));
         this.particles = particles;
@@ -36,11 +36,11 @@ export class CollisionBuffer
 
     public async loadFromGpu(): Promise<void>
     {
-        // const particleCount = this.particles.count;
-        //
-        // const particleUpdateCountData = await this.particleUpdateCountBuffer
-        //     .readBuffer(particleCount * 4);
-        //
-        // this.gpuCollision = new Collision(particleUpdateCountData);
+        const particleCount = this.particles.count;
+
+        const particleUpdateCountData = await this.particleUpdateCountBuffer
+            .readBuffer(particleCount * 4);
+
+        this.gpuCollision = new Collision(particleUpdateCountData);
     }
 }

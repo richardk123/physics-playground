@@ -105,7 +105,7 @@ export class PrefixSumComputeShader
         this.buffer.buffer2.copyFrom(this.buffer.buffer1, 4);
 
         // TODO: ceil? maybe floor?
-        const rCount = Math.ceil(Math.log2(numberOfCells));
+        const rCount = Math.log2(numberOfCells);
         this.buffer.swap = false;
 
         for (let r = 1; r <= rCount; r++)

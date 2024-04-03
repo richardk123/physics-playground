@@ -13,7 +13,7 @@ export const SimpleGpu = () =>
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [engine, setEngine] = useState<Engine | undefined>();
 
-    const count = 3;
+    const count = 4;
 
     useEffect(() =>
     {
