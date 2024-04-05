@@ -164,8 +164,8 @@ export class ParticlesBuffer
             return `[${array[0].toFixed(1)}, ${array[1].toFixed(1)}]`;
         }
         // already swapped
-        console.log(`source pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
+        // console.log(`source pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
-        console.log(`target pos cur: ${toPairs(sourcePositionCurrentData).map(mapPair).join(", ")}`);
+        console.log(`pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
     }
 }

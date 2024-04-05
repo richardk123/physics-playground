@@ -34,10 +34,6 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
             {
                 const x = particles.positionCurrent[i * 2 + 0];
                 const y = particles.positionCurrent[i * 2 + 1];
-                const prevX = particles.positionPrevious[i * 2 + 0];
-                const prevY = particles.positionPrevious[i * 2 + 1];
-                const velocityX = particles.velocity[i * 2 + 0];
-                const velocityY = particles.velocity[i * 2 + 1];
 
                 const tPos = transform.toClipSpace().position(x, y);
                 const tSize = transform.toClipSpace().size(1);
@@ -46,9 +42,7 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
                 p5.circle(tPos.x, tPos.y, tSize);
 
                 p5.fill(0, 255);
-                p5.text(`   cur: [${x.toFixed(precision)}, ${y.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y - tSize / 2);
-                p5.text(` prev: [${prevX.toFixed(precision)}, ${prevY.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y);
-                p5.text(`    vel: [${velocityX.toFixed(precision)}, ${velocityY.toFixed(precision)}], `, tPos.x + tSize / 2, tPos.y + tSize / 2);
+                p5.text(`[${x}, ${y}], `, tPos.x, tPos.y);
             }
         }
     }

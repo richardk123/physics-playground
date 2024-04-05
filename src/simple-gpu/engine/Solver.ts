@@ -2,7 +2,6 @@ import {GPUEngine} from "./common/GPUEngine";
 import {EngineSettingsBuffer} from "./data/EngineSettings";
 import {ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
-import {CollisionBuffer} from "./data/Collision";
 import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
 
 export interface Solver
@@ -11,7 +10,6 @@ export interface Solver
     particlesBuffer: ParticlesBuffer;
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
-    collisionBuffer: CollisionBuffer;
 }
 
 export class Solvers
@@ -20,8 +18,7 @@ export class Solvers
                                particlesBuffer: ParticlesBuffer,
                                settingsBuffer: EngineSettingsBuffer,
                                gridBuffer: GridBuffer,
-                               prefixSumBuffer: PrefixSumBuffer,
-                               collisionBuffer: CollisionBuffer): Promise<Solver>
+                               prefixSumBuffer: PrefixSumBuffer): Promise<Solver>
     {
         const preSolve = await engine.createComputeShader("preSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
@@ -56,25 +53,15 @@ export class Solvers
             .addBuffer(() => gridBuffer.particleCellOffsetBuffer, "read-only-storage")
             .build();
 
-        const collisionClear = await engine.createComputeShader("collisionClear")
-            .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => collisionBuffer.particleCollisionCountBuffer, "storage")
-            .addBuffer(() => collisionBuffer.particleCollisionVelocitiesBuffer, "storage")
-            .build();
-
         const collisionSolve = await engine.createComputeShader("collisionSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
-            .addBuffer(() => collisionBuffer.particleCollisionCountBuffer, "storage")
-            .addBuffer(() => collisionBuffer.particleCollisionVelocitiesBuffer, "storage")
             .build();
 
-        const collisionApply = await engine.createComputeShader("collisionApply")
+        const boundingBox = await engine.createComputeShader("boundingBox")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
-            .addBuffer(() => collisionBuffer.particleCollisionCountBuffer, "read-only-storage")
-            .addBuffer(() => collisionBuffer.particleCollisionVelocitiesBuffer, "read-only-storage")
             .build();
 
         const postSolve = await engine.createComputeShader("postSolve")
@@ -97,35 +84,34 @@ export class Solvers
                 for (let i = 0; i < subStepCount; i++)
                 {
                     preSolve.dispatch(Math.ceil(particleCount / 256));
+                    for (let j = 0; j < 8; j++)
+                    {
+                        gridClear.dispatch(Math.ceil(numberOfCells / 256));
+                        gridUpdate.dispatch(Math.ceil(particleCount / 256));
 
-                    gridClear.dispatch(Math.ceil(numberOfCells / 256));
-                    gridUpdate.dispatch(Math.ceil(particleCount / 256));
+                        await prefixSum.dispatch(gridBuffer);
 
-                    await prefixSum.dispatch(gridBuffer);
+                        particleSort.dispatch(Math.ceil(particleCount / 256));
+                        particlesBuffer.swapBuffers();
 
-                    particleSort.dispatch(Math.ceil(particleCount / 256));
-                    particlesBuffer.swapBuffers();
-
-                    // collisionClear.dispatch(Math.ceil(particleCount / 256));
-                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                    // collisionApply.dispatch(Math.ceil(particleCount / 256));
+                        boundingBox.dispatch(Math.ceil(particleCount / 256));
+                        collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                    }
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)
                     {
                         await particlesBuffer.loadFromGpu();
+                        await particlesBuffer.printParticlesFromGpu();
                         await settingsBuffer.loadFromGpu();
                         console.log(settingsBuffer.gpuData);
                         await gridBuffer.loadFromGpu();
-                        // await prefixSum.printGPUData();
-                        await particlesBuffer.printParticlesFromGpu();
-                        await collisionBuffer.loadFromGpu();
+                        await prefixSum.printGPUData();
                     }
                 }
             },
             particlesBuffer: particlesBuffer,
-            collisionBuffer: collisionBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
         };

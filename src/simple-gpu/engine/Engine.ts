@@ -5,7 +5,6 @@ import {GPUEngine} from "./common/GPUEngine";
 import {Renderer} from "./Renderer";
 import {Camera} from "./data/Camera";
 import {GridBuffer} from "./data/Grid";
-import {CollisionBuffer} from "./data/Collision";
 import {PrefixSumBuffer} from "./data/PrefixSum";
 
 export class Engine
@@ -35,10 +34,9 @@ export class Engine
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
         const gridBuffer = new GridBuffer(engine, settings);
         const prefixSumBuffer = new PrefixSumBuffer(engine, settings);
-        const collisionBuffer = new CollisionBuffer(engine, settings, particles);
 
         const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer,
-            gridBuffer, prefixSumBuffer, collisionBuffer);
+            gridBuffer, prefixSumBuffer);
 
         const renderer = await Renderer.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);

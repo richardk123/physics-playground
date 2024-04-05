@@ -3,6 +3,7 @@ import {GPUEngine} from "../common/GPUEngine";
 import {ComputeShader} from "../common/ComputeShader";
 import {EngineSettings} from "./EngineSettings";
 import {GridBuffer} from "./Grid";
+import assert from "assert";
 
 export class PrefixSumBuffer
 {
@@ -64,19 +65,30 @@ export class PrefixSumBuffer
 
     public async printGPU()
     {
-        console.log("========================");
-
-        const previous = new Uint32Array(await this.getSwapped().readBuffer());
-        console.log(`prefixSum swapped [${previous.join(", ")}]`);
+        // console.log("========================");
+        //
+        // const previous = new Uint32Array(await this.getSwapped().readBuffer());
+        // console.log(`prefixSum swapped [${previous.join(", ")}]`);
 
         const current = new Uint32Array(await this.getCurrent().readBuffer());
         console.log(`prefixSum current [${current.join(", ")}]`);
-
-        const settings = new Uint32Array(await this.prefixSumSettings.readBuffer());
-        console.log(`settings [${settings.join(", ")}]`);
+        //
+        // const settings = new Uint32Array(await this.prefixSumSettings.readBuffer());
+        // console.log(`settings [${settings.join(", ")}]`);
     }
 
-    public printExpected(data: Uint32Array)
+    public async assertPrefixSumIsExpected(gridBuffer: GridBuffer)
+    {
+        const expected = this.getExpected(gridBuffer.gpuGrid.cellParticleCount);
+        const current = new Uint32Array(await this.getCurrent().readBuffer());
+        const isOk = expected.every((val, index) => val === current[index]);
+        if (!isOk)
+        {
+            throw new Error("prefix sum is not ok");
+        }
+    }
+
+    public getExpected(data: Uint32Array)
     {
         const result = [];
         let sum = 0;
@@ -86,7 +98,8 @@ export class PrefixSumBuffer
             result.push(sum);
         }
 
-        console.log(`expected          [${result.join(", ")}]`);
+        // console.log(`expected          [${result.join(", ")}]`);
+        return result;
     }
 }
 
@@ -124,9 +137,8 @@ export class PrefixSumComputeShader
             this.buffer.swap = !this.buffer.swap;
         }
         // await this.buffer.printGPU();
-        //
         // await gridBuffer.loadFromGpu();
-        // this.buffer.printExpected(gridBuffer.gpuGrid.cellParticleCount);
+        // await this.buffer.assertPrefixSumIsExpected(gridBuffer);
     }
 
     public async printGPUData()

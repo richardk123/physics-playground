@@ -5,6 +5,7 @@ struct Settings
     gridSizeY: u32,
     subStepCount: u32,
     dt: f32,
+    gravity: vec2<f32>,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
