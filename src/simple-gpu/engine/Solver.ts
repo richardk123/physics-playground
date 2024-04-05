@@ -81,10 +81,10 @@ export class Solvers
                 const particleCount = particlesBuffer.particles.count;
                 const numberOfCells = settingsBuffer.settings.gridSizeX * settingsBuffer.settings.gridSizeY;
 
-                for (let i = 0; i < subStepCount; i++)
-                {
+                // for (let i = 0; i < subStepCount; i++)
+                // {
                     preSolve.dispatch(Math.ceil(particleCount / 256));
-                    for (let j = 0; j < 8; j++)
+                    for (let j = 0; j < subStepCount; j++)
                     {
                         gridClear.dispatch(Math.ceil(numberOfCells / 256));
                         gridUpdate.dispatch(Math.ceil(particleCount / 256));
@@ -96,6 +96,7 @@ export class Solvers
 
                         boundingBox.dispatch(Math.ceil(particleCount / 256));
                         collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                        boundingBox.dispatch(Math.ceil(particleCount / 256));
                     }
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
@@ -109,7 +110,7 @@ export class Solvers
                         await gridBuffer.loadFromGpu();
                         await prefixSum.printGPUData();
                     }
-                }
+                // }
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,

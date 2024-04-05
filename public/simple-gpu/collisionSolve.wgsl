@@ -42,10 +42,10 @@ fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
 
         if (d > 0.0 && d < 1.0 && anotherParticleIndex != index && row == u32(floor(anotherParticle.y)))
         {
-            let normal = normalize(p - anotherParticle);
             let dist = length(diff);
-            let corr = ((1.0 - dist) * 0.5);
-            position[index] += normal * corr;
+            let corr = ((1.0 - dist) * 0.4);
+            position[index] += diff * corr;
+            position[anotherParticleIndex] += diff * -corr;
         }
     }
 }

@@ -115,15 +115,13 @@ export class PrefixSumComputeShader
         this.buffer = buffer;
     }
 
-    public async dispatch(gridBuffer: GridBuffer)
+    public dispatch(gridBuffer: GridBuffer)
     {
         const numberOfCells = this.buffer.getNumberOfCells();
         // copy cell particle count to buffer1
         this.buffer.buffer1.copyFrom(gridBuffer.cellParticleCountBuffer, numberOfCells * 4);
         // copy first value
         this.buffer.buffer2.copyFrom(this.buffer.buffer1, 4);
-
-        // await this.buffer.printGPU();
 
         const treeHeight = Math.log2(numberOfCells);
         this.buffer.swap = false;
@@ -136,9 +134,6 @@ export class PrefixSumComputeShader
             this.prefixSum.dispatch(Math.ceil(numberOfCells / 256));
             this.buffer.swap = !this.buffer.swap;
         }
-        // await this.buffer.printGPU();
-        // await gridBuffer.loadFromGpu();
-        // await this.buffer.assertPrefixSumIsExpected(gridBuffer);
     }
 
     public async printGPUData()
