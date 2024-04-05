@@ -5,18 +5,22 @@ import {Particles} from "./Particles";
 
 export class Collision
 {
-    public particleUpdateCount: Uint32Array;
+    public particleCollisionCount: Uint32Array;
+    public particleCollisionVelocities: Float32Array;
 
 
-    constructor(particleUpdateCountData: ArrayBuffer)
+    constructor(particleCollisionCountData: ArrayBuffer,
+                particleCollisionVelocitiesData: ArrayBuffer)
     {
-        this.particleUpdateCount = new Uint32Array(particleUpdateCountData);
+        this.particleCollisionCount = new Uint32Array(particleCollisionCountData);
+        this.particleCollisionVelocities = new Float32Array(particleCollisionVelocitiesData);
     }
 }
 
 export class CollisionBuffer
 {
-    public particleUpdateCountBuffer: Buffer;
+    public particleCollisionCountBuffer: Buffer;
+    public particleCollisionVelocitiesBuffer: Buffer;
     public gpuCollision: Collision;
     private particles: Particles;
 
@@ -26,10 +30,13 @@ export class CollisionBuffer
     {
         const maxParticleCount = settings.maxParticleCount;
 
-        this.particleUpdateCountBuffer = engine.createBuffer("particleUpdateCount",
+        this.particleCollisionCountBuffer = engine.createBuffer("particleCollisionCount",
             maxParticleCount * 4, "storage");
 
-        this.gpuCollision = new Collision(new ArrayBuffer(0));
+        this.particleCollisionVelocitiesBuffer = engine.createBuffer("particleCollisionIndexes",
+            maxParticleCount * 4 * 8 * 2, "storage");
+
+        this.gpuCollision = new Collision(new ArrayBuffer(0), new ArrayBuffer(0));
         this.particles = particles;
     }
 
@@ -38,9 +45,12 @@ export class CollisionBuffer
     {
         const particleCount = this.particles.count;
 
-        const particleUpdateCountData = await this.particleUpdateCountBuffer
+        const particleCollisionCountData = await this.particleCollisionCountBuffer
             .readBuffer(particleCount * 4);
 
-        this.gpuCollision = new Collision(particleUpdateCountData);
+        const particleCollisionVelocitiesData = await this.particleCollisionVelocitiesBuffer
+            .readBuffer(particleCount * 4 * 8 * 2);
+
+        this.gpuCollision = new Collision(particleCollisionCountData, particleCollisionVelocitiesData);
     }
 }

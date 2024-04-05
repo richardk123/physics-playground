@@ -13,18 +13,18 @@ export const SimpleGpu = () =>
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [engine, setEngine] = useState<Engine | undefined>();
 
-    const count = 4;
+    const count = 256;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
-            maxParticleCount: 100000,
-            gridSizeY: count * 2,
-            gridSizeX: count * 2,
-            subStepCount: 1,
+            maxParticleCount: 400000,
+            gridSizeY: count,
+            gridSizeX: count,
+            subStepCount: 30,
             deltaTime: 1 / 60,
             gravity: {x: 0, y: -10},
-            debug: true,
+            debug: false,
         }
         const camera: Camera = {
             zoom: 0.03,
@@ -51,30 +51,30 @@ export const SimpleGpu = () =>
             })
     }, []);
 
-    return <div className="flex h-full bg-gray-200">
-        <div className="flex-1 flex flex-col h-full">
-            <div className="flex h-1/2">
-                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
-                {engine && <ParticlesDebugRenderer engine={engine} />}
-            </div>
-            <div className="flex h-1/2">
-                {engine && <GridDebugRenderer engine={engine} />}
-                {engine && <CollisionDebugRenderer engine={engine} />}
-            </div>
-        </div>
-        <div className="w-64 h-full text-white">
-            {engine && <Sidebar engine={engine}/>}
-        </div>
-    </div>;
-
     // return <div className="flex h-full bg-gray-200">
     //     <div className="flex-1 flex flex-col h-full">
-    //         <div className="flex h-full">
+    //         <div className="flex h-1/2">
     //             <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+    //             {engine && <ParticlesDebugRenderer engine={engine} />}
+    //         </div>
+    //         <div className="flex h-1/2">
+    //             {engine && <GridDebugRenderer engine={engine} />}
+    //             {engine && <CollisionDebugRenderer engine={engine} />}
     //         </div>
     //     </div>
     //     <div className="w-64 h-full text-white">
     //         {engine && <Sidebar engine={engine}/>}
     //     </div>
     // </div>;
+
+    return <div className="flex h-full bg-gray-200">
+        <div className="flex-1 flex flex-col h-full">
+            <div className="flex h-full">
+                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+            </div>
+        </div>
+        <div className="w-64 h-full text-white">
+            {engine && <Sidebar engine={engine}/>}
+        </div>
+    </div>;
 }

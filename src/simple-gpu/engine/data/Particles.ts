@@ -95,10 +95,9 @@ export class ParticlesBuffer
     {
         if (this.particles.dataChanged)
         {
-            const particleBufferSize = this.particles.count * 4 * 2;
-            this.getCurrent().positionCurrentBuffer.writeBuffer(this.particles.positionCurrent, 0, 0, particleBufferSize);
-            this.getCurrent().positionPreviousBuffer.writeBuffer(this.particles.positionPrevious, 0, 0, particleBufferSize);
-            this.getCurrent().velocityBuffer.writeBuffer(this.particles.velocity, 0, 0, particleBufferSize);
+            this.getCurrent().positionCurrentBuffer.writeBuffer(this.particles.positionCurrent);
+            this.getCurrent().positionPreviousBuffer.writeBuffer(this.particles.positionPrevious);
+            this.getCurrent().velocityBuffer.writeBuffer(this.particles.velocity);
             this.particles.dataChanged = false;
         }
     }

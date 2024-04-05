@@ -44,7 +44,7 @@ export class Buffer
                        size?: GPUSize64)
     {
         const device = this.engine.device;
-        device.queue.writeBuffer(this.buffer, bufferOffset || 0, data, dataOffset, size);
+        device.queue.writeBuffer(this.buffer, bufferOffset || 0, data, dataOffset || 0, size);
     }
 
 

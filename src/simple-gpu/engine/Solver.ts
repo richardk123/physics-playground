@@ -56,16 +56,10 @@ export class Solvers
             .addBuffer(() => gridBuffer.particleCellOffsetBuffer, "read-only-storage")
             .build();
 
-        const collisionClear = await engine.createComputeShader("collisionClear")
-            .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => collisionBuffer.particleUpdateCountBuffer, "storage")
-            .build();
-
         const collisionSolve = await engine.createComputeShader("collisionSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
-            .addBuffer(() => collisionBuffer.particleUpdateCountBuffer, "storage")
             .build();
 
         const postSolve = await engine.createComputeShader("postSolve")
@@ -97,7 +91,6 @@ export class Solvers
                     particleSort.dispatch(Math.ceil(particleCount / 256));
                     particlesBuffer.swapBuffers();
 
-                    collisionClear.dispatch(Math.ceil(particleCount / 256));
                     collisionSolve.dispatch(Math.ceil(particleCount / 256));
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
@@ -108,15 +101,15 @@ export class Solvers
                         await settingsBuffer.loadFromGpu();
                         await gridBuffer.loadFromGpu();
                         await prefixSum.printGPUData();
-                        // await particlesBuffer.printParticlesFromGpu();
+                        await particlesBuffer.printParticlesFromGpu();
                         await collisionBuffer.loadFromGpu();
                     }
                 }
             },
             particlesBuffer: particlesBuffer,
+            collisionBuffer: collisionBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
-            collisionBuffer: collisionBuffer,
         };
     }
 }

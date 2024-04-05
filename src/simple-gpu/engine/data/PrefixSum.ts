@@ -19,8 +19,8 @@ export class PrefixSumBuffer
         this.settings = settings;
         this.buffer1 = engine.createBuffer("prefix-sum-buffer1", this.getNumberOfCells() * 4, "storage");
         this.buffer2 = engine.createBuffer("prefix-sum-buffer2", this.getNumberOfCells() * 4, "storage");
-        this.prefixSumSettings = engine.createBuffer("prefix-sum-settings", 16, "uniform");
-        this.data = new Uint32Array(4);
+        this.prefixSumSettings = engine.createBuffer("prefix-sum-settings", 8, "uniform");
+        this.data = new Uint32Array(2);
         this.swap = false;
     }
 
@@ -58,16 +58,22 @@ export class PrefixSumBuffer
     {
         this.data[0] = step;
         this.data[1] = this.getNumberOfCells();
-        this.data[2] = 0;
-        this.data[3] = 0;
 
         this.prefixSumSettings.writeBuffer(this.data);
     }
 
     public async printGPU()
     {
+        console.log("========================");
+
+        const previous = new Uint32Array(await this.getSwapped().readBuffer());
+        console.log(`prefixSum swapped [${previous.join(", ")}]`);
+
         const current = new Uint32Array(await this.getCurrent().readBuffer());
-        console.log(`prefixSum result [${current.join(", ")}]`);
+        console.log(`prefixSum current [${current.join(", ")}]`);
+
+        const settings = new Uint32Array(await this.prefixSumSettings.readBuffer());
+        console.log(`settings [${settings.join(", ")}]`);
     }
 
     public printExpected(data: Uint32Array)
@@ -80,7 +86,7 @@ export class PrefixSumBuffer
             result.push(sum);
         }
 
-        console.log(`expected [${result.join(", ")}]`);
+        console.log(`expected          [${result.join(", ")}]`);
     }
 }
 
@@ -96,7 +102,7 @@ export class PrefixSumComputeShader
         this.buffer = buffer;
     }
 
-    public dispatch(gridBuffer: GridBuffer)
+    public async dispatch(gridBuffer: GridBuffer)
     {
         const numberOfCells = this.buffer.getNumberOfCells();
         // copy cell particle count to buffer1
@@ -104,21 +110,21 @@ export class PrefixSumComputeShader
         // copy first value
         this.buffer.buffer2.copyFrom(this.buffer.buffer1, 4);
 
-        // TODO: ceil? maybe floor?
-        const rCount = Math.log2(numberOfCells);
+        // await this.buffer.printGPU();
+
+        const treeHeight = Math.log2(numberOfCells);
         this.buffer.swap = false;
 
-        for (let r = 1; r <= rCount; r++)
+        for (let d = 1; d <= treeHeight; d++)
         {
-            const step = Math.pow(2, r - 1);
+            const step = Math.pow(2, d - 1);
             this.buffer.write(step);
 
             this.prefixSum.dispatch(Math.ceil(numberOfCells / 256));
-
             this.buffer.swap = !this.buffer.swap;
         }
-
         // await this.buffer.printGPU();
+        //
         // await gridBuffer.loadFromGpu();
         // this.buffer.printExpected(gridBuffer.gpuGrid.cellParticleCount);
     }
