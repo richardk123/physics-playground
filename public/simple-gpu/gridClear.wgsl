@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    subStepCount: u32,
     dt: f32,
 }
 

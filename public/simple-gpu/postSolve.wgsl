@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    subStepCount: u32,
     dt: f32,
 }
 
@@ -16,5 +17,5 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     let inverseDt: f32 = 1 / settings.dt;
     // update velocity
-    velocities[id.x] = (positionsCurrent[id.x] - positionsPrevious[id.x]) * inverseDt;
+    velocities[id.x] = (positionsCurrent[id.x] - positionsPrevious[id.x]) * inverseDt * 0.99999;
 }

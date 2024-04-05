@@ -13,14 +13,14 @@ export const SimpleGpu = () =>
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [engine, setEngine] = useState<Engine | undefined>();
 
-    const count = 256;
+    const count = 16;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 400000,
-            gridSizeY: count,
-            gridSizeX: count,
+            gridSizeY: count * 2,
+            gridSizeX: count * 2,
             subStepCount: 30,
             deltaTime: 1 / 60,
             gravity: {x: 0, y: -10},

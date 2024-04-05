@@ -3,6 +3,7 @@ struct Settings
     particleCount: u32,
     gridSizeX: u32,
     gridSizeY: u32,
+    subStepCount: u32,
     dt: f32,
 }
 
@@ -25,8 +26,7 @@ fn updatePoint(p: vec2<f32>, index: u32,  yOffset: f32)
 
     let particleStartId = u32(max(0, i32(prefixSum[startId]) - 1));
     let particleEndId = u32(max(0, i32(prefixSum[endId]) - 1));
-    var moveDir = vec2(0.0, 0.0);
-
+    var moveDir = vec2<f32>(0, 0);
     for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
     {
         let anotherParticle = position[anotherParticleIndex];
@@ -35,18 +35,27 @@ fn updatePoint(p: vec2<f32>, index: u32,  yOffset: f32)
         if (d > 0.0 && d < 1.0 && anotherParticleIndex != index && row == u32(floor(anotherParticle.y)))
         {
             let normal = normalize(p - anotherParticle);
-            let corr = ((1.0 - d) * (0.5 / 30));
+            let corr = ((1.0 - d) * 0.5) / f32(settings.subStepCount);
+
+//            let bucketId1 = (index * 8) + atomicAdd(&particleCollisionCount[index], 1);
+//            particleCollisionVelocities[bucketId1] = normal * corr;
+//
+//            let bucketId2 = (anotherParticleIndex * 8) + atomicAdd(&particleCollisionCount[anotherParticleIndex], 1);
+//            particleCollisionVelocities[bucketId2] = normal * -corr;
 
             moveDir += normal * corr;
         }
     }
 
     position[index] += moveDir;
+
 }
 
 @binding(0) @group(0) var<uniform> settings: Settings;
 @binding(1) @group(0) var<storage, read_write> position: array<vec2<f32>>;
 @binding(2) @group(0) var<storage, read> prefixSum : array<u32>;
+@binding(3) @group(0) var<storage, read_write> particleCollisionCount : array<atomic<u32>>;
+@binding(4) @group(0) var<storage, read_write> particleCollisionVelocities : array<vec2<f32>>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
