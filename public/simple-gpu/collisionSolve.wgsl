@@ -24,15 +24,14 @@ fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
     let startId = clamp(getGridID(vec2<f32>(leftX, y)), 0, gridSize);
     let endId = clamp(getGridID(vec2<f32>(rightX, y)), 0, gridSize);
 
-    var particleStartId: u32 = clamp(prefixSum[startId] - 1, 0, settings.particleCount);
-    let row = u32(y);
+    var particleStartId: u32 = clamp(prefixSum[startId] - 1, 0, settings.particleCount - 1);
 
     if (startId == 0)
     {
         particleStartId = 0;
     }
 
-    let particleEndId: u32 = clamp(prefixSum[endId] - 1, 0, settings.particleCount);
+    let particleEndId: u32 = clamp(prefixSum[endId] - 1, 0, settings.particleCount - 1);
 
     for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
     {
@@ -40,7 +39,7 @@ fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
         let diff = p - anotherParticle;
         let d = dot(diff, diff);
 
-        if (d > 0.0 && d < 1.0 && anotherParticleIndex != index && row == u32(floor(anotherParticle.y)))
+        if (d > 0.0 && d < 1.0 && anotherParticleIndex != index)
         {
             let dist = length(diff);
             let corr = ((1.0 - dist) * 0.4);
