@@ -5,19 +5,28 @@ struct Settings
     gridSizeY: u32,
     subStepCount: u32,
     dt: f32,
+    cellSize: f32,
     gravity: vec2<f32>,
 }
 
+struct Particle
+{
+    positionCurrent: vec2<f32>,
+    positionPrevious: vec2<f32>,
+    velocity: vec2<f32>,
+    density: f32,
+}
+
 fn getGridID(p: vec2<f32>) -> u32 {
-  let x = u32(floor(p.x));
-  let y = u32(floor(p.y));
+  let x = u32(floor(p.x / settings.cellSize));
+  let y = u32(floor(p.y / settings.cellSize));
   return (settings.gridSizeX * y) + x;
 }
 
 @binding(0) @group(0) var<uniform> settings : Settings;
 @binding(1) @group(0) var<storage, read_write> cellParticleCount : array<atomic<u32>>;
 @binding(2) @group(0) var<storage, read_write> particleCellOffset : array<u32>;
-@binding(3) @group(0) var<storage, read> points : array<vec2<f32>>;
+@binding(3) @group(0) var<storage, read> particles : array<Particle>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id : vec3<u32>)
@@ -29,6 +38,6 @@ fn main(@builtin(global_invocation_id) id : vec3<u32>)
     return;
   }
 
-  let gridID: u32 = getGridID(points[pointIndex]);
+  let gridID: u32 = getGridID(particles[pointIndex].positionCurrent);
   particleCellOffset[pointIndex] = atomicAdd(&cellParticleCount[gridID], 1);
 }

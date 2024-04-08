@@ -70,7 +70,7 @@ export class Renderer
             layout: bindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: this.cameraBuffer.buffer.buffer }},
-                { binding: 1, resource: { buffer: particlesBuffer.getCurrent().positionCurrentBuffer.buffer }},
+                { binding: 1, resource: { buffer: particlesBuffer.getCurrent().buffer.buffer }},
             ],
         });
 

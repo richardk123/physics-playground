@@ -22,9 +22,7 @@ export class Solvers
     {
         const preSolve = await engine.createComputeShader("preSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
-            .addBuffer(() => particlesBuffer.getCurrent().positionPreviousBuffer, "storage")
-            .addBuffer(() => particlesBuffer.getCurrent().velocityBuffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .build();
 
         const gridClear = await engine.createComputeShader("gridClear")
@@ -36,39 +34,33 @@ export class Solvers
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => gridBuffer.cellParticleCountBuffer, "storage")
             .addBuffer(() => gridBuffer.particleCellOffsetBuffer, "storage")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "read-only-storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "read-only-storage")
             .build();
 
         const prefixSum = await PrefixSumComputeShader.create(engine, prefixSumBuffer);
 
         const particleSort = await engine.createComputeShader("particleSort")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "read-only-storage")
-            .addBuffer(() => particlesBuffer.getCurrent().positionPreviousBuffer, "read-only-storage")
-            .addBuffer(() => particlesBuffer.getCurrent().velocityBuffer, "read-only-storage")
-            .addBuffer(() => particlesBuffer.getSwapped().positionCurrentBuffer, "storage")
-            .addBuffer(() => particlesBuffer.getSwapped().positionPreviousBuffer, "storage")
-            .addBuffer(() => particlesBuffer.getSwapped().velocityBuffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "read-only-storage")
+            .addBuffer(() => particlesBuffer.getSwapped().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .addBuffer(() => gridBuffer.particleCellOffsetBuffer, "read-only-storage")
             .build();
 
         const collisionSolve = await engine.createComputeShader("collisionSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .build();
 
         const boundingBox = await engine.createComputeShader("boundingBox")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .build();
 
         const postSolve = await engine.createComputeShader("postSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().positionCurrentBuffer, "read-only-storage")
-            .addBuffer(() => particlesBuffer.getCurrent().positionPreviousBuffer, "read-only-storage")
-            .addBuffer(() => particlesBuffer.getCurrent().velocityBuffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .build();
 
         return {

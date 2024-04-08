@@ -9,18 +9,20 @@ struct Settings
     gravity: vec2<f32>,
 }
 
-struct Particle
-{
-    positionCurrent: vec2<f32>,
-    positionPrevious: vec2<f32>,
-    velocity: vec2<f32>,
-    density: f32,
-}
-
 fn getGridID(p: vec2<f32>) -> u32 {
   let x = u32(floor(p.x / settings.cellSize));
   let y = u32(floor(p.y / settings.cellSize));
   return (settings.gridSizeX * y) + x;
+}
+
+fn calculateDensity(distance: f32, smoothingRadius: f32) -> f32
+{
+    if (distance >= radius)
+    {
+        return 0.0;
+    }
+    let volume = (3.14159265359 * pow(smoothingRadius, 4)) / 6;
+    return (smoothingRadius - distance) * (smoothingRadius - distance) / volume;
 }
 
 fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
@@ -44,36 +46,27 @@ fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
 
     for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
     {
-        let anotherParticle = particles[anotherParticleIndex].positionCurrent;
+        let anotherParticle = position[anotherParticleIndex];
         let diff = p - anotherParticle;
         let d = dot(diff, diff);
 
-        if (d > 0.0 && d < 1.0 && anotherParticleIndex != index)
+        if (d > 0.0 && d < 1.2 && anotherParticleIndex != index)
         {
             let dist = length(diff);
             let corr = ((1.0 - dist) * 0.4);
-            particles[index].positionCurrent += diff * corr;
-            particles[anotherParticleIndex].positionCurrent += diff * -corr;
+            density[index] += diff * corr;
         }
     }
 }
 
-@binding(0) @group(0) var<uniform> settings: Settings;
-@binding(1) @group(0) var<storage, read_write> particles: array<Particle>;
-@binding(2) @group(0) var<storage, read> prefixSum : array<u32>;
+@group(0) @binding(0) var<uniform> settings: Settings;
+@group(0) @binding(1) var<storage, read_write> positionsCurrent: array<vec2<f32>>;
+@group(0) @binding(2) var<storage, read_write> density: array<f32>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
-    let index: u32 = id.x;
-
-    if (index >= settings.particleCount)
-    {
-        return;
-    }
-
-    let p = particles[index].positionCurrent;
-    updatePoint(p, index, -1.0);
-    updatePoint(p, index, 0.0);
-    updatePoint(p, index, 1.0);
+    // bounding box
+    positionsCurrent[id.x].x = clamp(positionsCurrent[id.x].x, 0, f32(settings.gridSizeX) - 0.001);
+    positionsCurrent[id.x].y = clamp(positionsCurrent[id.x].y, 0, f32(settings.gridSizeY) - 0.001);
 }

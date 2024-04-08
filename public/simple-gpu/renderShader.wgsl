@@ -10,19 +10,27 @@ struct Camera {
     projection: mat4x4<f32>,
 };
 
+struct Particle
+{
+    positionCurrent: vec2<f32>,
+    positionPrevious: vec2<f32>,
+    velocity: vec2<f32>,
+    density: f32,
+}
+
 struct VertexOutput {
     @builtin(position) transformedPos: vec4<f32>,
     @location(0) localSpace: vec2<f32>,
 }
 
 @group(0) @binding(0) var<uniform> camera: Camera;
-@group(0) @binding(1) var<storage, read> positions: array<vec2<f32>>;
+@group(0) @binding(1) var<storage, read> particles: array<Particle>;
 @vertex
 fn vs(@builtin(vertex_index) vertexIndex : u32,
       @builtin(instance_index) instanceIndex: u32) -> VertexOutput
 {
     var out: VertexOutput;
-    let vertexPos = positions[instanceIndex] + TRIANGLE[vertexIndex];
+    let vertexPos = particles[instanceIndex].positionCurrent + TRIANGLE[vertexIndex];
 
     let transformedPos = camera.projection *
         camera.view *

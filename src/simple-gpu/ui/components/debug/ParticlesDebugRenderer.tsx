@@ -32,8 +32,8 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
             // render particles
             for (let i = 0; i < particles.count; i++)
             {
-                const x = particles.positionCurrent[i * 2 + 0];
-                const y = particles.positionCurrent[i * 2 + 1];
+                const x = particles.data[i * 7 + 0];
+                const y = particles.data[i * 7 + 1];
 
                 const tPos = transform.toClipSpace().position(x, y);
                 const tSize = transform.toClipSpace().size(1);

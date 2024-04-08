@@ -23,6 +23,7 @@ export const SimpleGpu = () =>
             gridSizeX: count,
             subStepCount: 20,
             deltaTime: 1 / 60,
+            cellSize: 1.2,
             gravity: {x: 0, y: -10},
             debug: false,
         }

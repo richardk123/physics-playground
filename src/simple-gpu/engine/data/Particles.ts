@@ -4,47 +4,41 @@ import {EngineSettings} from "./EngineSettings";
 
 export class Particles
 {
-    public positionCurrent: Float32Array;
-    public positionPrevious: Float32Array;
-    public velocity: Float32Array;
+    public data: Float32Array;
     public count: number;
     // data has been changed, buffer needs to be written
     public dataChanged: boolean = true;
 
-    private constructor(positionCurrent: ArrayBuffer,
-                        positionPrevious: ArrayBuffer,
-                        velocity: ArrayBuffer,
+    private constructor(data: ArrayBuffer,
                         count: number)
     {
-        this.positionCurrent = new Float32Array(positionCurrent);
-        this.positionPrevious = new Float32Array(positionPrevious);
-        this.velocity = new Float32Array(velocity);
-
+        this.data = new Float32Array(data);
         this.count = count;
     }
 
     static create(maxParticleCount: number)
     {
-        const positionCurrent = new ArrayBuffer(maxParticleCount * 4 * 2);
-        const positionPrevious = new ArrayBuffer(maxParticleCount * 4 * 2);
-        const velocity = new ArrayBuffer(maxParticleCount * 4 * 2);
-        return new Particles(positionCurrent, positionPrevious, velocity, 0);
+        // position vec2<f32>
+        // previousPosition vec2<f32>
+        // velocity vec2<f32>
+        // density f32
+        const arraySize = maxParticleCount * 4 * 8;
+        const data = new ArrayBuffer(arraySize);
+        return new Particles(data, 0);
     }
 
-    static createFromBuffer(positionCurrent: ArrayBuffer,
-                            positionPrevious: ArrayBuffer,
-                            velocity: ArrayBuffer,
+    static createFromBuffer(data: ArrayBuffer,
                             count: number)
     {
-        return new Particles(positionCurrent, positionPrevious, velocity, count);
+        return new Particles(data, count);
     }
 
     public addPoint(x: number, y: number)
     {
         const index = this.count;
 
-        this.positionCurrent[index * 2 + 0] = x;
-        this.positionCurrent[index * 2 + 1] = y;
+        this.data[index * 8 + 0] = x;
+        this.data[index * 8 + 1] = y;
 
         this.count += 1;
         this.dataChanged = true;
@@ -54,18 +48,12 @@ export class Particles
 
 class ParticleBufferHolder
 {
-    public positionCurrentBuffer: Buffer;
-    public positionPreviousBuffer: Buffer;
-    public velocityBuffer: Buffer;
-
+    public buffer: Buffer;
     constructor(engine: GPUEngine,
-                settings: EngineSettings,
-                particles: Particles)
+                settings: EngineSettings)
     {
-        const maxParticleBufferSize = settings.maxParticleCount * 4 * 2;
-        this.positionCurrentBuffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
-        this.positionPreviousBuffer = engine.createBuffer("previous-position", maxParticleBufferSize, "storage");
-        this.velocityBuffer = engine.createBuffer("velocity", maxParticleBufferSize, "storage");
+        const maxParticleBufferSize = settings.maxParticleCount * 4 * 8;
+        this.buffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
     }
 
 }
@@ -86,8 +74,8 @@ export class ParticlesBuffer
         this.swap = false;
         this.particles = particles;
 
-        this.buffer1 = new ParticleBufferHolder(engine, settings, particles);
-        this.buffer2 = new ParticleBufferHolder(engine, settings, particles);
+        this.buffer1 = new ParticleBufferHolder(engine, settings);
+        this.buffer2 = new ParticleBufferHolder(engine, settings);
         this.gpuParticles = Particles.create(0);
     }
 
@@ -95,9 +83,7 @@ export class ParticlesBuffer
     {
         if (this.particles.dataChanged)
         {
-            this.getCurrent().positionCurrentBuffer.writeBuffer(this.particles.positionCurrent);
-            this.getCurrent().positionPreviousBuffer.writeBuffer(this.particles.positionPrevious);
-            this.getCurrent().velocityBuffer.writeBuffer(this.particles.velocity);
+            this.getCurrent().buffer.writeBuffer(this.particles.data);
             this.particles.dataChanged = false;
         }
     }
@@ -127,45 +113,38 @@ export class ParticlesBuffer
 
     public async loadFromGpu()
     {
-        const positionCurrentData = await this.getCurrent().positionCurrentBuffer.readBuffer();
-        const positionPreviousData = await this.getCurrent().positionPreviousBuffer.readBuffer();
-        const velocityData = await this.getCurrent().velocityBuffer.readBuffer();
-
+        const data = await this.getCurrent().buffer.readBuffer();
         const particleCount = this.particles.count;
-        this.gpuParticles = Particles.createFromBuffer(positionCurrentData, positionPreviousData, velocityData, particleCount);
+        this.gpuParticles = Particles.createFromBuffer(data, particleCount);
     }
 
     public async printParticlesFromGpu()
     {
-        const particleSize = this.particles.count * 4 * 2;
+        const size = this.particles.count * 4 * 8;
 
-        const sourcePositionCurrentData = new Float32Array(await this.getCurrent().positionCurrentBuffer.readBuffer(particleSize));
-        const sourcePositionPreviousData = new Float32Array(await this.getCurrent().positionPreviousBuffer.readBuffer(particleSize));
-        const sourceVelocityData = new Float32Array(await this.getCurrent().velocityBuffer.readBuffer(particleSize));
+        const sourceData = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
+        const targetData = new Float32Array(await this.getSwapped().buffer.readBuffer(size));
 
-        const targetPositionCurrentData = new Float32Array(await this.getSwapped().positionCurrentBuffer.readBuffer(particleSize));
-        const targetPositionPreviousData = new Float32Array(await this.getSwapped().positionPreviousBuffer.readBuffer(particleSize));
-        const targetVelocityData = new Float32Array(await this.getSwapped().velocityBuffer.readBuffer(particleSize));
-
-        const toPairs = (array: Float32Array) =>
-        {
-            return array.reduce((acc: number[][], curr: number, index: number, array: Float32Array) =>
-            {
-                if (index % 2 === 0)
-                {
-                    acc.push([curr, array[index + 1]]);
+        const aggregateParticleData = (array: Float32Array) => {
+            return array.reduce((acc: number[][], curr: number, index: number, array: Float32Array) => {
+                if (index % 14 === 0) {
+                    acc.push([curr, array[index + 1], array[index + 2], array[index + 3], array[index + 4], array[index + 5], array[index + 6]]);
                 }
                 return acc;
             }, []);
         }
 
-        const mapPair = (array: number[]) =>
+        const mapPair = (array: number[], index: number) =>
         {
-            return `[${array[0].toFixed(1)}, ${array[1].toFixed(1)}]`;
+            return `i: ${index}: { 
+            cur:[${array[0].toFixed(1)}, ${array[1].toFixed(1)}], 
+            pre:[${array[2].toFixed(1)}, ${array[3].toFixed(1)}], 
+            vel:[${array[4].toFixed(1)}, ${array[5].toFixed(1)}], 
+            density:[${array[6].toFixed(1)}] }`;
         }
         // already swapped
-        // console.log(`source pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
+        // console.log(`source pos cur: ${aggregateParticleData(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
-        console.log(`pos cur: ${toPairs(targetPositionCurrentData).map(mapPair).join(", ")}`);
+        console.log(`particle: ${aggregateParticleData(targetData).map(mapPair).join(", ")}`);
     }
 }
