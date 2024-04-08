@@ -136,15 +136,18 @@ export class ParticlesBuffer
 
         const mapPair = (array: number[], index: number) =>
         {
-            return `i: ${index}: { 
-            cur:[${array[0].toFixed(1)}, ${array[1].toFixed(1)}], 
-            pre:[${array[2].toFixed(1)}, ${array[3].toFixed(1)}], 
-            vel:[${array[4].toFixed(1)}, ${array[5].toFixed(1)}], 
-            density:[${array[6].toFixed(1)}] }`;
+            if (array.every(v => v !== undefined))
+            {
+                return `i: ${index}: { cur:[${array[0].toFixed(1)}, ${array[1].toFixed(1)}], pre:[${array[2].toFixed(1)}, ${array[3].toFixed(1)}], vel:[${array[4].toFixed(1)}, ${array[5].toFixed(1)}], density:[${array[6].toFixed(1)}] }`;
+            }
+            else
+            {
+                return "undefined";
+            }
         }
         // already swapped
         // console.log(`source pos cur: ${aggregateParticleData(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
-        console.log(`particle: ${aggregateParticleData(targetData).map(mapPair).join(", ")}`);
+        console.log(`particle: ${aggregateParticleData(targetData).map(mapPair).join("\n ")}`);
     }
 }

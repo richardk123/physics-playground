@@ -60,7 +60,7 @@ export class EngineSettingsBuffer
         this.intData[1] = this.settings.gridSizeX;
         this.intData[2] = this.settings.gridSizeY;
         this.intData[3] = this.settings.subStepCount;
-        this.floatData[4] = this.settings.deltaTime;
+        this.floatData[4] = this.settings.deltaTime / this.settings.subStepCount;
         this.floatData[5] = this.settings.cellSize;
         this.floatData[6] = Math.sign(this.settings.gravity.x) * (this.settings.gravity.x * this.settings.gravity.x);
         this.floatData[7] = Math.sign(this.settings.gravity.y) * (this.settings.gravity.y * this.settings.gravity.y);

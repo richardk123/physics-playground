@@ -6,6 +6,7 @@ import {registerMoving, registerScrolling} from "./components/utils/CanvasUtils"
 import {Sidebar} from "./components/Sidebar";
 import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
+import {DensityDebugRenderer} from "./components/debug/DensityDebugRenderer";
 
 export const SimpleGpu = () =>
 {
@@ -13,15 +14,15 @@ export const SimpleGpu = () =>
     const [engine, setEngine] = useState<Engine | undefined>();
 
     // must be power of 8
-    const count = 32;
+    const count = 16;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 400000,
             gridSizeY: count * 2,
-            gridSizeX: count,
-            subStepCount: 20,
+            gridSizeX: count * 2,
+            subStepCount: 4,
             deltaTime: 1 / 60,
             cellSize: 1.2,
             gravity: {x: 0, y: -10},
@@ -60,6 +61,7 @@ export const SimpleGpu = () =>
     //         </div>
     //         <div className="flex h-1/2">
     //             {engine && <GridDebugRenderer engine={engine} />}
+    //             {engine && <DensityDebugRenderer engine={engine} />}
     //         </div>
     //     </div>
     //     <div className="w-64 h-full text-white">

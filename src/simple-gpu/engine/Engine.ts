@@ -50,6 +50,18 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
+                this.addPoint(bottomLeftX + x, bottomLeftY + y);
+            }
+        }
+    }
+
+    public createRectangleRandom(bottomLeftX: number, bottomLeftY: number,
+                                 width: number, height: number)
+    {
+        for (let y = 0; y < height; y++)
+        {
+            for (let x = 0; x < width; x++)
+            {
                 this.addPoint(bottomLeftX + x + Math.random() * 0.01, bottomLeftY + y + Math.random() * 0.01);
             }
         }

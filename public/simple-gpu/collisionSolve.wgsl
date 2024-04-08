@@ -73,7 +73,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     }
 
     let p = particles[index].positionCurrent;
-    updatePoint(p, index, -1.0);
+    updatePoint(p, index, -settings.cellSize);
     updatePoint(p, index, 0.0);
-    updatePoint(p, index, 1.0);
+    updatePoint(p, index, settings.cellSize);
 }

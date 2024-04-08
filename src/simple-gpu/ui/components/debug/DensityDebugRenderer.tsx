@@ -4,7 +4,7 @@ import p5Types from "p5";
 import {Transformer} from "../../../engine/common/Transformer";
 import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 
-export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
+export const DensityDebugRenderer = ({engine}: {engine: Engine}) =>
 {
     const render = (p5: p5Types, canvas: HTMLCanvasElement) =>
     {
@@ -34,15 +34,15 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
             {
                 const x = particles.data[i * 8 + 0];
                 const y = particles.data[i * 8 + 1];
+                const density = particles.data[i * 8 + 6];
 
                 const tPos = transform.toClipSpace().position(x, y);
                 const tSize = transform.toClipSpace().size(1);
-                const precision = 2;
                 p5.fill(0, 0);
                 p5.circle(tPos.x, tPos.y, tSize);
 
                 p5.fill(0, 255);
-                p5.text(`[${x.toFixed(2)}, ${y.toFixed(2)}], `, tPos.x, tPos.y);
+                p5.text(`[${density.toFixed(2)}], `, tPos.x, tPos.y);
             }
         }
     }

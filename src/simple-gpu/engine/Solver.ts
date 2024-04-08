@@ -53,6 +53,18 @@ export class Solvers
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .build();
 
+        const densityCompute = await engine.createComputeShader("densityCompute")
+            .addBuffer(() => settingsBuffer.buffer, "uniform")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
+            .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .build();
+
+        const densitySolve = await engine.createComputeShader("densitySolve")
+            .addBuffer(() => settingsBuffer.buffer, "uniform")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
+            .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .build();
+
         const boundingBox = await engine.createComputeShader("boundingBox")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
@@ -73,36 +85,34 @@ export class Solvers
                 const particleCount = particlesBuffer.particles.count;
                 const numberOfCells = settingsBuffer.settings.gridSizeX * settingsBuffer.settings.gridSizeY;
 
-                // for (let i = 0; i < subStepCount; i++)
-                // {
+                for (let i = 0; i < subStepCount; i++)
+                {
                     preSolve.dispatch(Math.ceil(particleCount / 256));
-                    for (let j = 0; j < subStepCount; j++)
-                    {
-                        gridClear.dispatch(Math.ceil(numberOfCells / 256));
-                        gridUpdate.dispatch(Math.ceil(particleCount / 256));
+                    gridClear.dispatch(Math.ceil(numberOfCells / 256));
+                    gridUpdate.dispatch(Math.ceil(particleCount / 256));
 
-                        await prefixSum.dispatch(gridBuffer);
+                    await prefixSum.dispatch(gridBuffer);
 
-                        particleSort.dispatch(Math.ceil(particleCount / 256));
-                        particlesBuffer.swapBuffers();
+                    particleSort.dispatch(Math.ceil(particleCount / 256));
+                    particlesBuffer.swapBuffers();
 
-                        boundingBox.dispatch(Math.ceil(particleCount / 256));
-                        collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                        boundingBox.dispatch(Math.ceil(particleCount / 256));
-                    }
+                    // collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                    boundingBox.dispatch(Math.ceil(particleCount / 256));
 
+                    densityCompute.dispatch(Math.ceil(particleCount / 256));
+                    densitySolve.dispatch(Math.ceil(particleCount / 256));
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)
                     {
                         await particlesBuffer.loadFromGpu();
                         await particlesBuffer.printParticlesFromGpu();
-                        await settingsBuffer.loadFromGpu();
-                        console.log(settingsBuffer.gpuData);
-                        await gridBuffer.loadFromGpu();
-                        await prefixSum.printGPUData();
+                        // await settingsBuffer.loadFromGpu();
+                        // console.log(settingsBuffer.gpuData);
+                        // await gridBuffer.loadFromGpu();
+                        // await prefixSum.printGPUData();
                     }
-                // }
+                }
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,

@@ -23,14 +23,27 @@ fn getGridID(p: vec2<f32>) -> u32 {
   return (settings.gridSizeX * y) + x;
 }
 
-fn smoothingKernel(distance: f32, smoothingRadius: f32) -> f32
+fn smoothingKernelDerivative(distance: f32, radius: f32) -> f32
 {
-    if (distance >= smoothingRadius)
+    if (distance >= radius)
     {
         return 0.0;
     }
-    let volume = (3.14159265359 * pow(smoothingRadius, 4)) / 6;
-    return (smoothingRadius - distance) * (smoothingRadius - distance) / volume;
+    let scale = 12 / (pow(radius, 4) * 3.14159265359);
+    return (distance - radius) * scale;
+}
+
+fn convertDensityToPressure(density: f32) -> f32
+{
+    let densityError = density - 1.4;
+    return densityError * 0.8;
+}
+
+fn calculateSharedPressure(densityA: f32, densityB: f32) -> f32
+{
+    let pressureA = convertDensityToPressure(densityA);
+    let pressureB = convertDensityToPressure(densityB);
+    return (pressureA + pressureB) / 2;
 }
 
 fn updateDensity(p: vec2<f32>, index: u32, yOffset: f32)
@@ -51,20 +64,31 @@ fn updateDensity(p: vec2<f32>, index: u32, yOffset: f32)
     }
 
     let particleEndId: u32 = clamp(prefixSum[endId] - 1, 0, settings.particleCount - 1);
+    var moveVec = vec2<f32>(0.0, 0.0);
 
     for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
     {
         let anotherParticle = particles[anotherParticleIndex].positionCurrent;
-        let diff = p - anotherParticle;
-        let d = dot(diff, diff);
+        let direction = normalize(anotherParticle - p);
+        let dist = distance(anotherParticle, p);
 
-        if (d > 0.0 && d < 1.2 && anotherParticleIndex != index)
+        if (anotherParticleIndex != index && dist != 0.0)
         {
-            let dist = length(diff);
-            let influence = smoothingKernel(dist, 1.2);
-            particles[index].density += influence; //TODO: mass
+            let slope = smoothingKernelDerivative(dist, 1.2);
+            let densityA = particles[index].density;
+            let densityB = particles[anotherParticleIndex].density;
+            let sharedPressure = calculateSharedPressure(densityB, densityA);
+
+            if (densityB == 0.0)
+            {
+                continue;
+            }
+
+            moveVec += direction * ((sharedPressure * slope) / densityB); //TODO: mass
         }
     }
+
+    particles[index].positionCurrent += moveVec * settings.dt;
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
