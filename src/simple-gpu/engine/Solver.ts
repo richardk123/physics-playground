@@ -58,11 +58,6 @@ export class Solvers
             .addBuffer(() => positionChangeBuffer.buffer, "storage")
             .build();
 
-        const positionChangeClear = await engine.createComputeShader("positionChangeClear")
-            .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => positionChangeBuffer.buffer, "storage")
-            .build();
-
         const positionChangeApply = await engine.createComputeShader("positionChangeApply")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => positionChangeBuffer.buffer, "read-only-storage")
@@ -78,9 +73,10 @@ export class Solvers
 
         const densitySolve = await engine.createComputeShader("densitySolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
-            .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
+            .addBuffer(() => particlesBuffer.getCurrent().buffer, "read-only-storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
+            .addBuffer(() => positionChangeBuffer.buffer, "storage")
             .build();
 
         const boundingBox = await engine.createComputeShader("boundingBox")
@@ -116,13 +112,13 @@ export class Solvers
                     particlesBuffer.swapBuffers();
 
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
-                    positionChangeClear.dispatch(Math.ceil(particleCount / 256));
-                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                    positionChangeApply.dispatch(Math.ceil(particleCount / 256));
 
-                    // densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
-                    // boundingBox.dispatch(Math.ceil(particleCount / 256));
+                    // collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                    // positionChangeApply.dispatch(Math.ceil(particleCount / 256));
+
+                    densityCompute.dispatch(Math.ceil(particleCount / 256));
+                    densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    positionChangeApply.dispatch(Math.ceil(particleCount / 256));
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 

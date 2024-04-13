@@ -25,7 +25,7 @@ export const SimpleGpu = () =>
             subStepCount: 8,
             deltaTime: 1 / 60,
             cellSize: 1.2 / Math.sqrt(2),
-            gravity: {x: 0, y: -10},
+            gravity: {x: 0, y: 0},
             debug: false,
         }
         const camera: Camera = {

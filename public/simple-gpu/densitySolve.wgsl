@@ -1,6 +1,6 @@
 const PI: f32 = 3.14159265359;
-const TARGET_DENSITY: f32 = 0.05;
-const PRESSURE_MULTIPLIER: f32 = 10;
+const TARGET_DENSITY: f32 = 0.1;
+const PRESSURE_MULTIPLIER: f32 = 5;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
 struct Settings
@@ -30,6 +30,10 @@ fn getGridID(p: vec2<f32>) -> u32 {
 
 fn smoothingKernelDerivative(distance: f32) -> f32
 {
+    if (distance >= SMOOTHING_RADIUS)
+    {
+        return 0.0;
+    }
     let scale = 12 / (pow(SMOOTHING_RADIUS, 4) * PI);
     return (distance - SMOOTHING_RADIUS) * scale;
 }
@@ -70,15 +74,22 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
 
         for (var anotherParticleIndex = particleStartId; anotherParticleIndex < particleEndId; anotherParticleIndex++)
         {
-            let anotherParticle = particles[anotherParticleIndex].positionCurrent;
-            let direction = normalize(anotherParticle - p);
-            let dist = distance(p, anotherParticle);
-
-            if (dist <= 0.0 || dist >= SMOOTHING_RADIUS)
+            if (anotherParticleIndex == particleIndex)
             {
                 continue;
             }
 
+            let anotherParticle = particles[anotherParticleIndex].positionCurrent;
+
+            let diff = anotherParticle - p;
+            let dist = length(diff);
+
+            if (dist == 0.0)
+            {
+                continue;
+            }
+
+            let direction = normalize(diff);
             let slope = smoothingKernelDerivative(dist);
             let densityA = particles[particleIndex].density;
             let densityB = particles[anotherParticleIndex].density;
@@ -89,17 +100,18 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
                 continue;
             }
 
-            moveVec += direction * ((sharedPressure * slope) / densityB); //TODO: mass
+            moveVec += direction * ((sharedPressure * slope) / densityB);
         }
     }
 
-    particles[particleIndex].positionCurrent += moveVec * settings.dt;
+    positionChange[particleIndex] = moveVec * settings.dt;
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
-@group(0) @binding(1) var<storage, read_write> particles: array<Particle>;
+@group(0) @binding(1) var<storage, read> particles: array<Particle>;
 @group(0) @binding(2) var<storage, read> prefixSum : array<u32>;
 @group(0) @binding(3) var<storage, read> cellParticleCount : array<u32>;
+@group(0) @binding(4) var<storage, read_write> positionChange : array<vec2<f32>>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)

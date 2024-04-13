@@ -84,11 +84,10 @@ export const solveFluidConstraint = (grid: Grid,
             Vec.scale(vecs, 0, 1 / distance);
 
             const slope = smoothingKernelDerivative(distance, SMOOTHING_RADIUS);
-            const density = points.density[index2];
-            const mass = 1 / points.massInverse[index];
-            const sharedPressure = calculateSharedPressure(density, points.density[index]);
-            Vec.add(positionChange, 0, vecs, 0, (sharedPressure * slope * mass) / density);
-            Vec.scale(positionChange, 0, DAMPING);
+            const densityA = points.density[index];
+            const densityB = points.density[index2];
+            const sharedPressure = calculateSharedPressure(densityB, densityA);
+            Vec.add(positionChange, 0, vecs, 0, (sharedPressure * slope) / densityB);
         }
     }
     positionChange.fill(0);

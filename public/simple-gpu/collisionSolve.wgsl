@@ -34,6 +34,8 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
     }
     let endY = min(gridId + settings.gridSizeX, gridSize);
 
+    var moveVec = vec2<f32>(0.0, 0.0);
+
     for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
         let startGridId = u32(max(i32(y) - 1, 0));
@@ -52,12 +54,13 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
             {
                 let dist = length(diff);
                 let corr = ((1.0 - dist) * 0.2);
-                positionChange[particleIndex] += diff * corr;
-//                particles[particleIndex].positionCurrent += diff * corr;
-//                particles[anotherParticleIndex].positionCurrent += diff * -corr;
+                moveVec += diff * corr;
             }
         }
     }
+
+
+    positionChange[particleIndex] = moveVec;
 }
 
 
