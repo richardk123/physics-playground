@@ -51,7 +51,7 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
             if (d > 0.0 && d < 1.0 && anotherParticleIndex != particleIndex)
             {
                 let dist = length(diff);
-                let corr = ((1.0 - dist) * 0.025);
+                let corr = ((1.0 - dist) * 0.2);
                 positionChange[particleIndex] += diff * corr;
 //                particles[particleIndex].positionCurrent += diff * corr;
 //                particles[anotherParticleIndex].positionCurrent += diff * -corr;

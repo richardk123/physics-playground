@@ -22,7 +22,7 @@ export const SimpleGpu = () =>
             maxParticleCount: 400000,
             gridSizeY: count * 2,
             gridSizeX: count,
-            subStepCount: 16,
+            subStepCount: 8,
             deltaTime: 1 / 60,
             cellSize: 1.2 / Math.sqrt(2),
             gravity: {x: 0, y: -10},

@@ -23,13 +23,13 @@ export const SimulationSettings = ({engine}: {engine: Engine}) =>
         <BoxTitle label="Gravity">
             <SliderComponent value={settings.gravity.x}
                              setValue={val => settings.gravity.x = val}
-                             minVal={-20}
-                             maxVal={20}
+                             minVal={-10}
+                             maxVal={10}
                              step={1}/>
             <SliderComponent value={settings.gravity.y}
                              setValue={val => settings.gravity.y = val}
-                             minVal={-20}
-                             maxVal={20}
+                             minVal={-10}
+                             maxVal={10}
                              step={1} />
         </BoxTitle>
         <BoxTitle label="Simulations per second">
