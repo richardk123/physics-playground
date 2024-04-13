@@ -64,7 +64,9 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.addPoint(bottomLeftX + x + Math.random() * 0.01, bottomLeftY + y + Math.random() * 0.01);
+                const nx = bottomLeftX + x * 1.1 + Math.random() * 0.01;
+                const ny = bottomLeftY + y * 1.1 + Math.random() * 0.01;
+                this.addPoint(nx, ny);
             }
         }
     }

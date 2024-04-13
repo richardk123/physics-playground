@@ -52,6 +52,7 @@ export class Solvers
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
             .build();
 
         const densityCompute = await engine.createComputeShader("densityCompute")
@@ -91,6 +92,7 @@ export class Solvers
                 for (let i = 0; i < subStepCount; i++)
                 {
                     preSolve.dispatch(Math.ceil(particleCount / 256));
+
                     gridClear.dispatch(Math.ceil(numberOfCells / 256));
                     gridUpdate.dispatch(Math.ceil(particleCount / 256));
 
@@ -99,11 +101,12 @@ export class Solvers
                     particleSort.dispatch(Math.ceil(particleCount / 256));
                     particlesBuffer.swapBuffers();
 
-                    // collisionSolve.dispatch(Math.ceil(particleCount / 256));
+                    boundingBox.dispatch(Math.ceil(particleCount / 256));
+                    // densityCompute.dispatch(Math.ceil(particleCount / 256));
+                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
 
-                    densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    densitySolve.dispatch(Math.ceil(particleCount / 256));
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)
@@ -111,9 +114,9 @@ export class Solvers
                         await particlesBuffer.loadFromGpu();
                         await particlesBuffer.printParticlesFromGpu();
                         await settingsBuffer.loadFromGpu();
-                        console.log(settingsBuffer.gpuData);
+                        // console.log(settingsBuffer.gpuData);
                         await gridBuffer.loadFromGpu();
-                        await prefixSum.printGPUData();
+                        // await prefixSum.printGPUData();
                     }
                 }
             },

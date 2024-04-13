@@ -131,7 +131,7 @@ export class ParticlesBuffer
     {
         const size = this.particles.count * 4 * 8;
 
-        // const sourceData = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
+        const sourceData = new Float32Array(await this.getSwapped().buffer.readBuffer(size));
         const data = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
 
         const aggregateParticleData = (array: Float32Array) => {
@@ -142,22 +142,6 @@ export class ParticlesBuffer
                 return acc;
             }, []);
         }
-        //
-        // const aggregateParticleData2 = (array: Float32Array) =>
-        // {
-        //     const chunkSize = 8;
-        //     const chunks: number[][] = [];
-        //     for (let i = 0; i < array.length; i += chunkSize)
-        //     {
-        //         const chunk: number[] = [];
-        //         for (let j = i; j < Math.min(i + chunkSize, array.length); j++)
-        //         {
-        //             chunk.push(array[j])
-        //         }
-        //         chunks.push(chunk);
-        //     }
-        //     return chunks;
-        // }
 
         const mapPair = (array: number[], index: number) =>
         {
@@ -174,5 +158,6 @@ export class ParticlesBuffer
         // console.log(`source pos cur: ${aggregateParticleData(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
         console.log(`particles: \n ${aggregateParticleData(data).map(mapPair).join("\n ")}`);
+        console.log(`particles swapped: \n ${aggregateParticleData(sourceData).map(mapPair).join("\n ")}`);
     }
 }

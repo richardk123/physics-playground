@@ -57,7 +57,7 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
             let anotherParticle = particles[i].positionCurrent;
             let dist = distance(p, anotherParticle);
 
-            if (dist <= 0 || dist >= SMOOTHING_RADIUS)
+            if (dist <= 0.0 || dist >= SMOOTHING_RADIUS)
             {
                 continue;
             }

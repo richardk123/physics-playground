@@ -23,57 +23,57 @@ fn getGridID(p: vec2<f32>) -> u32 {
   return (settings.gridSizeX * y) + x;
 }
 
-fn updatePoint(p: vec2<f32>, index: u32, yOffset: f32)
+fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
 {
-    let leftX = clamp(p.x - settings.cellSize, 0.0, f32(settings.gridSizeX));
-    let rightX = clamp(p.x + settings.cellSize, 0.0, f32(settings.gridSizeX));
-    let y = clamp(p.y + yOffset, 0.0, f32(settings.gridSizeY));
-
-    let gridSize = settings.gridSizeX * settings.gridSizeY;
-    let startId = clamp(getGridID(vec2<f32>(leftX, y)), 0, gridSize);
-    let endId = clamp(getGridID(vec2<f32>(rightX, y)), 0, gridSize);
-
-    var particleStartId: u32 = clamp(prefixSum[startId] - 1, 0, settings.particleCount - 1);
-
-    if (startId == 0)
+    let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
+    let t1 = i32(gridId) - i32(settings.gridSizeX);
+    var startY = u32(t1);
+    if (t1 < 0)
     {
-        particleStartId = 0;
+        startY = gridId;
     }
+    let endY = min(gridId + settings.gridSizeX, gridSize);
 
-    let particleEndId: u32 = clamp(prefixSum[endId] - 1, 0, settings.particleCount - 1);
-
-    for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
+    for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
-        let anotherParticle = particles[anotherParticleIndex].positionCurrent;
-        let diff = p - anotherParticle;
-        let d = dot(diff, diff);
+        let startGridId = u32(max(i32(y) - 1, 0));
+        let endGridId = min(y + 2, gridSize);
 
-        if (d > 0.0 && d < 1.0 && anotherParticleIndex != index)
+        let particleStartId = prefixSum[startGridId] - cellParticleCount[startGridId];
+        let particleEndId = prefixSum[endGridId];
+
+        for (var anotherParticleIndex = particleStartId; anotherParticleIndex < particleEndId; anotherParticleIndex++)
         {
-            let dist = length(diff);
-            let corr = ((1.0 - dist) * 0.4);
-            particles[index].positionCurrent += diff * corr;
-            particles[anotherParticleIndex].positionCurrent += diff * -corr;
+            let anotherParticle = particles[anotherParticleIndex].positionCurrent;
+            let diff = p - anotherParticle;
+            let d = dot(diff, diff);
+
+            if (d > 0.0 && d < 1.0 && anotherParticleIndex != particleIndex)
+            {
+                let dist = length(diff);
+                let corr = ((1.0 - dist) * 0.025);
+                particles[particleIndex].positionCurrent += diff * corr;
+//                particles[anotherParticleIndex].positionCurrent += diff * -corr;
+            }
         }
     }
 }
 
+
 @binding(0) @group(0) var<uniform> settings: Settings;
 @binding(1) @group(0) var<storage, read_write> particles: array<Particle>;
 @binding(2) @group(0) var<storage, read> prefixSum : array<u32>;
+@binding(3) @group(0) var<storage, read> cellParticleCount : array<u32>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
-    let index: u32 = id.x;
-
-    if (index >= settings.particleCount)
+    if (id.x >= settings.particleCount)
     {
         return;
     }
 
-    let p = particles[index].positionCurrent;
-    updatePoint(p, index, -settings.cellSize);
-    updatePoint(p, index, 0.0);
-    updatePoint(p, index, settings.cellSize);
+    let p = particles[id.x].positionCurrent;
+    let gridId = getGridID(p);
+    updateParticle(gridId, p, id.x);
 }

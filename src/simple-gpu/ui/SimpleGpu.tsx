@@ -14,23 +14,23 @@ export const SimpleGpu = () =>
     const [engine, setEngine] = useState<Engine | undefined>();
 
     // must be power of 8
-    const count = 192;
+    const count = 256;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 400000,
-            gridSizeY: count,
+            gridSizeY: count * 2,
             gridSizeX: count,
-            subStepCount: 4,
+            subStepCount: 8,
             deltaTime: 1 / 60,
-            cellSize: 1.697,
-            gravity: {x: 0, y: 0},
+            cellSize: 1.2 / Math.sqrt(2),
+            gravity: {x: 0, y: -10},
             debug: false,
         }
         const camera: Camera = {
-            zoom: 0.0023 * count,
-            translation: {x: count / 2, y: count / 2},
+            zoom: 0.0007 * settings.gridSizeX,
+            translation: {x: count / 2 - 1, y: count / 2 - 1},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -40,12 +40,7 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                // engine.createRectangle(0, 0, count, count);
-                // engine.createRectangle(12, 0, count, count);
-                // engine.createRectangle(12, 12, count, count);
-                // engine.createRectangle(0, 12, count, count);
-
-                engine.createRectangle(0, 0, count - 1, count - 1);
+                engine.createRectangleRandom(0, 0, 190, 128);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
