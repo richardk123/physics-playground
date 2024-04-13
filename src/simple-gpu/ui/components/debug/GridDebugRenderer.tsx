@@ -11,6 +11,7 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
     {
         const grid = engine.solver.gridBuffer.gpuGrid;
         const settings = engine.solver.settingsBuffer.settings;
+        const prefixSum = engine.solver.prefixSumBuffer().gpuData;
         const camera = engine.renderer.cameraBuffer.camera;
 
         if (!settings.debug)
@@ -23,16 +24,16 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
         // draw horizontal lines
         for (let y = 0; y <= settings.gridSizeY; y++)
         {
-            const p1 = transform.toClipSpace().position(0, y);
-            const p2 = transform.toClipSpace().position(settings.gridSizeX, y);
+            const p1 = transform.toClipSpace().position(0, y * settings.cellSize);
+            const p2 = transform.toClipSpace().position(settings.gridSizeX * settings.cellSize, y * settings.cellSize);
             p5.line(p1.x, p1.y, p2.x, p2.y);
         }
 
         // draw vertical lines
         for (let x = 0; x <= settings.gridSizeX; x++)
         {
-            const p1 = transform.toClipSpace().position(x, 0);
-            const p2 = transform.toClipSpace().position(x, settings.gridSizeY);
+            const p1 = transform.toClipSpace().position(x * settings.cellSize, 0);
+            const p2 = transform.toClipSpace().position(x * settings.cellSize, settings.gridSizeY * settings.cellSize);
             p5.line(p1.x, p1.y, p2.x, p2.y);
         }
 
@@ -40,7 +41,7 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
         {
             const y = Math.floor(index / settings.gridSizeX);
             const x = index - (y * settings.gridSizeX);
-            return { x, y };
+            return { x: x * settings.cellSize, y: y * settings.cellSize };
         }
 
         const numberOfCells = settings.gridSizeX * settings.gridSizeY;
@@ -52,7 +53,8 @@ export const GridDebugRenderer = ({engine}: {engine: Engine}) =>
 
             if (particleCount !== undefined)
             {
-                p5.text(particleCount.toFixed(0), p.x, p.y);
+                p5.text(`[${particleCount.toFixed(0)}, ${prefixSum[i].toFixed(0)}]`, p.x, p.y);
+                // p5.text(`id: ${i}: c: ${particleCount.toFixed(0)} ps: ${prefixSum[i].toFixed(0)}`, p.x, p.y);
             }
         }
     }

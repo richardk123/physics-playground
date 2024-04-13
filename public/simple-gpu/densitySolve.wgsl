@@ -1,3 +1,8 @@
+const PI: f32 = 3.14159265359;
+const TARGET_DENSITY: f32 = 0.1;
+const PRESSURE_MULTIPLIER: f32 = 0.5;
+const SMOOTHING_RADIUS: f32 = 1.2;
+
 struct Settings
 {
     particleCount: u32,
@@ -29,14 +34,14 @@ fn smoothingKernelDerivative(distance: f32, radius: f32) -> f32
     {
         return 0.0;
     }
-    let scale = 12 / (pow(radius, 4) * 3.14159265359);
+    let scale = 12 / (pow(radius, 4) * PI);
     return (distance - radius) * scale;
 }
 
 fn convertDensityToPressure(density: f32) -> f32
 {
-    let densityError = density - 1.4;
-    return densityError * 0.8;
+    let densityError = density - TARGET_DENSITY;
+    return densityError * PRESSURE_MULTIPLIER;
 }
 
 fn calculateSharedPressure(densityA: f32, densityB: f32) -> f32
@@ -70,14 +75,14 @@ fn updateDensity(p: vec2<f32>, index: u32, yOffset: f32)
     {
         let anotherParticle = particles[anotherParticleIndex].positionCurrent;
         let direction = normalize(anotherParticle - p);
-        let dist = distance(anotherParticle, p);
+        let dist = distance(p, anotherParticle);
 
         if (anotherParticleIndex != index && dist != 0.0)
         {
-            let slope = smoothingKernelDerivative(dist, 1.2);
+            let slope = smoothingKernelDerivative(dist, SMOOTHING_RADIUS);
             let densityA = particles[index].density;
             let densityB = particles[anotherParticleIndex].density;
-            let sharedPressure = calculateSharedPressure(densityB, densityA);
+            let sharedPressure = calculateSharedPressure(densityA, densityB);
 
             if (densityB == 0.0)
             {

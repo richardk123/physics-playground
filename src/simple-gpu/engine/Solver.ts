@@ -10,6 +10,7 @@ export interface Solver
     particlesBuffer: ParticlesBuffer;
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
+    prefixSumBuffer: () => PrefixSumBuffer;
 }
 
 export class Solvers
@@ -57,6 +58,7 @@ export class Solvers
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
             .build();
 
         const densitySolve = await engine.createComputeShader("densitySolve")
@@ -100,23 +102,24 @@ export class Solvers
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
 
                     densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)
                     {
                         await particlesBuffer.loadFromGpu();
                         await particlesBuffer.printParticlesFromGpu();
-                        // await settingsBuffer.loadFromGpu();
-                        // console.log(settingsBuffer.gpuData);
-                        // await gridBuffer.loadFromGpu();
-                        // await prefixSum.printGPUData();
+                        await settingsBuffer.loadFromGpu();
+                        console.log(settingsBuffer.gpuData);
+                        await gridBuffer.loadFromGpu();
+                        await prefixSum.printGPUData();
                     }
                 }
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
+            prefixSumBuffer: () => prefixSum.buffer,
         };
     }
 }

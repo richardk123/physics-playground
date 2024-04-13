@@ -24,6 +24,6 @@ struct Particle
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     // bounding box
-    particles[id.x].positionCurrent.x = clamp(particles[id.x].positionCurrent.x, 0, f32(settings.gridSizeX) - 0.001);
-    particles[id.x].positionCurrent.y = clamp(particles[id.x].positionCurrent.y, 0, f32(settings.gridSizeY) - 0.001);
+    particles[id.x].positionCurrent.x = clamp(particles[id.x].positionCurrent.x, 0, f32(settings.gridSizeX) * settings.cellSize - 0.001);
+    particles[id.x].positionCurrent.y = clamp(particles[id.x].positionCurrent.y, 0, f32(settings.gridSizeY) * settings.cellSize - 0.001);
 }

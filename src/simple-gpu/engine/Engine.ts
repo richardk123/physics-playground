@@ -50,7 +50,9 @@ export class Engine
         {
             for (let x = 0; x < width; x++)
             {
-                this.addPoint(bottomLeftX + x, bottomLeftY + y);
+                const nx = bottomLeftX + x * 1.1;
+                const ny = bottomLeftY + y * 1.1;
+                this.addPoint(nx, ny);
             }
         }
     }

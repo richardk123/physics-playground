@@ -21,7 +21,7 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
             }
 
             // bounding box
-            const gridTopRight = transform.toClipSpace().position(settings.gridSizeX, settings.gridSizeY);
+            const gridTopRight = transform.toClipSpace().position(settings.gridSizeX * settings.cellSize, settings.gridSizeY * settings.cellSize);
             const gridBottomLeft = transform.toClipSpace().position(0, 0);
 
             p5.line(gridBottomLeft.x, gridBottomLeft.y, gridTopRight.x, gridBottomLeft.y);
@@ -42,7 +42,7 @@ export const ParticlesDebugRenderer = ({engine}: {engine: Engine}) =>
                 p5.circle(tPos.x, tPos.y, tSize);
 
                 p5.fill(0, 255);
-                p5.text(`[${x.toFixed(2)}, ${y.toFixed(2)}], `, tPos.x, tPos.y);
+                p5.text(`${i} - [${x.toFixed(2)}, ${y.toFixed(2)}], `, tPos.x - tSize / 4, tPos.y);
             }
         }
     }

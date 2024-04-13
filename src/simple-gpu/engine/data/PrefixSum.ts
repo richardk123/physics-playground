@@ -3,7 +3,6 @@ import {GPUEngine} from "../common/GPUEngine";
 import {ComputeShader} from "../common/ComputeShader";
 import {EngineSettings} from "./EngineSettings";
 import {GridBuffer} from "./Grid";
-import assert from "assert";
 
 export class PrefixSumBuffer
 {
@@ -11,6 +10,7 @@ export class PrefixSumBuffer
     public buffer2: Buffer;
     public prefixSumSettings: Buffer;
     private data: Uint32Array;
+    public gpuData: Uint32Array;
     private settings: EngineSettings;
     public swap: boolean;
 
@@ -22,6 +22,7 @@ export class PrefixSumBuffer
         this.buffer2 = engine.createBuffer("prefix-sum-buffer2", this.getNumberOfCells() * 4, "storage");
         this.prefixSumSettings = engine.createBuffer("prefix-sum-settings", 8, "uniform");
         this.data = new Uint32Array(2);
+        this.gpuData = new Uint32Array(this.getNumberOfCells());
         this.swap = false;
     }
 
@@ -70,11 +71,17 @@ export class PrefixSumBuffer
         // const previous = new Uint32Array(await this.getSwapped().readBuffer());
         // console.log(`prefixSum swapped [${previous.join(", ")}]`);
 
-        const current = new Uint32Array(await this.getCurrent().readBuffer());
-        console.log(`prefixSum current [${current.join(", ")}]`);
+        await this.loadGpuData();
+        console.log(`prefixSum indexes [${this.gpuData.map((c, i) => i).join(", ")}]`);
+        console.log(`prefixSum current [${this.gpuData.join(", ")}]`);
         //
         // const settings = new Uint32Array(await this.prefixSumSettings.readBuffer());
         // console.log(`settings [${settings.join(", ")}]`);
+    }
+
+    public async loadGpuData()
+    {
+        this.gpuData = new Uint32Array(await this.getCurrent().readBuffer());
     }
 
     public async assertPrefixSumIsExpected(gridBuffer: GridBuffer)

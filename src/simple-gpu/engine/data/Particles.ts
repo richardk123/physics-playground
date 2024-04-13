@@ -37,8 +37,17 @@ export class Particles
     {
         const index = this.count;
 
+        // current pos
         this.data[index * 8 + 0] = x;
         this.data[index * 8 + 1] = y;
+        // previous pos
+        this.data[index * 8 + 2] = x;
+        this.data[index * 8 + 3] = y;
+        // velocity
+        this.data[index * 8 + 4] = 0;
+        this.data[index * 8 + 5] = 0;
+        // density
+        this.data[index * 8 + 6] = 0;
 
         this.count += 1;
         this.dataChanged = true;
@@ -122,23 +131,39 @@ export class ParticlesBuffer
     {
         const size = this.particles.count * 4 * 8;
 
-        const sourceData = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
-        const targetData = new Float32Array(await this.getSwapped().buffer.readBuffer(size));
+        // const sourceData = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
+        const data = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
 
         const aggregateParticleData = (array: Float32Array) => {
             return array.reduce((acc: number[][], curr: number, index: number, array: Float32Array) => {
-                if (index % 14 === 0) {
-                    acc.push([curr, array[index + 1], array[index + 2], array[index + 3], array[index + 4], array[index + 5], array[index + 6]]);
+                if (index % 8 === 0) {
+                    acc.push([array[index + 0], array[index + 1], array[index + 2], array[index + 3], array[index + 4], array[index + 5], array[index + 6]]);
                 }
                 return acc;
             }, []);
         }
+        //
+        // const aggregateParticleData2 = (array: Float32Array) =>
+        // {
+        //     const chunkSize = 8;
+        //     const chunks: number[][] = [];
+        //     for (let i = 0; i < array.length; i += chunkSize)
+        //     {
+        //         const chunk: number[] = [];
+        //         for (let j = i; j < Math.min(i + chunkSize, array.length); j++)
+        //         {
+        //             chunk.push(array[j])
+        //         }
+        //         chunks.push(chunk);
+        //     }
+        //     return chunks;
+        // }
 
         const mapPair = (array: number[], index: number) =>
         {
             if (array.every(v => v !== undefined))
             {
-                return `i: ${index}: { cur:[${array[0].toFixed(1)}, ${array[1].toFixed(1)}], pre:[${array[2].toFixed(1)}, ${array[3].toFixed(1)}], vel:[${array[4].toFixed(1)}, ${array[5].toFixed(1)}], density:[${array[6].toFixed(1)}] }`;
+                return `i: ${index}: { cur:[${array[0].toFixed(2)}, ${array[1].toFixed(2)}], pre:[${array[2].toFixed(2)}, ${array[3].toFixed(2)}], vel:[${array[4].toFixed(2)}, ${array[5].toFixed(2)}], density:[${array[6].toFixed(2)}] }`;
             }
             else
             {
@@ -148,6 +173,6 @@ export class ParticlesBuffer
         // already swapped
         // console.log(`source pos cur: ${aggregateParticleData(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
-        console.log(`particle: ${aggregateParticleData(targetData).map(mapPair).join("\n ")}`);
+        console.log(`particles: \n ${aggregateParticleData(data).map(mapPair).join("\n ")}`);
     }
 }

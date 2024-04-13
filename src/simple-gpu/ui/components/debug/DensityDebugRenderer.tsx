@@ -21,13 +21,29 @@ export const DensityDebugRenderer = ({engine}: {engine: Engine}) =>
             }
 
             // bounding box
-            const gridTopRight = transform.toClipSpace().position(settings.gridSizeX, settings.gridSizeY);
+            const gridTopRight = transform.toClipSpace().position(settings.gridSizeX * settings.cellSize, settings.gridSizeY * settings.cellSize);
             const gridBottomLeft = transform.toClipSpace().position(0, 0);
 
             p5.line(gridBottomLeft.x, gridBottomLeft.y, gridTopRight.x, gridBottomLeft.y);
             p5.line(gridBottomLeft.x, gridBottomLeft.y, gridBottomLeft.x, gridTopRight.y);
             p5.line(gridBottomLeft.x, gridTopRight.y, gridTopRight.x, gridTopRight.y);
             p5.line(gridTopRight.x, gridTopRight.y, gridTopRight.x, gridBottomLeft.y);
+
+            // draw horizontal lines
+            for (let y = 0; y <= settings.gridSizeY; y++)
+            {
+                const p1 = transform.toClipSpace().position(0, y * settings.cellSize);
+                const p2 = transform.toClipSpace().position(settings.gridSizeX * settings.cellSize, y * settings.cellSize);
+                p5.line(p1.x, p1.y, p2.x, p2.y);
+            }
+
+            // draw vertical lines
+            for (let x = 0; x <= settings.gridSizeX; x++)
+            {
+                const p1 = transform.toClipSpace().position(x * settings.cellSize, 0);
+                const p2 = transform.toClipSpace().position(x * settings.cellSize, settings.gridSizeY * settings.cellSize);
+                p5.line(p1.x, p1.y, p2.x, p2.y);
+            }
 
             // render particles
             for (let i = 0; i < particles.count; i++)
