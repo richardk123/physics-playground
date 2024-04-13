@@ -22,7 +22,7 @@ export const SimpleGpu = () =>
             maxParticleCount: 400000,
             gridSizeY: count * 2,
             gridSizeX: count,
-            subStepCount: 8,
+            subStepCount: 16,
             deltaTime: 1 / 60,
             cellSize: 1.2 / Math.sqrt(2),
             gravity: {x: 0, y: -10},
@@ -30,7 +30,7 @@ export const SimpleGpu = () =>
         }
         const camera: Camera = {
             zoom: 0.0007 * settings.gridSizeX,
-            translation: {x: count / 2 - 1, y: count / 2 - 1},
+            translation: {x: count / 2 - 10, y: count / 4},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -40,7 +40,8 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                engine.createRectangleRandom(0, 0, 190, 128);
+                const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
+                engine.createRectangleRandom(0, 0, fullWidth, 128);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);

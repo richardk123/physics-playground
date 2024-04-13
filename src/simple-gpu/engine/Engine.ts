@@ -6,6 +6,7 @@ import {Renderer} from "./Renderer";
 import {Camera} from "./data/Camera";
 import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer} from "./data/PrefixSum";
+import {PositionChangeBuffer} from "./data/PositionChange";
 
 export class Engine
 {
@@ -34,9 +35,10 @@ export class Engine
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
         const gridBuffer = new GridBuffer(engine, settings);
         const prefixSumBuffer = new PrefixSumBuffer(engine, settings);
+        const positionChangeBuffer = new PositionChangeBuffer(engine, settings);
 
         const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer,
-            gridBuffer, prefixSumBuffer);
+            gridBuffer, prefixSumBuffer, positionChangeBuffer);
 
         const renderer = await Renderer.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);

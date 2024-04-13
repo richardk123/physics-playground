@@ -31,7 +31,7 @@ export class GridBuffer
         const numberOfCells = this.settings.gridSizeX * this.settings.gridSizeY;
 
         this.cellParticleCountBuffer = engine.createBuffer("cellParticleCount", numberOfCells * 4, "storage");
-        this.particleCellOffsetBuffer = engine.createBuffer("particleCellOffset", settings.maxParticleCount, "storage");
+        this.particleCellOffsetBuffer = engine.createBuffer("particleCellOffset", settings.maxParticleCount * 4, "storage");
         this.gpuGrid = new Grid(new ArrayBuffer(0), new ArrayBuffer(0));
     }
 

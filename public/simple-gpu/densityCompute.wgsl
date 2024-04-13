@@ -47,7 +47,7 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
     for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
         let startGridId = u32(max(i32(y) - 1, 0));
-        let endGridId = min(y + 2, gridSize);
+        let endGridId = min(y + 1, gridSize);
 
         let particleStartId = prefixSum[startGridId] - cellParticleCount[startGridId];
         let particleEndId = prefixSum[endGridId];

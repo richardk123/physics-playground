@@ -37,7 +37,7 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
     for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
         let startGridId = u32(max(i32(y) - 1, 0));
-        let endGridId = min(y + 2, gridSize);
+        let endGridId = min(y + 1, gridSize);
 
         let particleStartId = prefixSum[startGridId] - cellParticleCount[startGridId];
         let particleEndId = prefixSum[endGridId];
@@ -52,7 +52,8 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
             {
                 let dist = length(diff);
                 let corr = ((1.0 - dist) * 0.025);
-                particles[particleIndex].positionCurrent += diff * corr;
+                positionChange[particleIndex] += diff * corr;
+//                particles[particleIndex].positionCurrent += diff * corr;
 //                particles[anotherParticleIndex].positionCurrent += diff * -corr;
             }
         }
@@ -64,6 +65,7 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
 @binding(1) @group(0) var<storage, read_write> particles: array<Particle>;
 @binding(2) @group(0) var<storage, read> prefixSum : array<u32>;
 @binding(3) @group(0) var<storage, read> cellParticleCount : array<u32>;
+@binding(4) @group(0) var<storage, read_write> positionChange : array<vec2<f32>>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
