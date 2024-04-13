@@ -1,6 +1,6 @@
 const PI: f32 = 3.14159265359;
 const TARGET_DENSITY: f32 = 0.1;
-const PRESSURE_MULTIPLIER: f32 = 0.5;
+const PRESSURE_MULTIPLIER: f32 = 2.5;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
 struct Settings
@@ -28,14 +28,10 @@ fn getGridID(p: vec2<f32>) -> u32 {
   return (settings.gridSizeX * y) + x;
 }
 
-fn smoothingKernelDerivative(distance: f32, radius: f32) -> f32
+fn smoothingKernelDerivative(distance: f32) -> f32
 {
-    if (distance >= radius)
-    {
-        return 0.0;
-    }
-    let scale = 12 / (pow(radius, 4) * PI);
-    return (distance - radius) * scale;
+    let scale = 12 / (pow(SMOOTHING_RADIUS, 4) * PI);
+    return (distance - SMOOTHING_RADIUS) * scale;
 }
 
 fn convertDensityToPressure(density: f32) -> f32
@@ -51,36 +47,40 @@ fn calculateSharedPressure(densityA: f32, densityB: f32) -> f32
     return (pressureA + pressureB) / 2;
 }
 
-fn updateDensity(p: vec2<f32>, index: u32, yOffset: f32)
+fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
 {
-    let leftX = clamp(p.x - settings.cellSize, 0.0, f32(settings.gridSizeX));
-    let rightX = clamp(p.x + settings.cellSize, 0.0, f32(settings.gridSizeX));
-    let y = clamp(p.y + yOffset, 0.0, f32(settings.gridSizeY));
-
-    let gridSize = settings.gridSizeX * settings.gridSizeY;
-    let startId = clamp(getGridID(vec2<f32>(leftX, y)), 0, gridSize);
-    let endId = clamp(getGridID(vec2<f32>(rightX, y)), 0, gridSize);
-
-    var particleStartId: u32 = clamp(prefixSum[startId] - 1, 0, settings.particleCount - 1);
-
-    if (startId == 0)
+    let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
+    let t1 = i32(gridId) - i32(settings.gridSizeX);
+    var startY = u32(t1);
+    if (t1 < 0)
     {
-        particleStartId = 0;
+        startY = gridId;
     }
+    let endY = min(gridId + settings.gridSizeX, gridSize);
 
-    let particleEndId: u32 = clamp(prefixSum[endId] - 1, 0, settings.particleCount - 1);
     var moveVec = vec2<f32>(0.0, 0.0);
 
-    for (var anotherParticleIndex = particleStartId; anotherParticleIndex <= particleEndId; anotherParticleIndex++)
+    for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
-        let anotherParticle = particles[anotherParticleIndex].positionCurrent;
-        let direction = normalize(anotherParticle - p);
-        let dist = distance(p, anotherParticle);
+        let startGridId = u32(max(i32(y) - 1, 0));
+        let endGridId = min(y + 2, gridSize);
 
-        if (anotherParticleIndex != index && dist != 0.0)
+        let particleStartId = prefixSum[startGridId] - cellParticleCount[startGridId];
+        let particleEndId = prefixSum[endGridId];
+
+        for (var anotherParticleIndex = particleStartId; anotherParticleIndex < particleEndId; anotherParticleIndex++)
         {
-            let slope = smoothingKernelDerivative(dist, SMOOTHING_RADIUS);
-            let densityA = particles[index].density;
+            let anotherParticle = particles[anotherParticleIndex].positionCurrent;
+            let direction = normalize(anotherParticle - p);
+            let dist = distance(p, anotherParticle);
+
+            if (dist <= 0.0 || dist >= SMOOTHING_RADIUS)
+            {
+                continue;
+            }
+
+            let slope = smoothingKernelDerivative(dist);
+            let densityA = particles[particleIndex].density;
             let densityB = particles[anotherParticleIndex].density;
             let sharedPressure = calculateSharedPressure(densityA, densityB);
 
@@ -93,25 +93,23 @@ fn updateDensity(p: vec2<f32>, index: u32, yOffset: f32)
         }
     }
 
-    particles[index].positionCurrent += moveVec * settings.dt;
+    particles[particleIndex].positionCurrent += moveVec * settings.dt;
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
 @group(0) @binding(1) var<storage, read_write> particles: array<Particle>;
 @group(0) @binding(2) var<storage, read> prefixSum : array<u32>;
+@group(0) @binding(3) var<storage, read> cellParticleCount : array<u32>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
-    let index: u32 = id.x;
-
-    if (index >= settings.particleCount)
+    if (id.x >= settings.particleCount)
     {
         return;
     }
 
-    let p = particles[index].positionCurrent;
-    updateDensity(p, index, -settings.cellSize);
-    updateDensity(p, index, 0.0);
-    updateDensity(p, index, settings.cellSize);
+    let p = particles[id.x].positionCurrent;
+    let gridId = getGridID(p);
+    updateDensity(gridId, p, id.x);
 }

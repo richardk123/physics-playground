@@ -65,6 +65,7 @@ export class Solvers
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
             .build();
 
         const boundingBox = await engine.createComputeShader("boundingBox")
@@ -102,7 +103,7 @@ export class Solvers
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
 
                     densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    densitySolve.dispatch(Math.ceil(particleCount / 256));
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)

@@ -14,22 +14,22 @@ export const SimpleGpu = () =>
     const [engine, setEngine] = useState<Engine | undefined>();
 
     // must be power of 8
-    const count = 4;
+    const count = 192;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 400000,
-            gridSizeY: count * 2,
-            gridSizeX: count * 2,
-            subStepCount: 1,
+            gridSizeY: count,
+            gridSizeX: count,
+            subStepCount: 4,
             deltaTime: 1 / 60,
-            cellSize: 2.0,
+            cellSize: 1.697,
             gravity: {x: 0, y: 0},
-            debug: true,
+            debug: false,
         }
         const camera: Camera = {
-            zoom: 0.024,
+            zoom: 0.0023 * count,
             translation: {x: count / 2, y: count / 2},
             rotation: 0,
         }
@@ -40,7 +40,12 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                engine.createRectangle(0, 0, count, count);
+                // engine.createRectangle(0, 0, count, count);
+                // engine.createRectangle(12, 0, count, count);
+                // engine.createRectangle(12, 12, count, count);
+                // engine.createRectangle(0, 12, count, count);
+
+                engine.createRectangle(0, 0, count - 1, count - 1);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
@@ -49,31 +54,31 @@ export const SimpleGpu = () =>
                 engine.render()
             })
     }, []);
-
-    return <div className="flex h-full bg-gray-200">
-        <div className="flex-1 flex flex-col h-full">
-            <div className="flex h-1/2">
-                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
-                {engine && <ParticlesDebugRenderer engine={engine} />}
-            </div>
-            <div className="flex h-1/2">
-                {engine && <GridDebugRenderer engine={engine} />}
-                {engine && <DensityDebugRenderer engine={engine} />}
-            </div>
-        </div>
-        <div className="w-64 h-full text-white">
-            {engine && <Sidebar engine={engine}/>}
-        </div>
-    </div>;
     //
     // return <div className="flex h-full bg-gray-200">
     //     <div className="flex-1 flex flex-col h-full">
-    //         <div className="flex h-full">
+    //         <div className="flex h-1/2">
     //             <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+    //             {engine && <ParticlesDebugRenderer engine={engine} />}
+    //         </div>
+    //         <div className="flex h-1/2">
+    //             {engine && <GridDebugRenderer engine={engine} />}
+    //             {engine && <DensityDebugRenderer engine={engine} />}
     //         </div>
     //     </div>
     //     <div className="w-64 h-full text-white">
     //         {engine && <Sidebar engine={engine}/>}
     //     </div>
     // </div>;
+
+    return <div className="flex h-full bg-gray-200">
+        <div className="flex-1 flex flex-col h-full">
+            <div className="flex h-full">
+                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+            </div>
+        </div>
+        <div className="w-64 h-full text-white">
+            {engine && <Sidebar engine={engine}/>}
+        </div>
+    </div>;
 }
