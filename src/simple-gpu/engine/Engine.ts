@@ -2,11 +2,13 @@ import {Solver, Solvers} from "./Solver";
 import {Particles, ParticlesBuffer} from "./data/Particles";
 import {EngineSettings, EngineSettingsBuffer} from "./data/EngineSettings";
 import {GPUEngine} from "./common/GPUEngine";
-import {Renderer} from "./Renderer";
+import {RendererCircle} from "./renderer/RendererCircle";
 import {Camera} from "./data/Camera";
 import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
+import {Renderer} from "./renderer/Renderer";
+import {RendererFluid} from "./renderer/RendererFluid";
 
 export class Engine
 {
@@ -40,7 +42,7 @@ export class Engine
         const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer,
             gridBuffer, prefixSumBuffer, positionChangeBuffer);
 
-        const renderer = await Renderer.create(engine, camera, particlesBuffer);
+        const renderer = await RendererCircle.create(engine, camera, particlesBuffer);
         return new Engine(engine, solver, renderer);
     }
 

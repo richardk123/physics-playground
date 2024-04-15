@@ -12,6 +12,7 @@ export interface Solver
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
     prefixSumBuffer: () => PrefixSumBuffer;
+    msPerFrame: () => number;
 }
 
 export class Solvers
@@ -89,9 +90,13 @@ export class Solvers
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .build();
 
+        let msPerFrame = 0;
+
         return {
             simulate: async (): Promise<void> =>
             {
+                const start = performance.now();
+
                 settingsBuffer.write();
                 particlesBuffer.write();
 
@@ -132,11 +137,13 @@ export class Solvers
                         // await prefixSum.printGPUData();
                     }
                 }
+                msPerFrame = performance.now() - start;
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
             prefixSumBuffer: () => prefixSum.buffer,
+            msPerFrame: () => msPerFrame,
         };
     }
 }

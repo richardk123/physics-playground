@@ -14,12 +14,12 @@ export const SimpleGpu = () =>
     const [engine, setEngine] = useState<Engine | undefined>();
 
     // must be power of 8
-    const count = 256;
+    const count = 512;
 
     useEffect(() =>
     {
         const settings: EngineSettings = {
-            maxParticleCount: 400000,
+            maxParticleCount: 1000000,
             gridSizeY: count,
             gridSizeX: count,
             subStepCount: 8,
@@ -41,13 +41,13 @@ export const SimpleGpu = () =>
                 setEngine(engine);
 
                 const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
-                engine.createRectangleRandom(0, 0, fullWidth, 128);
+                engine.createRectangleRandom(0, 0, fullWidth, fullWidth);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
 
                 await engine.next();
-                engine.render()
+                engine.render();
             })
     }, []);
     //

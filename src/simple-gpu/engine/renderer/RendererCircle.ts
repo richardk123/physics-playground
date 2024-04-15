@@ -1,8 +1,9 @@
-import {GPUEngine} from "./common/GPUEngine";
-import {Camera, CameraBuffer} from "./data/Camera";
-import {ParticlesBuffer} from "./data/Particles";
+import {GPUEngine} from "../common/GPUEngine";
+import {Camera, CameraBuffer} from "../data/Camera";
+import {ParticlesBuffer} from "../data/Particles";
+import {Renderer} from "./Renderer";
 
-export class Renderer
+export class RendererCircle implements Renderer
 {
     private engine: GPUEngine;
 
@@ -82,10 +83,10 @@ export class Renderer
                         camera: Camera,
                         particlesBuffer: ParticlesBuffer)
     {
-        const shaderCode = await (fetch('/physics-playground/simple-gpu/renderShader.wgsl')
+        const shaderCode = await (fetch('/physics-playground/simple-gpu/renderCircleShader.wgsl')
             .then((r) => r.text()));
 
-        return new Renderer(engine, shaderCode, camera, particlesBuffer);
+        return new RendererCircle(engine, shaderCode, camera, particlesBuffer);
     }
 
 
