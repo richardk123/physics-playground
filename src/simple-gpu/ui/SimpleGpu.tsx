@@ -20,12 +20,12 @@ export const SimpleGpu = () =>
     {
         const settings: EngineSettings = {
             maxParticleCount: 400000,
-            gridSizeY: count * 2,
+            gridSizeY: count,
             gridSizeX: count,
             subStepCount: 8,
             deltaTime: 1 / 60,
             cellSize: 1.2 / Math.sqrt(2),
-            gravity: {x: 0, y: 0},
+            gravity: {x: 0, y: -10},
             debug: false,
         }
         const camera: Camera = {

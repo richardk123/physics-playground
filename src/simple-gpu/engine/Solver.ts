@@ -113,12 +113,12 @@ export class Solvers
 
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
 
-                    // collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                    // positionChangeApply.dispatch(Math.ceil(particleCount / 256));
-
-                    densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
                     positionChangeApply.dispatch(Math.ceil(particleCount / 256));
+
+                    // densityCompute.dispatch(Math.ceil(particleCount / 256));
+                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    // positionChangeApply.dispatch(Math.ceil(particleCount / 256));
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 

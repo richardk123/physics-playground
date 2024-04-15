@@ -25,5 +25,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     let inverseDt: f32 = 1 / settings.dt;
     // update velocity
-    particles[id.x].velocity = (particles[id.x].positionCurrent - particles[id.x].positionPrevious) * inverseDt;
+    // damping
+    particles[id.x].velocity = (particles[id.x].positionCurrent - particles[id.x].positionPrevious) * inverseDt * 0.999;
 }
