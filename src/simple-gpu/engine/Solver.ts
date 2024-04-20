@@ -111,30 +111,30 @@ export class Solvers
                     gridClear.dispatch(Math.ceil(numberOfCells / 256));
                     gridUpdate.dispatch(Math.ceil(particleCount / 256));
 
-                    await prefixSum.dispatch(gridBuffer);
+                    prefixSum.dispatch(gridBuffer);
 
                     particleSort.dispatch(Math.ceil(particleCount / 256));
                     particlesBuffer.swapBuffers();
 
                     boundingBox.dispatch(Math.ceil(particleCount / 256));
 
-                    collisionSolve.dispatch(Math.ceil(particleCount / 256));
-                    positionChangeApply.dispatch(Math.ceil(particleCount / 256));
-
-                    // densityCompute.dispatch(Math.ceil(particleCount / 256));
-                    // densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    // collisionSolve.dispatch(Math.ceil(particleCount / 256));
                     // positionChangeApply.dispatch(Math.ceil(particleCount / 256));
+
+                    densityCompute.dispatch(Math.ceil(particleCount / 256));
+                    densitySolve.dispatch(Math.ceil(particleCount / 256));
+                    positionChangeApply.dispatch(Math.ceil(particleCount / 256));
 
                     postSolve.dispatch(Math.ceil(particleCount / 256));
 
                     if (settingsBuffer.settings.debug)
                     {
                         await particlesBuffer.loadFromGpu();
-                        await particlesBuffer.printParticlesFromGpu();
                         await settingsBuffer.loadFromGpu();
-                        // console.log(settingsBuffer.gpuData);
                         await gridBuffer.loadFromGpu();
                         // await prefixSum.printGPUData();
+                        // await particlesBuffer.printParticlesFromGpu();
+                        console.log(settingsBuffer.gpuData);
                     }
                 }
                 msPerFrame = performance.now() - start;

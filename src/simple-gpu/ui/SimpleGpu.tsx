@@ -14,7 +14,7 @@ export const SimpleGpu = () =>
     const [engine, setEngine] = useState<Engine | undefined>();
 
     // must be power of 8
-    const count = 512;
+    const count = 256;
 
     useEffect(() =>
     {
@@ -41,7 +41,7 @@ export const SimpleGpu = () =>
                 setEngine(engine);
 
                 const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
-                engine.createRectangleRandom(0, 0, fullWidth, fullWidth);
+                engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2);
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);

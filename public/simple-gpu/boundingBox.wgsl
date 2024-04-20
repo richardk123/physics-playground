@@ -7,6 +7,7 @@ struct Settings
     dt: f32,
     cellSize: f32,
     gravity: vec2<f32>,
+    mouse: vec2<f32>,
 }
 
 struct Particle
@@ -31,4 +32,13 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     // bounding box
     particles[id.x].positionCurrent.x = clamp(particles[id.x].positionCurrent.x, 0, f32(settings.gridSizeX) * settings.cellSize - 0.001);
     particles[id.x].positionCurrent.y = clamp(particles[id.x].positionCurrent.y, 0, f32(settings.gridSizeY) * settings.cellSize - 0.001);
+
+    // mouse diff
+    let mouseDiff =  particles[id.x].positionCurrent - settings.mouse;
+    let mouseDist = length(mouseDiff);
+    if (mouseDist < 10)
+    {
+        let normal = normalize(mouseDiff);
+        particles[id.x].positionCurrent += normal * mouseDist * settings.dt;
+    }
 }

@@ -7,6 +7,7 @@ struct Settings
     dt: f32,
     cellSize: f32,
     gravity: vec2<f32>,
+    mouse: vec2<f32>,
 }
 
 @binding(0) @group(0) var<uniform> settings : Settings;

@@ -8,7 +8,6 @@ import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
 import {Renderer} from "./renderer/Renderer";
-import {RendererFluid} from "./renderer/RendererFluid";
 
 export class Engine
 {
@@ -34,7 +33,7 @@ export class Engine
         const particles = Particles.create(settings.maxParticleCount);
 
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
-        const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles);
+        const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles, camera);
         const gridBuffer = new GridBuffer(engine, settings);
         const prefixSumBuffer = new PrefixSumBuffer(engine, settings);
         const positionChangeBuffer = new PositionChangeBuffer(engine, settings);

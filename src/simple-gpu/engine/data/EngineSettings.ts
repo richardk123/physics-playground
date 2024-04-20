@@ -2,6 +2,9 @@ import {GPUEngine} from "../common/GPUEngine";
 import {Buffer} from "../common/Buffer";
 import {Particles} from "./Particles";
 import {Vec2d} from "./Vec2d";
+import {Camera} from "./Camera";
+import {Transformer} from "../common/Transformer";
+import {MouseTracker} from "../common/MouseTracker";
 
 export interface EngineSettings
 {
@@ -25,6 +28,8 @@ export interface SettingsGpuData
     deltaTime: number;
     gravityX: number;
     gravityY: number;
+    mouseX: number;
+    mouseY: number;
 }
 
 export class EngineSettingsBuffer
@@ -33,6 +38,7 @@ export class EngineSettingsBuffer
     public settings: EngineSettings;
     private particles: Particles;
     public gpuData: SettingsGpuData;
+    private mouseTracker: MouseTracker;
 
     readonly intData: Uint32Array;
     readonly floatData: Float32Array;
@@ -40,18 +46,22 @@ export class EngineSettingsBuffer
 
     constructor(engine: GPUEngine,
                 settings: EngineSettings,
-                particles: Particles)
+                particles: Particles,
+                camera: Camera)
     {
         this.settings = settings;
         this.particles = particles;
-        const structSizeBytes = 32;
+        this.mouseTracker = new MouseTracker(camera, engine.canvas)
+
+        const structSizeBytes = 40;
         this.buffer = engine.createBuffer("engine-settings", structSizeBytes, "uniform");
         this.data = new ArrayBuffer(structSizeBytes);
 
         this.intData = new Uint32Array(this.data);
         this.floatData = new Float32Array(this.data);
         this.gpuData = {particleCount: 0, gridSizeY: 0, gridSizeX: 0,
-            cellSize: 0, subStepCount: 1, deltaTime: 0, gravityX: 0, gravityY: 0};
+            cellSize: 0, subStepCount: 1, deltaTime: 0, gravityX: 0, gravityY: 0,
+            mouseX: 0, mouseY: 0};
     }
 
     public write()
@@ -64,6 +74,8 @@ export class EngineSettingsBuffer
         this.floatData[5] = this.settings.cellSize;
         this.floatData[6] = Math.sign(this.settings.gravity.x) * (this.settings.gravity.x * this.settings.gravity.x);
         this.floatData[7] = Math.sign(this.settings.gravity.y) * (this.settings.gravity.y * this.settings.gravity.y);
+        this.floatData[8] = this.mouseTracker.x;
+        this.floatData[9] = this.mouseTracker.y;
         this.buffer.writeBuffer(this.data)
     }
 
@@ -81,6 +93,8 @@ export class EngineSettingsBuffer
             cellSize: floatData[5],
             gravityX: floatData[6],
             gravityY: floatData[7],
+            mouseX: floatData[8],
+            mouseY: floatData[9],
         }
     }
 }
