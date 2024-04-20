@@ -1,5 +1,5 @@
 const PI: f32 = 3.14159265359;
-const TARGET_DENSITY: f32 = 1.4;
+const TARGET_DENSITY: f32 = 1.2;
 const PRESSURE_MULTIPLIER: f32 = 90;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
@@ -12,6 +12,7 @@ struct Settings
     dt: f32,
     cellSize: f32,
     gravity: vec2<f32>,
+    mouse: vec2<f32>,
 }
 
 struct Particle
@@ -20,6 +21,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {

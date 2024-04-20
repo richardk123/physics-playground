@@ -11,6 +11,7 @@ struct Settings
     dt: f32,
     cellSize: f32,
     gravity: vec2<f32>,
+    mouse: vec2<f32>,
 }
 
 struct Particle
@@ -19,6 +20,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {

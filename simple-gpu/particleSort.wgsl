@@ -7,6 +7,7 @@ struct Settings
     dt: f32,
     cellSize: f32,
     gravity: vec2<f32>,
+    mouse: vec2<f32>,
 }
 
 struct Particle
@@ -15,6 +16,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
@@ -46,4 +48,5 @@ fn main(@builtin(global_invocation_id) id : vec3<u32>)
     targetParticles[targetIndex].positionPrevious = sourceParticles[index].positionPrevious;
     targetParticles[targetIndex].velocity = sourceParticles[index].velocity;
     targetParticles[targetIndex].density = sourceParticles[index].density;
+    targetParticles[targetIndex].color = sourceParticles[index].color;
 }

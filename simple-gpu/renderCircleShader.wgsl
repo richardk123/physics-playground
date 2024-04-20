@@ -16,11 +16,13 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 struct VertexOutput {
     @builtin(position) transformedPos: vec4<f32>,
     @location(0) localSpace: vec2<f32>,
+    @location(1) color: vec3<f32>,
 }
 
 @group(0) @binding(0) var<uniform> camera: Camera;
@@ -38,6 +40,7 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
 
     out.transformedPos = transformedPos;
     out.localSpace = TRIANGLE[vertexIndex];
+    out.color = particles[instanceIndex].color;
     return out;
 }
 
@@ -48,5 +51,5 @@ fn fs(in: VertexOutput) -> @location(0) vec4f
     {
         discard;
     }
-    return vec4(1.0, 1.0, 1.0, 1.0);
+    return vec4(in.color, 1.0);
 }
