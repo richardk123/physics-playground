@@ -8,6 +8,7 @@ import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
 import {Renderer} from "./renderer/Renderer";
+import {Color} from "./data/Color";
 
 export class Engine
 {
@@ -47,7 +48,8 @@ export class Engine
 
 
     public createRectangle(bottomLeftX: number, bottomLeftY: number,
-                           width: number, height: number)
+                           width: number, height: number,
+                           color: Color)
     {
         for (let y = 0; y < height; y++)
         {
@@ -55,28 +57,29 @@ export class Engine
             {
                 const nx = bottomLeftX + x * 1.1;
                 const ny = bottomLeftY + y * 1.1;
-                this.addPoint(nx, ny);
+                this.addPoint(nx, ny, color);
             }
         }
     }
 
     public createRectangleRandom(bottomLeftX: number, bottomLeftY: number,
-                                 width: number, height: number)
+                                 width: number, height: number,
+                                 color: Color)
     {
         for (let y = 0; y < height; y++)
         {
             for (let x = 0; x < width; x++)
             {
-                const nx = bottomLeftX + x * 1.1 + Math.random() * 0.01;
-                const ny = bottomLeftY + y * 1.1 + Math.random() * 0.01;
-                this.addPoint(nx, ny);
+                const nx = bottomLeftX + (x * 1.1) + (Math.random() * 0.01);
+                const ny = bottomLeftY + (y * 1.1) + (Math.random() * 0.01);
+                this.addPoint(nx, ny, color);
             }
         }
     }
 
-    public addPoint(x: number, y: number)
+    public addPoint(x: number, y: number, color: Color)
     {
-        this.solver.particlesBuffer.particles.addPoint(x, y);
+        this.solver.particlesBuffer.particles.addPoint(x, y, color);
     }
 
     public stop()

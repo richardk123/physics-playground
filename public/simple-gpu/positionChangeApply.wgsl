@@ -16,6 +16,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 @binding(0) @group(0) var<uniform> settings : Settings;

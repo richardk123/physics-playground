@@ -7,6 +7,7 @@ import {Sidebar} from "./components/Sidebar";
 import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
 import {DensityDebugRenderer} from "./components/debug/DensityDebugRenderer";
+import {Colors} from "../engine/data/Color";
 
 export const SimpleGpu = () =>
 {
@@ -29,8 +30,8 @@ export const SimpleGpu = () =>
             debug: false,
         }
         const camera: Camera = {
-            zoom: 0.0007 * settings.gridSizeX,
-            translation: {x: count / 2 - 10, y: count / 4},
+            zoom: 0.0008 * settings.gridSizeX,
+            translation: {x:108.33, y: 76.44},
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -41,7 +42,10 @@ export const SimpleGpu = () =>
                 setEngine(engine);
 
                 const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
-                engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2);
+                // engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, Colors.blue());
+
+                engine.createRectangleRandom(0, 10, fullWidth / 2, fullWidth / 2, Colors.blue())
+                engine.createRectangleRandom((fullWidth / 2) * 1.1, 40, fullWidth / 2 - 5, fullWidth / 2, Colors.red())
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);

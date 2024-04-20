@@ -133,8 +133,8 @@ export class Solvers
                         await settingsBuffer.loadFromGpu();
                         await gridBuffer.loadFromGpu();
                         // await prefixSum.printGPUData();
-                        // await particlesBuffer.printParticlesFromGpu();
-                        console.log(settingsBuffer.gpuData);
+                        await particlesBuffer.printParticlesFromGpu();
+                        // console.log(settingsBuffer.gpuData);
                     }
                 }
                 msPerFrame = performance.now() - start;

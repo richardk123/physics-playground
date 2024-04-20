@@ -16,6 +16,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    color: vec3<f32>,
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
@@ -39,6 +40,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     if (mouseDist < 10)
     {
         let normal = normalize(mouseDiff);
-        particles[id.x].positionCurrent += normal * mouseDist * settings.dt;
+        particles[id.x].positionCurrent += normal * max(mouseDist, 1.0) * settings.dt;
     }
 }

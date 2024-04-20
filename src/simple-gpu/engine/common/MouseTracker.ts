@@ -3,8 +3,8 @@ import {Transformer} from "./Transformer";
 
 export class MouseTracker
 {
-    public x: number = 0;
-    public y: number = 0;
+    public x: number = -1000;
+    public y: number = -1000;
 
     constructor(camera: Camera,
                 canvas: HTMLCanvasElement)
