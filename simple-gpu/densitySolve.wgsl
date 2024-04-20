@@ -1,6 +1,6 @@
 const PI: f32 = 3.14159265359;
 const TARGET_DENSITY: f32 = 1.2;
-const PRESSURE_MULTIPLIER: f32 = 90;
+const PRESSURE_MULTIPLIER: f32 = 80;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
 struct Settings

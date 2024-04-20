@@ -64,6 +64,8 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
             let dist = distance(p, anotherParticle);
             let influence = smoothingKernel(dist);
             particles[particleIndex].density += influence; //TODO: mass
+
+            // collor mixing
             let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
             particles[particleIndex].color = mix(particles[particleIndex].color, particles[i].color, colorMixStrength);
         }

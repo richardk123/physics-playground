@@ -40,6 +40,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     if (mouseDist < 10)
     {
         let normal = normalize(mouseDiff);
-        particles[id.x].positionCurrent += normal * max(mouseDist, 1.0) * settings.dt;
+        particles[id.x].positionCurrent += normal * max(mouseDist, 0.3) * settings.dt;
     }
 }
