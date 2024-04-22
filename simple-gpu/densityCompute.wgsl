@@ -1,7 +1,6 @@
 const PI: f32 = 3.14159265359;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
-
 struct Settings
 {
     particleCount: u32,
@@ -20,6 +19,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    mass: f32,
     color: vec3<f32>,
 }
 
@@ -31,15 +31,11 @@ fn getGridID(p: vec2<f32>) -> u32 {
 
 fn smoothingKernel(distance: f32) -> f32
 {
-    if (distance >= SMOOTHING_RADIUS)
-    {
-        return 0.0;
-    }
     let volume = (PI * pow(SMOOTHING_RADIUS, 4)) / 6;
     return ((SMOOTHING_RADIUS - distance) * (SMOOTHING_RADIUS - distance)) / volume;
 }
 
-fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
+fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
 {
     let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
     let t1 = i32(gridId) - i32(settings.gridSizeX);
@@ -60,14 +56,17 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
 
         for (var i = particleStartId; i < particleEndId; i++)
         {
-            let anotherParticle = particles[i].positionCurrent;
-            let dist = distance(p, anotherParticle);
-            let influence = smoothingKernel(dist);
-            particles[particleIndex].density += influence; //TODO: mass
+            let anotherParticle = particles[i];
+            let dist = distance(particle.positionCurrent, anotherParticle.positionCurrent);
+            if (dist < SMOOTHING_RADIUS)
+            {
+                let influence = smoothingKernel(dist);
+                particles[particleIndex].density += influence * particle.mass;
 
-            // collor mixing
-            let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
-            particles[particleIndex].color = mix(particles[particleIndex].color, particles[i].color, colorMixStrength);
+                // collor mixing
+                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
+                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
+            }
         }
     }
 }
@@ -85,7 +84,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
         return;
     }
 
-    let p = particles[id.x].positionCurrent;
-    let gridId = getGridID(p);
-    updateDensity(gridId, p, id.x);
+    let particle = particles[id.x];
+    let gridId = getGridID(particle.positionCurrent);
+    updateDensity(gridId, particle, id.x);
 }

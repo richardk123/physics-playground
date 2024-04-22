@@ -16,6 +16,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    mass: f32,
     color: vec3<f32>,
 }
 
@@ -44,9 +45,5 @@ fn main(@builtin(global_invocation_id) id : vec3<u32>)
     let gridId = getGridID(sourceParticles[index].positionCurrent);
     let targetIndex = prefixSum[gridId] - 1 - particleCellOffset[index];
 
-    targetParticles[targetIndex].positionCurrent = sourceParticles[index].positionCurrent;
-    targetParticles[targetIndex].positionPrevious = sourceParticles[index].positionPrevious;
-    targetParticles[targetIndex].velocity = sourceParticles[index].velocity;
-    targetParticles[targetIndex].density = sourceParticles[index].density;
-    targetParticles[targetIndex].color = sourceParticles[index].color;
+    targetParticles[targetIndex] = sourceParticles[index];
 }
