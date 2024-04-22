@@ -26,7 +26,7 @@ export const SimpleGpu = () =>
             gridSizeX: count,
             subStepCount: 8,
             deltaTime: 1 / 60,
-            cellSize: 1.2,
+            cellSize: 1.3 / Math.sqrt(2),
             gravity: {x: 0, y: -10},
             debug: false,
         }
@@ -55,7 +55,7 @@ export const SimpleGpu = () =>
 
                 engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
                     fullWidth / 2 - 10, fullWidth / 1,
-                    1.0, Colors.red());
+                    1.0, Colors.green());
 
                 // engine.createRectangleRandom(0, 0,
                 //     fullWidth / 2, fullWidth / 3 - 10,
