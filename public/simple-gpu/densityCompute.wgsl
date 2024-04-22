@@ -31,10 +31,6 @@ fn getGridID(p: vec2<f32>) -> u32 {
 
 fn smoothingKernel(distance: f32) -> f32
 {
-    if (distance >= SMOOTHING_RADIUS)
-    {
-        return 0.0;
-    }
     let volume = (PI * pow(SMOOTHING_RADIUS, 4)) / 6;
     return ((SMOOTHING_RADIUS - distance) * (SMOOTHING_RADIUS - distance)) / volume;
 }
@@ -62,10 +58,15 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
         {
             let anotherParticle = particles[i].positionCurrent;
             let dist = distance(p, anotherParticle);
-            let influence = smoothingKernel(dist);
-            particles[particleIndex].density += influence; //TODO: mass
-            let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
-            particles[particleIndex].color = mix(particles[particleIndex].color, particles[i].color, colorMixStrength);
+            if (dist < SMOOTHING_RADIUS)
+            {
+                let influence = smoothingKernel(dist);
+                particles[particleIndex].density += influence; //TODO: mass
+
+                // collor mixing
+                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
+                particles[particleIndex].color = mix(particles[particleIndex].color, particles[i].color, colorMixStrength);
+            }
         }
     }
 }

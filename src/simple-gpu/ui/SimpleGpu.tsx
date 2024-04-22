@@ -44,8 +44,8 @@ export const SimpleGpu = () =>
                 const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
                 // engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, Colors.blue());
 
-                engine.createRectangleRandom(0, 10, fullWidth / 2, fullWidth / 2, Colors.blue())
-                engine.createRectangleRandom((fullWidth / 2) * 1.1, 40, fullWidth / 2 - 5, fullWidth / 2, Colors.red())
+                engine.createRectangleRandom(0, 0, fullWidth / 2, fullWidth / 1.5, Colors.blue())
+                engine.createRectangleRandom((fullWidth / 2) * 1.1, 0, fullWidth / 2 - 10, fullWidth / 1.5, Colors.red())
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
