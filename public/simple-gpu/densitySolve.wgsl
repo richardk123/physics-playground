@@ -33,12 +33,9 @@ fn getGridID(p: vec2<f32>) -> u32 {
 
 fn smoothingKernelDerivative(distance: f32) -> f32
 {
-    if (distance >= SMOOTHING_RADIUS)
-    {
-        return 0.0;
-    }
     let scale = 12 / (pow(SMOOTHING_RADIUS, 4) * PI);
-    return (distance - SMOOTHING_RADIUS) * scale;
+    let test = min(distance - SMOOTHING_RADIUS, 0);
+    return test * scale;
 }
 
 fn convertDensityToPressure(density: f32) -> f32
@@ -54,7 +51,7 @@ fn calculateSharedPressure(densityA: f32, densityB: f32) -> f32
     return (pressureA + pressureB) / 2;
 }
 
-fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
+fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
 {
     let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
     let t1 = i32(gridId) - i32(settings.gridSizeX);
@@ -77,14 +74,9 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
 
         for (var anotherParticleIndex = particleStartId; anotherParticleIndex < particleEndId; anotherParticleIndex++)
         {
-            if (anotherParticleIndex == particleIndex)
-            {
-                continue;
-            }
+            let anotherParticle = particles[anotherParticleIndex];
 
-            let anotherParticle = particles[anotherParticleIndex].positionCurrent;
-
-            let diff = anotherParticle - p;
+            let diff = anotherParticle.positionCurrent - particle.positionCurrent;
             let dist = length(diff);
 
             if (dist == 0.0)
@@ -94,8 +86,8 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
 
             let direction = normalize(diff);
             let slope = smoothingKernelDerivative(dist);
-            let densityA = particles[particleIndex].density;
-            let densityB = particles[anotherParticleIndex].density;
+            let densityA = particle.density;
+            let densityB = anotherParticle.density;
             let sharedPressure = calculateSharedPressure(densityA, densityB);
 
             if (densityB == 0.0)
@@ -124,7 +116,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
         return;
     }
 
-    let p = particles[id.x].positionCurrent;
-    let gridId = getGridID(p);
-    updateDensity(gridId, p, id.x);
+    let particle = particles[id.x];
+    let gridId = getGridID(particle.positionCurrent);
+    updateDensity(gridId, particle, id.x);
 }

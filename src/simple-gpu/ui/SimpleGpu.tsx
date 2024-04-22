@@ -50,11 +50,11 @@ export const SimpleGpu = () =>
                 // engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, Colors.blue());
 
                 engine.createRectangleRandom(0, 0,
-                    fullWidth / 2, fullWidth / 2,
+                    fullWidth / 2, fullWidth / 1,
                     1.0, Colors.blue());
 
                 engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
-                    fullWidth / 2 - 10, fullWidth / 2,
+                    fullWidth / 2 - 10, fullWidth / 1,
                     1.0, Colors.red());
 
                 // engine.createRectangleRandom(0, 0,
