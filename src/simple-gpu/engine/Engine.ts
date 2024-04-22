@@ -49,6 +49,7 @@ export class Engine
 
     public createRectangle(bottomLeftX: number, bottomLeftY: number,
                            width: number, height: number,
+                           mass: number,
                            color: Color)
     {
         for (let y = 0; y < height; y++)
@@ -57,13 +58,14 @@ export class Engine
             {
                 const nx = bottomLeftX + x * 1.1;
                 const ny = bottomLeftY + y * 1.1;
-                this.addPoint(nx, ny, color);
+                this.addPoint(nx, ny, mass, color);
             }
         }
     }
 
     public createRectangleRandom(bottomLeftX: number, bottomLeftY: number,
                                  width: number, height: number,
+                                 mass: number,
                                  color: Color)
     {
         for (let y = 0; y < height; y++)
@@ -72,14 +74,14 @@ export class Engine
             {
                 const nx = bottomLeftX + (x * 1.1) + (Math.random() * 0.01);
                 const ny = bottomLeftY + (y * 1.1) + (Math.random() * 0.01);
-                this.addPoint(nx, ny, color);
+                this.addPoint(nx, ny, mass, color);
             }
         }
     }
 
-    public addPoint(x: number, y: number, color: Color)
+    public addPoint(x: number, y: number, mass: number, color: Color)
     {
-        this.solver.particlesBuffer.particles.addPoint(x, y, color);
+        this.solver.particlesBuffer.particles.addPoint(x, y, mass, color);
     }
 
     public stop()

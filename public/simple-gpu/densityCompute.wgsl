@@ -1,7 +1,6 @@
 const PI: f32 = 3.14159265359;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
-
 struct Settings
 {
     particleCount: u32,
@@ -20,6 +19,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    mass: f32,
     color: vec3<f32>,
 }
 
@@ -61,7 +61,7 @@ fn updateDensity(gridId: u32, p: vec2<f32>, particleIndex: u32)
             if (dist < SMOOTHING_RADIUS)
             {
                 let influence = smoothingKernel(dist);
-                particles[particleIndex].density += influence; //TODO: mass
+                particles[particleIndex].density += influence * particles[particleIndex].mass;
 
                 // collor mixing
                 let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;

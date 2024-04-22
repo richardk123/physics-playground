@@ -1,6 +1,6 @@
 const PI: f32 = 3.14159265359;
 const TARGET_DENSITY: f32 = 1.2;
-const PRESSURE_MULTIPLIER: f32 = 80;
+const PRESSURE_MULTIPLIER: f32 = 50;
 const SMOOTHING_RADIUS: f32 = 1.2;
 
 struct Settings
@@ -21,6 +21,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    mass: f32,
     color: vec3<f32>,
 }
 

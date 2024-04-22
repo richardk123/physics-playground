@@ -35,7 +35,7 @@ export class Particles
         return new Particles(data, count);
     }
 
-    public addPoint(x: number, y: number, color: Color)
+    public addPoint(x: number, y: number, mass: number, color: Color)
     {
         const index = this.count;
         // current pos
@@ -49,9 +49,8 @@ export class Particles
         this.data[index * OFFSET + 5] = 0;
         // density
         this.data[index * OFFSET + 6] = 0;
-        // offset
-        this.data[index * OFFSET + 7] = 0;
-        // this.data[index * OFFSET + 8] = 0;
+        // mass
+        this.data[index * OFFSET + 7] = mass;
         // color
         this.data[index * OFFSET + 8] = color.r / 255;
         this.data[index * OFFSET + 9] = color.g / 255;
@@ -155,7 +154,7 @@ export class ParticlesBuffer
         {
             if (array.every(v => v !== undefined))
             {
-                return `i: ${index}: { cur:[${array[0].toFixed(2)}, ${array[1].toFixed(2)}], pre:[${array[2].toFixed(2)}, ${array[3].toFixed(2)}], vel:[${array[4].toFixed(2)}, ${array[5].toFixed(2)}], density:[${array[6].toFixed(2)}], r:[${array[8].toFixed(2)}], g:[${array[9].toFixed(2)}], b:[${array[10].toFixed(2)}] }`;
+                return `i: ${index}: { cur:[${array[0].toFixed(2)}, ${array[1].toFixed(2)}], pre:[${array[2].toFixed(2)}, ${array[3].toFixed(2)}], vel:[${array[4].toFixed(2)}, ${array[5].toFixed(2)}], density:[${array[6].toFixed(2)}], mass:[${array[7].toFixed(2)}], r:[${array[8].toFixed(2)}], g:[${array[9].toFixed(2)}], b:[${array[10].toFixed(2)}] }`;
             }
             else
             {

@@ -16,6 +16,7 @@ struct Particle
     positionPrevious: vec2<f32>,
     velocity: vec2<f32>,
     density: f32,
+    mass: f32,
     color: vec3<f32>,
 }
 
@@ -37,7 +38,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     // mouse diff
     let mouseDiff =  particles[id.x].positionCurrent - settings.mouse;
     let mouseDist = length(mouseDiff);
-    if (mouseDist < 10)
+    if (mouseDist < 20)
     {
         let normal = normalize(mouseDiff);
         particles[id.x].positionCurrent += normal * max(mouseDist, 0.3) * settings.dt;
