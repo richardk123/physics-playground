@@ -74,7 +74,7 @@ export const SimpleGpu = () =>
     return <div className="flex h-full bg-gray-200">
         <div className="flex-1 flex flex-col h-full">
             <div className="flex h-full">
-                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1280}></canvas>
+                <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1080}></canvas>
             </div>
         </div>
         <div className="w-64 h-full text-white">

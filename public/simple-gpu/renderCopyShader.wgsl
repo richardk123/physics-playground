@@ -30,12 +30,12 @@ struct OurVertexShaderOutput {
 @fragment
 fn fs(fsInput: OurVertexShaderOutput) -> @location(0) vec4f
 {
-  return textureSample(ourTexture, ourSampler, fsInput.texcoord);
-//  let result = textureSample(ourTexture, ourSampler, fsInput.texcoord);
-//  let col = vec3(result.x, result.y, result.z);
-//  if (dot(col, col) == 0.0)
-//  {
-//    discard;
-//  }
-//    return vec4(1.0, 1.0, 1.0, 1.0);
+//  return textureSample(ourTexture, ourSampler, fsInput.texcoord);
+  let result = textureSample(ourTexture, ourSampler, fsInput.texcoord);
+  let col = vec3(result.x, result.y, result.z);
+  if (dot(col, col) == 0.0)
+  {
+    discard;
+  }
+    return vec4(1.0, 1.0, 1.0, 1.0);
 }

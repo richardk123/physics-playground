@@ -220,7 +220,7 @@ class CirclePipeline
         });
 
         const coef = 4;
-        const resolution = { width: 1980 / coef, height: 1280 / coef };
+        const resolution = { width: 1980 / coef, height: 1080 / coef };
         this.texture = device.createTexture({
             size: resolution,
             format: presentationFormat,
