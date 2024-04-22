@@ -8,6 +8,7 @@ import {GridDebugRenderer} from "./components/debug/GridDebugRenderer";
 import {ParticlesDebugRenderer} from "./components/debug/ParticlesDebugRenderer";
 import {DensityDebugRenderer} from "./components/debug/DensityDebugRenderer";
 import {Colors} from "../engine/data/Color";
+import {Vec2d} from "../engine/data/Vec2d";
 
 export const SimpleGpu = () =>
 {
@@ -25,13 +26,17 @@ export const SimpleGpu = () =>
             gridSizeX: count,
             subStepCount: 8,
             deltaTime: 1 / 60,
-            cellSize: 1.2 / Math.sqrt(2),
+            cellSize: 1.2,
             gravity: {x: 0, y: -10},
             debug: false,
         }
+        const translation: Vec2d = {
+            x: (settings.gridSizeX / 2) * settings.cellSize,
+            y: (settings.gridSizeY / 2) * settings.cellSize
+        }
         const camera: Camera = {
-            zoom: 0.00111328125 * settings.gridSizeX,
-            translation: {x:114.33, y: 106.44},
+            zoom: 0.38718,
+            translation: translation,
             rotation: 0,
         }
         const canvas = canvasRef.current!;
@@ -44,21 +49,21 @@ export const SimpleGpu = () =>
                 const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
                 // engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, Colors.blue());
 
-                // engine.createRectangleRandom(0, 0,
-                //     fullWidth / 2, fullWidth / 1.5,
-                //     1.0, Colors.blue());
-                //
-                // engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
-                //     fullWidth / 2 - 10, fullWidth / 1.5,
-                //     10, Colors.red());
-
                 engine.createRectangleRandom(0, 0,
-                    fullWidth / 2, fullWidth / 2 - 10,
-                    1, Colors.blue())
+                    fullWidth / 2, fullWidth / 2,
+                    1.0, Colors.blue());
 
-                engine.createRectangleRandom(0, (fullWidth / 2) * 1.1,
-                    fullWidth, fullWidth / 2,
-                    5, Colors.red())
+                engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
+                    fullWidth / 2 - 10, fullWidth / 2,
+                    1.0, Colors.red());
+
+                // engine.createRectangleRandom(0, 0,
+                //     fullWidth / 2, fullWidth / 3 - 10,
+                //     5, Colors.blue())
+                //
+                // engine.createRectangleRandom(0, (fullWidth / 2) * 1.1,
+                //     fullWidth, fullWidth / 3,
+                //     1, Colors.red())
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);
