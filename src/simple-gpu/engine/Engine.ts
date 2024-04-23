@@ -68,12 +68,13 @@ export class Engine
                                  mass: number,
                                  color: Color)
     {
+        const shrink = 0.5;
         for (let y = 0; y < height; y++)
         {
             for (let x = 0; x < width; x++)
             {
-                const nx = bottomLeftX + (x * 1.1) + (Math.random() * 0.01);
-                const ny = bottomLeftY + (y * 1.1) + (Math.random() * 0.01);
+                const nx = bottomLeftX  * shrink+ (x * shrink) + (Math.random() * 0.01);
+                const ny = bottomLeftY * shrink + (y * shrink) + (Math.random() * 0.01);
                 this.addPoint(nx, ny, mass, color);
             }
         }

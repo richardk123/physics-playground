@@ -31,8 +31,8 @@ export const SimpleGpu = () =>
             debug: false,
         }
         const translation: Vec2d = {
-            x: (settings.gridSizeX / 2) * settings.cellSize,
-            y: (settings.gridSizeY / 2) * settings.cellSize
+            x: (settings.gridSizeX / 2) * 0.9,
+            y: (settings.gridSizeY / 2) * 0.9
         }
         const camera: Camera = {
             zoom: 0.38718,
@@ -46,24 +46,24 @@ export const SimpleGpu = () =>
             {
                 setEngine(engine);
 
-                const fullWidth = Math.floor((settings.cellSize * count) / 1.1);
+                const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
                 // engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, Colors.blue());
 
-                engine.createRectangleRandom(0, 0,
-                    fullWidth / 2, fullWidth / 1,
-                    1.0, Colors.blue());
-
-                engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
-                    fullWidth / 2 - 10, fullWidth / 1,
-                    1.0, Colors.green());
-
                 // engine.createRectangleRandom(0, 0,
-                //     fullWidth / 2, fullWidth / 3 - 10,
-                //     5, Colors.blue())
+                //     fullWidth / 2, fullWidth / 1,
+                //     1.0, Colors.blue());
                 //
-                // engine.createRectangleRandom(0, (fullWidth / 2) * 1.1,
-                //     fullWidth, fullWidth / 3,
-                //     1, Colors.red())
+                // engine.createRectangleRandom((fullWidth / 2) * 1.1, 0,
+                //     fullWidth / 2 - 10, fullWidth / 1,
+                //     2.0, Colors.green());
+
+                engine.createRectangleRandom(0, 0,
+                    fullWidth, fullWidth / 6,
+                    1.7, Colors.blue())
+
+                engine.createRectangleRandom(0, fullWidth / 6,
+                    fullWidth, fullWidth / 6,
+                    1, Colors.green())
 
                 registerScrolling(canvas, camera);
                 registerMoving(canvas, camera);

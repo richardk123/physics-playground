@@ -1,5 +1,5 @@
 const PI: f32 = 3.14159265359;
-const SMOOTHING_RADIUS: f32 = 1.2;
+const SMOOTHING_RADIUS: f32 = 1.3;
 
 struct Settings
 {
@@ -64,8 +64,8 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
                 particles[particleIndex].density += influence * particle.mass;
 
                 // collor mixing
-                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
-                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
+//                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
+//                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
             }
         }
     }
