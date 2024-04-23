@@ -1,7 +1,7 @@
 const PI: f32 = 3.14159265359;
-const TARGET_DENSITY: f32 = 1.2;
-const PRESSURE_MULTIPLIER: f32 = 50;
-const SMOOTHING_RADIUS: f32 = 1.2;
+const TARGET_DENSITY: f32 = 5.0;
+const PRESSURE_MULTIPLIER: f32 = 40;
+const SMOOTHING_RADIUS: f32 = 1.3;
 
 struct Settings
 {
@@ -34,8 +34,8 @@ fn getGridID(p: vec2<f32>) -> u32 {
 fn smoothingKernelDerivative(distance: f32) -> f32
 {
     let scale = 12 / (pow(SMOOTHING_RADIUS, 4) * PI);
-    let test = min(distance - SMOOTHING_RADIUS, 0);
-    return test * scale;
+    let distanceError = min(distance - SMOOTHING_RADIUS, 0);
+    return distanceError * scale;
 }
 
 fn convertDensityToPressure(density: f32) -> f32
