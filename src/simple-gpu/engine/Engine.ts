@@ -16,6 +16,8 @@ export class Engine
     public solver: Solver;
     public renderer: Renderer;
     public running = false;
+    public rendering = false;
+    public simulating = false;
 
     constructor(engine: GPUEngine,
                 solver: Solver,
@@ -96,19 +98,47 @@ export class Engine
         this.renderer.render();
     }
 
-    public render()
-    {
-        this.renderer.render();
-        requestAnimationFrame(this.render.bind(this));
-    }
-
-    public async simulate()
+    public renderLoop()
     {
         if (this.running)
         {
-            await this.solver.simulate();
-            requestAnimationFrame(this.simulate.bind(this));
+            this.rendering = true;
+            this.renderer.render();
+            requestAnimationFrame(this.renderLoop.bind(this));
+            this.rendering = false;
         }
     }
 
+    public async simulateLoop()
+    {
+        if (this.running)
+        {
+            this.simulating = true;
+            await this.solver.simulate();
+            requestAnimationFrame(this.simulateLoop.bind(this));
+            this.simulating = false;
+        }
+    }
+
+    private waitForCondition(condition: () => boolean): Promise<void>
+    {
+        return new Promise<void>((resolve) => {
+            const intervalId = setInterval(() => {
+                if (condition()) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+            }, 10); // Adjust the interval as needed
+        });
+    }
+
+    public async destroy()
+    {
+        this.running = false;
+        await this.waitForCondition(() => !this.rendering && !this.simulating)
+        this.solver.destroy();
+        this.renderer.destroy();
+        this.engine.device.destroy();
+        console.log("destroyed");
+    }
 }

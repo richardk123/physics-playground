@@ -61,11 +61,16 @@ export class GPUMeasurement
     public read(encoder: GPUCommandEncoder)
     {
         if (this.engine.canTimestamp && this.data.resultBuffer.mapState === 'unmapped') {
-            this.data.resultBuffer.mapAsync(GPUMapMode.READ).then(() => {
-                const times = new BigInt64Array(this.data.resultBuffer.getMappedRange());
-                this.gpuTime = Number(times[1] - times[0]);
-                this.data.resultBuffer.unmap();
-            });
+            this.data.resultBuffer.mapAsync(GPUMapMode.READ)
+                .then(() => {
+                    const times = new BigInt64Array(this.data.resultBuffer.getMappedRange());
+                    this.gpuTime = Number(times[1] - times[0]);
+                    this.data.resultBuffer.unmap();
+                })
+                .catch(e =>
+                {
+
+                });
         }
     }
 }

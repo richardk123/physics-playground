@@ -6,4 +6,5 @@ export interface Renderer
     cameraBuffer: CameraBuffer;
     cpuTime: () => number;
     gpuTime: () => number;
+    destroy: () => void;
 }

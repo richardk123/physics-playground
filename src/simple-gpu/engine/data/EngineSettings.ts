@@ -97,4 +97,9 @@ export class EngineSettingsBuffer
             mouseY: floatData[9],
         }
     }
+
+    public destroy()
+    {
+      this.buffer.destroy();
+    }
 }

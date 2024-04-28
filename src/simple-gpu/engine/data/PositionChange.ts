@@ -13,4 +13,9 @@ export class PositionChangeBuffer
         this.settings = settings;
         this.buffer = engine.createBuffer("positionChange", settings.maxParticleCount * 4 * 2, "storage");
     }
+
+    public destroy()
+    {
+        this.buffer.destroy();
+    }
 }

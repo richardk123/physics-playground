@@ -167,4 +167,10 @@ export class ParticlesBuffer
         console.log(`particles: \n ${aggregateParticleData(data).map(mapPair).join("\n ")}`);
         console.log(`particles swapped: \n ${aggregateParticleData(sourceData).map(mapPair).join("\n ")}`);
     }
+
+    public destroy()
+    {
+        this.buffer1.buffer.destroy();
+        this.buffer2.buffer.destroy();
+    }
 }

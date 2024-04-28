@@ -137,4 +137,9 @@ export class RendererCircle implements Renderer
     {
         return this.gpuMeasurement.gpuTime;
     }
+
+    public destroy(): void
+    {
+        this.cameraBuffer.destroy();
+    }
 }

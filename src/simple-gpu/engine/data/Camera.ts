@@ -45,4 +45,9 @@ export class CameraBuffer
         this.buffer.writeBuffer(<ArrayBuffer>view, 64);
         this.buffer.writeBuffer(<ArrayBuffer>projection, 128);
     }
+
+    public destroy()
+    {
+        this.buffer.destroy();
+    }
 }

@@ -83,4 +83,10 @@ export class Buffer
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
     }
+
+    public destroy()
+    {
+        this.buffer.destroy();
+        this.bufferRead.destroy();
+    }
 }

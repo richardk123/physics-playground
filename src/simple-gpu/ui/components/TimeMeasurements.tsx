@@ -2,8 +2,9 @@ import {Engine} from "../../engine/Engine";
 import React, {useEffect, useState} from "react";
 import {SolverTimeMeasurement} from "../../engine/Solver";
 import {timer} from "rxjs";
+import {EngineSingleton} from "./scene/EngineSingleton";
 
-export const TimeMeasurements = ({engine}: {engine: Engine}) =>
+export const TimeMeasurements = () =>
 {
     const [increment, setIncrement] = useState(0);
 
@@ -15,11 +16,14 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
     {
         const sub = timer(1000).subscribe(() =>
         {
-
+            const engine = EngineSingleton.get();
+            if (engine)
+            {
+                setSolverMeasurement(engine.solver.timeMeasurement());
+                setCpuRenderMsPerFrame(engine.renderer.cpuTime());
+                setGpuRenderMsPerFrame(engine.renderer.gpuTime())
+            }
             setIncrement(increment + 1);
-            setSolverMeasurement(engine.solver.timeMeasurement());
-            setCpuRenderMsPerFrame(engine.renderer.cpuTime());
-            setGpuRenderMsPerFrame(engine.renderer.gpuTime())
         });
 
         return () => sub.unsubscribe();

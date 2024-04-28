@@ -60,6 +60,11 @@ export class RendererFluid implements Renderer
         return 0;
     }
 
+    public destroy()
+    {
+        throw new Error("not implemented");
+    }
+
     private particlePass()
     {
         const device = this.engine.device;

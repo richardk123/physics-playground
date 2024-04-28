@@ -108,6 +108,13 @@ export class PrefixSumBuffer
         // console.log(`expected          [${result.join(", ")}]`);
         return result;
     }
+
+    public destroy()
+    {
+        this.buffer1.destroy();
+        this.buffer2.destroy();
+        this.prefixSumSettings.destroy();
+    }
 }
 
 export class PrefixSumComputeShader
@@ -168,4 +175,8 @@ export class PrefixSumComputeShader
         return new PrefixSumComputeShader(prefixSum, buffer);
     }
 
+    public destroy()
+    {
+        this.buffer.destroy();
+    }
 }

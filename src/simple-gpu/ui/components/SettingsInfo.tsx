@@ -3,9 +3,9 @@ import React, {useEffect, useState} from "react";
 import {EngineSettings} from "../../engine/data/EngineSettings";
 import {timer} from "rxjs";
 import {Camera} from "../../engine/data/Camera";
-import {SolverTimeMeasurement} from "../../engine/Solver";
+import {EngineSingleton} from "./scene/EngineSingleton";
 
-export const SettingsInfo = ({engine}: {engine: Engine}) =>
+export const SettingsInfo = () =>
 {
     const [increment, setIncrement] = useState(0);
     const [settings, setSettings] = useState<EngineSettings>();
@@ -16,10 +16,13 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
     {
         const sub = timer(100).subscribe(() =>
         {
-
-            setSettings(engine.solver.settingsBuffer.settings);
-            setParticleCount(engine.solver.particlesBuffer.particles.count);
-            setCamera(engine.renderer.cameraBuffer.camera);
+            const engine = EngineSingleton.get();
+            if (engine)
+            {
+                setSettings(engine.solver.settingsBuffer.settings);
+                setParticleCount(engine.solver.particlesBuffer.particles.count);
+                setCamera(engine.renderer.cameraBuffer.camera);
+            }
             setIncrement(increment + 1);
         });
 

@@ -24,6 +24,7 @@ export interface SolverTimeMeasurement
 export interface Solver
 {
     simulate: () => Promise<void>;
+    destroy: () => void;
     particlesBuffer: ParticlesBuffer;
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
@@ -180,6 +181,14 @@ export class Solvers
                     positionChangeApply: positionChangeApply.gpuTime() * subStepCount / 1000,
                     postSolve: postSolve.gpuTime() * subStepCount / 1000,
                 }
+            },
+            destroy: () =>
+            {
+                particlesBuffer.destroy();
+                settingsBuffer.destroy();
+                gridBuffer.destroy();
+                prefixSumBuffer.destroy();
+                positionChangeBuffer.destroy();
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,

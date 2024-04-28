@@ -42,4 +42,10 @@ export class GridBuffer
 
         this.gpuGrid = new Grid(cellsCountData, cellsParticleIndexesData);
     }
+
+    public destroy()
+    {
+        this.cellParticleCountBuffer.destroy();
+        this.particleCellOffsetBuffer.destroy();
+    }
 }
