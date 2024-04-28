@@ -13,6 +13,7 @@ interface Scene
 }
 export const SceneControls = ({canvas}: {canvas: HTMLCanvasElement}) =>
 {
+    const [scene, setScene] = useState<Scene | undefined>(undefined);
     const [running, setRunning] = useState(true);
 
     const scenes: Scene[] = [
@@ -29,6 +30,10 @@ export const SceneControls = ({canvas}: {canvas: HTMLCanvasElement}) =>
         }
         await scene?.create();
         startStopEngine(running);
+        if (scene)
+        {
+            setScene(scene);
+        }
     }
 
     const startStopEngine = async (running: boolean) =>
@@ -48,6 +53,7 @@ export const SceneControls = ({canvas}: {canvas: HTMLCanvasElement}) =>
     {
         startStopEngine(!running);
     }
+
     const next = async () =>
     {
         const engine = EngineSingleton.get();
@@ -58,17 +64,38 @@ export const SceneControls = ({canvas}: {canvas: HTMLCanvasElement}) =>
         }
     }
 
+    const reload = async () =>
+    {
+        const prevEngine = EngineSingleton.get();
+        if (prevEngine)
+        {
+            await prevEngine.destroy();
+        }
+        if (scene)
+        {
+            await scene?.create();
+        }
+        else
+        {
+            await scenes[0].create();
+        }
+
+        startStopEngine(running);
+    }
+
     return <div className="w-full h-12 flex">
         <Autocomplete
             disablePortal
             options={scenes}
             size={"small"}
             sx={{ width: 300 }}
+            defaultValue={scenes[0]}
             onChange={onChange}
             isOptionEqualToValue={(option, value) => option.label === value.label}
             renderInput={(params) => <TextField {...params} label="Scene" />}
         />
         <Button variant="filled" size="md" onClick={startStop}>{running ? "Stop" : "Start"}</Button>
         <Button variant="filled" size="md" disabled={running} onClick={next}>Next</Button>
+        <Button variant="filled" size="md" onClick={reload}>Reload</Button>
     </div>;
 }

@@ -31,4 +31,9 @@ export class Colors
     {
         return {r: 139, g: 128, b: 0};
     }
+
+    static white = (): Color =>
+    {
+        return {r: 255, g: 255, b: 255};
+    }
 }

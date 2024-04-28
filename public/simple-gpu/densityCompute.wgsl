@@ -66,8 +66,8 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
                 densityChange += influence * particle.mass;
 
                 // collor mixing
-//                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
-//                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
+                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
+                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
             }
         }
     }

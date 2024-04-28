@@ -3,6 +3,7 @@ import {AccordionComponent} from "./common/AccordionComponent";
 import {SettingsInfo} from "./SettingsInfo";
 import React from "react";
 import {TimeMeasurements} from "./TimeMeasurements";
+import {SimulationSettings} from "./SimulationSettings";
 
 export const Sidebar = () =>
 {
@@ -14,7 +15,7 @@ export const Sidebar = () =>
             <TimeMeasurements />
         </AccordionComponent>
         <AccordionComponent expanded={true} label="Simulation settings">
-            {/*<SimulationSettings engine={engine} />*/}
+            {/*<SimulationSettings />*/}
         </AccordionComponent>
     </Card>
 }

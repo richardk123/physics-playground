@@ -34,7 +34,10 @@ export const createScene2 = async (canvas: HTMLCanvasElement) =>
     EngineSingleton.set(engine);
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
-    engine.createRectangleRandom(0, 0, fullWidth, fullWidth / 2, 1, Colors.blue());
+    engine.createRectangleRandom(0, 10, 50, fullWidth / 2, 1, Colors.blue());
+    engine.createRectangleRandom(100, 10, 50, fullWidth / 2, 1, Colors.green());
+    engine.createRectangleRandom(300, 10, 50, fullWidth / 2, 1, Colors.red());
+    engine.createRectangleRandom(400, 10, 50, fullWidth / 2, 1, Colors.white());
 
     // registerScrolling(canvas, camera);
     // registerMoving(canvas, camera);
