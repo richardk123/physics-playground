@@ -46,6 +46,8 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
     }
     let endY = min(gridId + settings.gridSizeX, gridSize);
 
+    var densityChange = 0.0;
+
     for (var y = startY; y <= endY; y += settings.gridSizeX)
     {
         let startGridId = u32(max(i32(y) - 1, 0));
@@ -61,14 +63,16 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
             if (dist < SMOOTHING_RADIUS)
             {
                 let influence = smoothingKernel(dist);
-                particles[particleIndex].density += influence * particle.mass;
+                densityChange += influence * particle.mass;
 
                 // collor mixing
-//                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
-//                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
+                let colorMixStrength = (dist / SMOOTHING_RADIUS) * settings.dt;
+                particles[particleIndex].color = mix(particle.color, anotherParticle.color, colorMixStrength);
             }
         }
     }
+
+    particles[particleIndex].density += densityChange;
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;
