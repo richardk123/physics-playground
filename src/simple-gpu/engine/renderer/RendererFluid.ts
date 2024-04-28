@@ -12,6 +12,8 @@ export class RendererFluid implements Renderer
 
     private circlePipeline: CirclePipeline;
     private copyPipeline: CopyPipeline;
+    private cpuMsPerFrame = 0;
+
 
     private constructor(engine: GPUEngine,
                         circleShaderCode: string,
@@ -41,8 +43,16 @@ export class RendererFluid implements Renderer
 
     public render()
     {
+        const now = performance.now();
         this.particlePass();
         this.displayFinalTexture();
+        this.cpuMsPerFrame = performance.now() - now;
+    }
+
+
+    public msPerFrame(): number
+    {
+        return this.cpuMsPerFrame;
     }
 
     private particlePass()

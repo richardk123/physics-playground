@@ -12,6 +12,7 @@ export class RendererCircle implements Renderer
 
     private pipeline: GPURenderPipeline;
     private bindGroup: GPUBindGroup;
+    private cpuMsPerFrame = 0;
 
     private constructor(engine: GPUEngine,
                         shaderCode: string,
@@ -92,11 +93,12 @@ export class RendererCircle implements Renderer
 
     public render()
     {
+        const now = performance.now();
+
         const device = this.engine.device;
         const context = this.engine.context;
         const pipeline = this.pipeline;
         const bindGroup = this.bindGroup;
-
         // camera matrices
         this.cameraBuffer.writeBuffer();
 
@@ -116,5 +118,11 @@ export class RendererCircle implements Renderer
         renderpass.end();
 
         device.queue.submit([commandEncoder.finish()]);
+        this.cpuMsPerFrame = performance.now() - now;
+    }
+
+    public msPerFrame(): number
+    {
+        return this.cpuMsPerFrame;
     }
 }

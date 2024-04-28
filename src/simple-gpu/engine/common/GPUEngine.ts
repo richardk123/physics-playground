@@ -10,6 +10,7 @@ export class GPUEngine
     public readonly format : GPUTextureFormat;
     public readonly presentationFormat: GPUTextureFormat;
     public readonly canvas: HTMLCanvasElement;
+    public readonly canTimestamp: boolean;
 
     private constructor(adapter : GPUAdapter,
                         device : GPUDevice,
@@ -24,6 +25,7 @@ export class GPUEngine
         this.format = format;
         this.presentationFormat = presentationFormat;
         this.canvas = canvas;
+        this.canTimestamp = adapter.features.has('timestamp-query');
     }
 
     static async create(canvas: HTMLCanvasElement)

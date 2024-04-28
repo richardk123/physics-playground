@@ -10,7 +10,8 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
     const [settings, setSettings] = useState<EngineSettings>();
     const [particleCount, setParticleCount] = useState(0);
     const [camera, setCamera] = useState<Camera | undefined>();
-    const [msPerFrame, setMsPerFrame] = useState(0);
+    const [physicsMsPerFrame, setPhysicsMsPerFrame] = useState(0);
+    const [renderMsPerFrame, setRenderMsPerFrame] = useState(0);
 
     useEffect(() =>
     {
@@ -20,7 +21,8 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
             setParticleCount(engine.solver.particlesBuffer.particles.count);
             setCamera(engine.renderer.cameraBuffer.camera);
             setIncrement(increment + 1);
-            setMsPerFrame(engine.solver.msPerFrame())
+            setPhysicsMsPerFrame(engine.solver.msPerFrame());
+            setRenderMsPerFrame(engine.renderer.msPerFrame());
         });
 
         return () => sub.unsubscribe();
@@ -28,7 +30,8 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
 
     return <div className="w-full h-full">
         <p>Particle count: {particleCount}</p>
-        <p>Ms per frame: {msPerFrame.toFixed(2)}</p>
+        <p>CPU Physics ms per frame: {physicsMsPerFrame.toFixed(2)}</p>
+        <p>CPU Render ms per frame: {renderMsPerFrame.toFixed(2)}</p>
         <p>Grid size: {`[${settings?.gridSizeX}, ${settings?.gridSizeY}]`}</p>
         <p>Delta time: {settings?.deltaTime.toFixed(5)}</p>
         <p>Gravity {`[${settings?.gravity.x.toFixed(2)}, ${settings?.gravity.y.toFixed(2)}]`}</p>
