@@ -118,12 +118,13 @@ export class ComputeShader
         pass.dispatchWorkgroups(x, y, z);
         pass.end();
 
-        this.gpuMeasurement.copy(encoder);
+        // this.gpuMeasurement.copy(encoder);
+
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
-        this.gpuMeasurement.read(encoder);
+        // this.gpuMeasurement.read(encoder);
     }
 
     public gpuTime(): number

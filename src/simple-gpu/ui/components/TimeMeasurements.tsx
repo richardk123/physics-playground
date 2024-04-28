@@ -13,7 +13,7 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
 
     useEffect(() =>
     {
-        const sub = timer(100).subscribe(() =>
+        const sub = timer(1000).subscribe(() =>
         {
 
             setIncrement(increment + 1);
@@ -25,8 +25,32 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
         return () => sub.unsubscribe();
     }, [increment]);
 
+    const gpuPhysicsPerFrame = () =>
+    {
+        if (!solverMeasurement)
+        {
+            return 0;
+        }
+        return (solverMeasurement.preSolve +
+            solverMeasurement.gridClear +
+            solverMeasurement.gridUpdate +
+            solverMeasurement.prefixSum +
+            solverMeasurement.particleSort +
+            solverMeasurement.boundingBox +
+            solverMeasurement.collisionSolve +
+            solverMeasurement.densityCompute +
+            solverMeasurement.densitySolve +
+            solverMeasurement.positionChangeApply +
+            solverMeasurement.postSolve) / 1000;
+    }
+
     return <div className="w-full h-full">
+        <p>CPU Render: {cpuRenderMsPerFrame.toFixed(2)}ms</p>
+        <p>GPU Render: {(gpuRenderMsPerFrame / 1000).toFixed(2)}µs</p>
+        <br/>
         <p>CPU Physics per frame: {solverMeasurement?.cpuTime.toFixed(2)}ms</p>
+        <p>GPU Physics per frame: {gpuPhysicsPerFrame().toFixed(2)}ms</p>
+        <br/>
         <ul>
             <li>preSolve: {solverMeasurement?.preSolve.toFixed(2)}µs</li>
             <li>gridClear: {solverMeasurement?.gridClear.toFixed(2)}µs</li>
@@ -40,7 +64,5 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
             <li>positionChangeApply: {solverMeasurement?.positionChangeApply.toFixed(2)}µs</li>
             <li>postSolve: {solverMeasurement?.postSolve.toFixed(2)}µs</li>
         </ul>
-        <p>CPU Render: {cpuRenderMsPerFrame.toFixed(2)}ms</p>
-        <p>GPU Render: {(gpuRenderMsPerFrame / 1000).toFixed(2)}µs</p>
     </div>
 }
