@@ -5,6 +5,22 @@ import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
 
+export interface SolverTimeMeasurement
+{
+    cpuTime: number;
+    preSolve: number;
+    gridClear: number;
+    gridUpdate: number;
+    prefixSum: number;
+    particleSort: number;
+    collisionSolve: number;
+    positionChangeApply: number;
+    densityCompute: number;
+    densitySolve: number;
+    boundingBox: number;
+    postSolve: number;
+}
+
 export interface Solver
 {
     simulate: () => Promise<void>;
@@ -12,7 +28,7 @@ export interface Solver
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
     prefixSumBuffer: () => PrefixSumBuffer;
-    msPerFrame: () => number;
+    timeMeasurement: () => SolverTimeMeasurement;
 }
 
 export class Solvers
@@ -24,6 +40,21 @@ export class Solvers
                                prefixSumBuffer: PrefixSumBuffer,
                                positionChangeBuffer: PositionChangeBuffer): Promise<Solver>
     {
+        let timeMeasurement: SolverTimeMeasurement = {
+            cpuTime: 0,
+            preSolve: 0,
+            gridClear: 0,
+            gridUpdate: 0,
+            prefixSum: 0,
+            particleSort: 0,
+            collisionSolve: 0,
+            positionChangeApply: 0,
+            densityCompute: 0,
+            densitySolve: 0,
+            boundingBox: 0,
+            postSolve: 0,
+        }
+
         const preSolve = await engine.createComputeShader("preSolve")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
@@ -90,8 +121,6 @@ export class Solvers
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .build();
 
-        let msPerFrame = 0;
-
         return {
             simulate: async (): Promise<void> =>
             {
@@ -137,13 +166,26 @@ export class Solvers
                         // console.log(settingsBuffer.gpuData);
                     }
                 }
-                msPerFrame = performance.now() - start;
+                timeMeasurement = {
+                    cpuTime: performance.now() - start,
+                    preSolve: preSolve.gpuTime() * subStepCount / 1000,
+                    gridClear: gridClear.gpuTime() * subStepCount / 1000,
+                    gridUpdate: gridUpdate.gpuTime() * subStepCount / 1000,
+                    prefixSum: prefixSum.gpuTime() * subStepCount / 1000,
+                    particleSort: particleSort.gpuTime() * subStepCount / 1000,
+                    collisionSolve: collisionSolve.gpuTime() * subStepCount / 1000,
+                    boundingBox: boundingBox.gpuTime() * subStepCount / 1000,
+                    densityCompute: densityCompute.gpuTime() * subStepCount / 1000,
+                    densitySolve: densitySolve.gpuTime() * subStepCount / 1000,
+                    positionChangeApply: positionChangeApply.gpuTime() * subStepCount / 1000,
+                    postSolve: postSolve.gpuTime(),
+                }
             },
             particlesBuffer: particlesBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
             prefixSumBuffer: () => prefixSum.buffer,
-            msPerFrame: () => msPerFrame,
+            timeMeasurement: () => timeMeasurement,
         };
     }
 }

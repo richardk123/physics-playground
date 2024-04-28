@@ -1,4 +1,4 @@
-import {GPUEngine} from "./GPUEngine";
+import {GPUEngine, GPUMeasurement} from "./GPUEngine";
 import {Buffer} from "./Buffer";
 
 export interface BufferBinding
@@ -41,6 +41,7 @@ export class ComputeShader
     private name: string;
     private bindGroupLayout: GPUBindGroupLayout;
     private buffers: BufferBinding[];
+    private gpuMeasurement: GPUMeasurement;
 
     constructor(engine: GPUEngine,
                 shaderCode: string,
@@ -51,6 +52,7 @@ export class ComputeShader
         this.engine = engine;
         const device : GPUDevice = engine.device;
         this.buffers = buffers;
+        this.gpuMeasurement = new GPUMeasurement(engine);
 
         const bindGroupLayoutEntries = buffers
             .map((b, index) =>
@@ -105,15 +107,27 @@ export class ComputeShader
 
         // Encode commands to do the computation
         const encoder = device.createCommandEncoder({ label: `${this.name} builtin encoder` });
-        const pass = encoder.beginComputePass({ label: `${this.name} compute pass` });
+        const pass = encoder.beginComputePass(
+            {
+                label: `${this.name} compute pass`,
+                ...this.gpuMeasurement.writesDescriptor()
+            });
 
         pass.setPipeline(pipeline);
         pass.setBindGroup(0, bindGroup);
         pass.dispatchWorkgroups(x, y, z);
         pass.end();
 
+        this.gpuMeasurement.copy(encoder);
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
+
+        this.gpuMeasurement.read(encoder);
+    }
+
+    public gpuTime(): number
+    {
+        return this.gpuMeasurement.gpuTime;
     }
 }

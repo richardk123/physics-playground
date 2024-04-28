@@ -143,6 +143,13 @@ export class PrefixSumComputeShader
         }
     }
 
+    public gpuTime(): number
+    {
+        const numberOfCells = this.buffer.getNumberOfCells();
+        const treeHeight = Math.log2(numberOfCells);
+        return this.prefixSum.gpuTime() * treeHeight;
+    }
+
     public async printGPUData()
     {
         await this.buffer.printGPU();
