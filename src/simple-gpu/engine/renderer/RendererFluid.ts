@@ -50,9 +50,14 @@ export class RendererFluid implements Renderer
     }
 
 
-    public msPerFrame(): number
+    public cpuTime(): number
     {
         return this.cpuMsPerFrame;
+    }
+
+    public gpuTime(): number
+    {
+        return 0;
     }
 
     private particlePass()

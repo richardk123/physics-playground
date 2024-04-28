@@ -4,5 +4,6 @@ export interface Renderer
 {
     render(): void;
     cameraBuffer: CameraBuffer;
-    msPerFrame: () => number;
+    cpuTime: () => number;
+    gpuTime: () => number;
 }

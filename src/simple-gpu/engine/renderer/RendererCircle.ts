@@ -1,4 +1,4 @@
-import {GPUEngine} from "../common/GPUEngine";
+import {GPUEngine, GPUMeasurement} from "../common/GPUEngine";
 import {Camera, CameraBuffer} from "../data/Camera";
 import {ParticlesBuffer} from "../data/Particles";
 import {Renderer} from "./Renderer";
@@ -13,6 +13,7 @@ export class RendererCircle implements Renderer
     private pipeline: GPURenderPipeline;
     private bindGroup: GPUBindGroup;
     private cpuMsPerFrame = 0;
+    private gpuMeasurement: GPUMeasurement;
 
     private constructor(engine: GPUEngine,
                         shaderCode: string,
@@ -25,6 +26,8 @@ export class RendererCircle implements Renderer
 
         const device = engine.device;
         const presentationFormat = engine.presentationFormat;
+
+        this.gpuMeasurement = engine.createGPUMeasurement();
 
         const bindGroupLayout = device.createBindGroupLayout({
             entries: [
@@ -111,18 +114,27 @@ export class RendererCircle implements Renderer
                 loadOp: "clear",
                 storeOp: "store"
             }] as GPURenderPassColorAttachment[],
+            ...this.gpuMeasurement.writesDescriptor()
         });
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
         renderpass.draw(3, this.particlesBuffer.particles.count);
         renderpass.end();
 
+        this.gpuMeasurement.copy(commandEncoder);
         device.queue.submit([commandEncoder.finish()]);
+        this.gpuMeasurement.read(commandEncoder);
+
         this.cpuMsPerFrame = performance.now() - now;
     }
 
-    public msPerFrame(): number
+    public cpuTime(): number
     {
         return this.cpuMsPerFrame;
+    }
+
+    public gpuTime(): number
+    {
+        return this.gpuMeasurement.gpuTime;
     }
 }

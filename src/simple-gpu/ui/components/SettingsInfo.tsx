@@ -10,8 +10,9 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
     const [settings, setSettings] = useState<EngineSettings>();
     const [particleCount, setParticleCount] = useState(0);
     const [camera, setCamera] = useState<Camera | undefined>();
-    const [physicsMsPerFrame, setPhysicsMsPerFrame] = useState(0);
-    const [renderMsPerFrame, setRenderMsPerFrame] = useState(0);
+    const [cpuPhysicsMsPerFrame, setCpuPhysicsMsPerFrame] = useState(0);
+    const [cpuRenderMsPerFrame, setCpuRenderMsPerFrame] = useState(0);
+    const [gpuRenderMsPerFrame, setGpuRenderMsPerFrame] = useState(0);
 
     useEffect(() =>
     {
@@ -21,8 +22,9 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
             setParticleCount(engine.solver.particlesBuffer.particles.count);
             setCamera(engine.renderer.cameraBuffer.camera);
             setIncrement(increment + 1);
-            setPhysicsMsPerFrame(engine.solver.msPerFrame());
-            setRenderMsPerFrame(engine.renderer.msPerFrame());
+            setCpuPhysicsMsPerFrame(engine.solver.msPerFrame());
+            setCpuRenderMsPerFrame(engine.renderer.cpuTime());
+            setGpuRenderMsPerFrame(engine.renderer.gpuTime())
         });
 
         return () => sub.unsubscribe();
@@ -30,8 +32,9 @@ export const SettingsInfo = ({engine}: {engine: Engine}) =>
 
     return <div className="w-full h-full">
         <p>Particle count: {particleCount}</p>
-        <p>CPU Physics ms per frame: {physicsMsPerFrame.toFixed(2)}</p>
-        <p>CPU Render ms per frame: {renderMsPerFrame.toFixed(2)}</p>
+        <p>CPU Physics per frame: {cpuPhysicsMsPerFrame.toFixed(2)}ms</p>
+        <p>CPU Render: {cpuRenderMsPerFrame.toFixed(2)}ms</p>
+        <p>GPU Render: {(gpuRenderMsPerFrame / 1000).toFixed(2)}µs</p>
         <p>Grid size: {`[${settings?.gridSizeX}, ${settings?.gridSizeY}]`}</p>
         <p>Delta time: {settings?.deltaTime.toFixed(5)}</p>
         <p>Gravity {`[${settings?.gravity.x.toFixed(2)}, ${settings?.gravity.y.toFixed(2)}]`}</p>
