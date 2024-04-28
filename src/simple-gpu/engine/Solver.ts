@@ -178,7 +178,7 @@ export class Solvers
                     densityCompute: densityCompute.gpuTime() * subStepCount / 1000,
                     densitySolve: densitySolve.gpuTime() * subStepCount / 1000,
                     positionChangeApply: positionChangeApply.gpuTime() * subStepCount / 1000,
-                    postSolve: postSolve.gpuTime(),
+                    postSolve: postSolve.gpuTime() / 1000,
                 }
             },
             particlesBuffer: particlesBuffer,
