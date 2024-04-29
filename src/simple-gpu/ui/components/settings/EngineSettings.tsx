@@ -28,11 +28,13 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
     if (engine)
     {
         return <Card className="w-full h-full">
-            <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine}/>
+            <AccordionComponent expanded={true} label="Select scene">
+                <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine}/>
+            </AccordionComponent>
             <AccordionComponent expanded={true} label="Settings">
                 <ReadOnlySettings engine={engine} />
             </AccordionComponent>
-            <AccordionComponent expanded={true} label="Performance">
+            <AccordionComponent expanded={false} label="Performance">
                 <TimeMeasurements engine={engine} />
             </AccordionComponent>
             <AccordionComponent expanded={true} label="Simulation settings">

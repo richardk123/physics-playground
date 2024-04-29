@@ -3,77 +3,10 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles.css';
 import reportWebVitals from './reportWebVitals';
-import {createTheme, ThemeProvider} from "@mui/material";
+import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 
-const theme = createTheme({
-    spacing: 2,
-    components: {
-        MuiButton: {
-            defaultProps: {
-                size: 'small',
-            },
-        },
-        MuiFilledInput: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiFormControl: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiFormHelperText: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiIconButton: {
-            defaultProps: {
-                size: 'small',
-            },
-        },
-        MuiInputBase: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiInputLabel: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiListItem: {
-            defaultProps: {
-                dense: true,
-            },
-        },
-        MuiOutlinedInput: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiFab: {
-            defaultProps: {
-                size: 'small',
-            },
-        },
-        MuiTable: {
-            defaultProps: {
-                size: 'small',
-            },
-        },
-        MuiTextField: {
-            defaultProps: {
-                margin: 'dense',
-            },
-        },
-        MuiToolbar: {
-            defaultProps: {
-                variant: 'dense',
-            },
-        },
-    },
+const darkTheme = createTheme({
+    spacing: 1
 });
 
 const root = ReactDOM.createRoot(
@@ -81,7 +14,8 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   // <React.StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
         <App />
     </ThemeProvider>
   // </React.StrictMode>

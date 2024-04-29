@@ -35,7 +35,7 @@ export const SimpleGpu = () =>
                     <canvas id="simple-gpu-canvas" className="w-full h-full" ref={canvasRef} width={1980} height={1080}></canvas>
                 </div>
             </div>
-            <div className="w-64 h-full text-white">
+            <div className="w-76 h-full text-white">
                 {canvasLoaded && <EngineSettings canvas={canvasRef.current!} />}
             </div>
         </div>
