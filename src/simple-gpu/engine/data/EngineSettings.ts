@@ -3,7 +3,6 @@ import {Buffer} from "../common/Buffer";
 import {Particles} from "./Particles";
 import {Vec2d} from "./Vec2d";
 import {Camera} from "./Camera";
-import {Transformer} from "../common/Transformer";
 import {MouseTracker} from "../common/MouseTracker";
 
 export interface EngineSettings
@@ -15,7 +14,8 @@ export interface EngineSettings
     subStepCount: number;
     deltaTime: number;
     gravity: Vec2d;
-    debug: boolean;
+    debug: boolean; // debug to ui or console
+    performance: boolean; // measure performance
 }
 
 export interface SettingsGpuData

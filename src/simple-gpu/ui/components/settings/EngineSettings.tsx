@@ -31,13 +31,13 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
             <AccordionComponent expanded={true} label="Select scene">
                 <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine}/>
             </AccordionComponent>
-            <AccordionComponent expanded={true} label="Settings">
+            <AccordionComponent expanded={false} label="Settings">
                 <ReadOnlySettings engine={engine} />
             </AccordionComponent>
             <AccordionComponent expanded={false} label="Performance">
                 <TimeMeasurements engine={engine} />
             </AccordionComponent>
-            <AccordionComponent expanded={true} label="Simulation settings">
+            <AccordionComponent expanded={false} label="Simulation settings">
                 <EditableSettings engine={engine}/>
             </AccordionComponent>
         </Card>

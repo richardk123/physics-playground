@@ -1,5 +1,6 @@
 import {ComputeShaderBuilder} from "./ComputeShader";
 import {Buffer, BufferType} from "./Buffer";
+import {EngineSettings} from "../data/EngineSettings";
 
 interface GPUMeasurementData
 {
@@ -84,6 +85,7 @@ export class GPUEngine
     public readonly presentationFormat: GPUTextureFormat;
     public readonly canvas: HTMLCanvasElement;
     public readonly canTimestamp: boolean;
+    public readonly settings: EngineSettings;
 
     private constructor(adapter : GPUAdapter,
                         device : GPUDevice,
@@ -91,6 +93,7 @@ export class GPUEngine
                         format : GPUTextureFormat,
                         presentationFormat: GPUTextureFormat,
                         canvas: HTMLCanvasElement,
+                        settings: EngineSettings,
                         canTimestamp: boolean)
     {
         this.adapter = adapter;
@@ -100,9 +103,10 @@ export class GPUEngine
         this.presentationFormat = presentationFormat;
         this.canvas = canvas;
         this.canTimestamp = canTimestamp;
+        this.settings = settings;
     }
 
-    static async create(canvas: HTMLCanvasElement)
+    static async create(canvas: HTMLCanvasElement, settings: EngineSettings)
     {
         const adapter : GPUAdapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
         const canTimestamp = adapter.features.has('timestamp-query');
@@ -120,7 +124,7 @@ export class GPUEngine
             format: presentationFormat,
         });
 
-        return new GPUEngine(adapter, device, context, format, presentationFormat, canvas, canTimestamp);
+        return new GPUEngine(adapter, device, context, format, presentationFormat, canvas, settings, canTimestamp);
     }
 
     public createComputeShader(name: string): ComputeShaderBuilder

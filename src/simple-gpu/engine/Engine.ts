@@ -32,7 +32,7 @@ export class Engine
                         settings: EngineSettings,
                         camera: Camera)
     {
-        const engine = await GPUEngine.create(canvas);
+        const engine = await GPUEngine.create(canvas, settings);
         const particles = Particles.create(settings.maxParticleCount);
 
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);

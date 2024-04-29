@@ -18,6 +18,7 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
         cellSize: 1.3 / Math.sqrt(2),
         gravity: {x: 0, y: -10},
         debug: false,
+        performance: false,
     }
     const translation: Vec2d = {
         x: (settings.gridSizeX / 2) * 0.9,

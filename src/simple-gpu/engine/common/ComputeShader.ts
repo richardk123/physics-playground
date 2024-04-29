@@ -1,5 +1,6 @@
 import {GPUEngine, GPUMeasurement} from "./GPUEngine";
 import {Buffer} from "./Buffer";
+import {EngineSettings} from "../data/EngineSettings";
 
 export interface BufferBinding
 {
@@ -119,13 +120,19 @@ export class ComputeShader
         pass.dispatchWorkgroups(x, y, z);
         pass.end();
 
-        // this.gpuMeasurement.copy(encoder);
+        if (this.engine.settings.performance)
+        {
+            this.gpuMeasurement.copy(encoder);
+        }
 
         // Finish encoding and submit the commands
         const commandBuffer = encoder.finish();
         device.queue.submit([commandBuffer]);
 
-        // this.gpuMeasurement.read(encoder);
+        if (this.engine.settings.performance)
+        {
+            this.gpuMeasurement.read(encoder);
+        }
     }
 
     public gpuTime(): number

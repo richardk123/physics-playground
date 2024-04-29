@@ -121,9 +121,17 @@ export class RendererCircle implements Renderer
         renderpass.draw(3, this.particlesBuffer.particles.count);
         renderpass.end();
 
-        // this.gpuMeasurement.copy(commandEncoder);
+        if (this.engine.settings.performance)
+        {
+            this.gpuMeasurement.copy(commandEncoder);
+        }
+
         device.queue.submit([commandEncoder.finish()]);
-        // this.gpuMeasurement.read(commandEncoder);
+
+        if (this.engine.settings.performance)
+        {
+            this.gpuMeasurement.read(commandEncoder);
+        }
 
         this.cpuMsPerFrame = performance.now() - now;
     }
