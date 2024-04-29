@@ -109,12 +109,18 @@ export class GPUEngine
     static async create(canvas: HTMLCanvasElement, settings: EngineSettings)
     {
         const adapter : GPUAdapter = <GPUAdapter> await navigator.gpu?.requestAdapter();
+        if (!adapter) {
+            alert('webgpu adapter not found');
+        }
         const canTimestamp = adapter.features.has('timestamp-query');
         const device : GPUDevice = <GPUDevice> await adapter?.requestDevice({
             requiredFeatures: [
                 ...(canTimestamp ? ['timestamp-query'] : []),
             ] as GPUFeatureName[],
         });
+        if (!device) {
+            alert('webgpu device not found');
+        }
         const context : GPUCanvasContext = <GPUCanvasContext> canvas.getContext("webgpu");
         const format : GPUTextureFormat = navigator.gpu.getPreferredCanvasFormat();
         const presentationFormat: GPUTextureFormat = navigator.gpu.getPreferredCanvasFormat();

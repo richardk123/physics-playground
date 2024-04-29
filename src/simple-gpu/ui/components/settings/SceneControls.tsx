@@ -54,7 +54,6 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
 
     const reload = async () =>
     {
-        console.log(scene);
         await engine.destroy();
         const newEngine = scene ? await scene.create() : await scenes[0].create();
         await startStopEngine(running, newEngine);

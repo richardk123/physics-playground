@@ -1,4 +1,15 @@
-import {combineLatest, filter, fromEvent, map, repeat, startWith, switchMap, takeUntil, timer} from "rxjs";
+import {
+    combineLatest,
+    filter,
+    fromEvent,
+    map,
+    repeat,
+    startWith,
+    Subscription,
+    switchMap,
+    takeUntil,
+    timer
+} from "rxjs";
 import {vec2} from "gl-matrix";
 import {Vec2d} from "../../../engine/data/Vec2d";
 import {Camera} from "../../../engine/data/Camera";
@@ -10,9 +21,9 @@ const transformEvent = (e: Event, canvas: HTMLCanvasElement) =>
     return vec2.fromValues(me.x - canvas.offsetLeft, me.y - canvas.offsetTop);
 }
 
-export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera) =>
+export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
 {
-    scroll$(canvas)
+    return scroll$(canvas)
         .subscribe(e =>
         {
             const transform = new Transformer(camera, canvas);
@@ -23,17 +34,17 @@ export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera) =>
 
             camera.translation.x += pCurrent.x - pZoomed.x;
             camera.translation.y += pCurrent.y - pZoomed.y;
-        })
+        });
 }
 
-export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera) =>
+export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
 {
     const cameraTranslation = () =>
     {
         return {x: camera.translation.x, y: camera.translation.y};
     }
 
-    dragAndDrop$(canvas, cameraTranslation, 0)
+    return dragAndDrop$(canvas, cameraTranslation, 0)
         .subscribe((val) =>
         {
             const transform = new Transformer(camera, canvas);
