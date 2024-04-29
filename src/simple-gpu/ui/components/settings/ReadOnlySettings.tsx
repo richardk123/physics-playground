@@ -1,11 +1,10 @@
-import {Engine} from "../../engine/Engine";
+import {Engine} from "../../../engine/Engine";
 import React, {useEffect, useState} from "react";
-import {EngineSettings} from "../../engine/data/EngineSettings";
+import {EngineSettings} from "../../../engine/data/EngineSettings";
 import {timer} from "rxjs";
-import {Camera} from "../../engine/data/Camera";
-import {EngineSingleton} from "./scene/EngineSingleton";
+import {Camera} from "../../../engine/data/Camera";
 
-export const SettingsInfo = () =>
+export const ReadOnlySettings = ({engine}: {engine: Engine}) =>
 {
     const [increment, setIncrement] = useState(0);
     const [settings, setSettings] = useState<EngineSettings>();
@@ -16,13 +15,9 @@ export const SettingsInfo = () =>
     {
         const sub = timer(100).subscribe(() =>
         {
-            const engine = EngineSingleton.get();
-            if (engine)
-            {
-                setSettings(engine.solver.settingsBuffer.settings);
-                setParticleCount(engine.solver.particlesBuffer.particles.count);
-                setCamera(engine.renderer.cameraBuffer.camera);
-            }
+            setSettings(engine.solver.settingsBuffer.settings);
+            setParticleCount(engine.solver.particlesBuffer.particles.count);
+            setCamera(engine.renderer.cameraBuffer.camera);
             setIncrement(increment + 1);
         });
 

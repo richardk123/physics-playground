@@ -1,24 +1,14 @@
 import React, {useEffect, useState} from "react";
-import {Sidebar} from "./components/Sidebar";
-import {SceneControls} from "./components/scene/SceneControls";
-import {createScene1} from "./components/scene/Scene1";
+import {EngineSettings} from "./components/settings/EngineSettings";
 
 export const SimpleGpu = () =>
 {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
-    const [canvas, setCanvas] = useState<HTMLCanvasElement>();
+    const [canvasLoaded, setCanvasLoaded] = useState(false);
 
     useEffect( () =>
     {
-        const c = canvasRef.current!;
-        setCanvas(c);
-        createScene1(c)
-            .then(async engine =>
-            {
-                engine.running = true;
-                await engine.simulateLoop();
-                await engine.renderLoop();
-            });
+        setCanvasLoaded(canvasRef.current !== null);
     }, []);
 
     //
@@ -41,13 +31,12 @@ export const SimpleGpu = () =>
     return (
         <div className="flex h-full bg-gray-200">
             <div className="flex-1 flex flex-col h-full">
-                {canvas && <SceneControls canvas={canvas} />}
                 <div className="flex h-full">
-                    <canvas className="w-full h-full" ref={canvasRef} width={1980} height={1080}></canvas>
+                    <canvas id="simple-gpu-canvas" className="w-full h-full" ref={canvasRef} width={1980} height={1080}></canvas>
                 </div>
             </div>
             <div className="w-64 h-full text-white">
-                <Sidebar/>
+                {canvasLoaded && <EngineSettings canvas={canvasRef.current!} />}
             </div>
         </div>
     );

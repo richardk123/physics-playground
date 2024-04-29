@@ -1,10 +1,10 @@
-import {BoxTitle} from "../../../verlet-gpu/ui/components/BoxTitle";
-import {SliderComponent} from "../../../verlet-gpu/ui/components/SliderComponent";
+import {BoxTitle} from "../../../../verlet-gpu/ui/components/BoxTitle";
+import {SliderComponent} from "../../../../verlet-gpu/ui/components/SliderComponent";
 import React from "react";
-import {Engine} from "../../engine/Engine";
-import {CheckboxComponent} from "../../../verlet-gpu/ui/components/CheckboxComponent";
+import {Engine} from "../../../engine/Engine";
+import {CheckboxComponent} from "../../../../verlet-gpu/ui/components/CheckboxComponent";
 
-export const SimulationSettings = ({engine}: {engine: Engine}) =>
+export const EditableSettings = ({engine}: {engine: Engine}) =>
 {
     const settings = engine.solver.settingsBuffer.settings;
 

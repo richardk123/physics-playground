@@ -4,7 +4,6 @@ import {Camera} from "../../../engine/data/Camera";
 import {Engine} from "../../../engine/Engine";
 import {Colors} from "../../../engine/data/Color";
 import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
-import {EngineSingleton} from "./EngineSingleton";
 
 export const createScene2 = async (canvas: HTMLCanvasElement) =>
 {
@@ -31,13 +30,12 @@ export const createScene2 = async (canvas: HTMLCanvasElement) =>
     }
 
     const engine = await Engine.create(canvas, settings, camera);
-    EngineSingleton.set(engine);
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
     engine.createRectangleRandom(0, 10, 50, fullWidth / 2, 1, Colors.blue());
-    engine.createRectangleRandom(100, 10, 50, fullWidth / 2, 1, Colors.green());
-    engine.createRectangleRandom(300, 10, 50, fullWidth / 2, 1, Colors.red());
-    engine.createRectangleRandom(400, 10, 50, fullWidth / 2, 1, Colors.white());
+    engine.createRectangleRandom(100, 10, 50, fullWidth / 2, 1.2, Colors.green());
+    engine.createRectangleRandom(300, 10, 50, fullWidth / 2, 1.4, Colors.red());
+    engine.createRectangleRandom(400, 10, 50, fullWidth / 2, 1.6, Colors.white());
 
     // registerScrolling(canvas, camera);
     // registerMoving(canvas, camera);
