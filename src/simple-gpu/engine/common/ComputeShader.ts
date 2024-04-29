@@ -29,7 +29,8 @@ export class ComputeShaderBuilder
 
     public async build(): Promise<ComputeShader>
     {
-        const code = await fetch(`/physics-playground/simple-gpu/${this.name}.wgsl`).then(r => r.text());
+        const code = await fetch(`/physics-playground/simple-gpu/${this.name}.wgsl`, {cache: "no-store"})
+            .then(r => r.text());
         return new ComputeShader(this.engine, code, this.name, this.bufferBindings);
     }
 
