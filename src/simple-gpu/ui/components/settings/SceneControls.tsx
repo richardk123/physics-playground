@@ -34,11 +34,12 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
 
     const startStopEngine = async (running: boolean, engine: Engine) =>
     {
-        engine.running = running;
-        setRunning(engine.running);
-        await engine.next();
-        await engine.simulateLoop();
-        await engine.renderLoop();
+        setRunning(running);
+        await engine.startLoop();
+        if (!running)
+        {
+            engine.stop();
+        }
     }
 
     const startStop = async () =>

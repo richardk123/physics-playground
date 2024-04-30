@@ -20,9 +20,7 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
             {
                 console.log("init first scene");
                 setEngine(engine);
-                engine.running = true;
-                await engine.simulateLoop();
-                await engine.renderLoop();
+                await engine.startLoop();
             })
     },[canvas]);
 
