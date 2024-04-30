@@ -32,7 +32,7 @@ export const createSimpleScene = async (canvas: HTMLCanvasElement) =>
 
     const engine = await Engine.create(canvas, settings, camera);
 
-    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
+    const m1 = engine.addMaterial({targetDensity: 3.0, smoothingRadius: 1.8, pressureMultiplier: 100});
 
     const width = Math.floor((settings.cellSize * count) / 0.5);
     const height = width / 5;
