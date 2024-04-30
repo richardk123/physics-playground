@@ -9,6 +9,7 @@ import {PrefixSumBuffer} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
 import {Renderer} from "./renderer/Renderer";
 import {Color} from "./data/Color";
+import {Material, Materials, MaterialsBuffer} from "./data/Material";
 
 export class Engine
 {
@@ -33,14 +34,16 @@ export class Engine
     {
         const engine = await GPUEngine.create(canvas, settings);
         const particles = Particles.create(settings.maxParticleCount);
+        const materials = Materials.create();
 
         const particlesBuffer = new ParticlesBuffer(engine, settings, particles);
+        const materialBuffer = new MaterialsBuffer(engine, settings, materials);
         const settingsBuffer = new EngineSettingsBuffer(engine, settings, particles, camera);
         const gridBuffer = new GridBuffer(engine, settings);
         const prefixSumBuffer = new PrefixSumBuffer(engine, settings);
         const positionChangeBuffer = new PositionChangeBuffer(engine, settings);
 
-        const solver = await Solvers.create(engine, particlesBuffer, settingsBuffer,
+        const solver = await Solvers.create(engine, particlesBuffer, materialBuffer, settingsBuffer,
             gridBuffer, prefixSumBuffer, positionChangeBuffer);
 
         const renderer = await RendererCircle.create(engine, camera, particlesBuffer);
@@ -84,6 +87,12 @@ export class Engine
     public addPoint(x: number, y: number, mass: number, color: Color)
     {
         this.solver.particlesBuffer.particles.addPoint(x, y, mass, color);
+    }
+
+    // return material index
+    public addMaterial(material: Material)
+    {
+        return this.solver.materialsBuffer.materials.addMaterial(material);
     }
 
     public stop()

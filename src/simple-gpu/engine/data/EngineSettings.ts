@@ -8,6 +8,7 @@ import {MouseTracker} from "../common/MouseTracker";
 export interface EngineSettings
 {
     maxParticleCount: number;
+    maxMaterialCount: number;
     gridSizeX: number;
     gridSizeY: number;
     cellSize: number;

@@ -8,6 +8,7 @@ import {Engine} from "../../../engine/Engine";
 import {createScene1} from "../scene/Scene1";
 import {EditableSettings} from "./EditableSettings";
 import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
+import {MaterialControls} from "./MaterialControls";
 
 export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
 {
@@ -56,6 +57,9 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
             </AccordionComponent>
             <AccordionComponent expanded={false} label="Simulation settings">
                 <EditableSettings engine={engine}/>
+            </AccordionComponent>
+            <AccordionComponent expanded={false} label="Materials">
+                <MaterialControls engine={engine}/>
             </AccordionComponent>
         </Card>
     }

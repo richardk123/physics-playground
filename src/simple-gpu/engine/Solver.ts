@@ -4,6 +4,7 @@ import {ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
 import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
 import {PositionChangeBuffer} from "./data/PositionChange";
+import {MaterialsBuffer} from "./data/Material";
 
 export interface SolverTimeMeasurement
 {
@@ -26,6 +27,7 @@ export interface Solver
     simulate: () => Promise<void>;
     destroy: () => void;
     particlesBuffer: ParticlesBuffer;
+    materialsBuffer: MaterialsBuffer;
     settingsBuffer: EngineSettingsBuffer;
     gridBuffer: GridBuffer;
     prefixSumBuffer: () => PrefixSumBuffer;
@@ -36,6 +38,7 @@ export class Solvers
 {
     public static async create(engine: GPUEngine,
                                particlesBuffer: ParticlesBuffer,
+                               materialsBuffer: MaterialsBuffer,
                                settingsBuffer: EngineSettingsBuffer,
                                gridBuffer: GridBuffer,
                                prefixSumBuffer: PrefixSumBuffer,
@@ -129,6 +132,7 @@ export class Solvers
 
                 settingsBuffer.write();
                 particlesBuffer.write();
+                materialsBuffer.write();
 
                 const subStepCount = settingsBuffer.settings.subStepCount;
                 const particleCount = particlesBuffer.particles.count;
@@ -162,9 +166,12 @@ export class Solvers
                         await particlesBuffer.loadFromGpu();
                         await settingsBuffer.loadFromGpu();
                         await gridBuffer.loadFromGpu();
+                        await materialsBuffer.loadFromGpu();
+
                         // await prefixSum.printGPUData();
-                        await particlesBuffer.printParticlesFromGpu();
+                        // await particlesBuffer.printParticlesFromGpu();
                         // console.log(settingsBuffer.gpuData);
+                        await materialsBuffer.printMaterialsFromGpu();
                     }
                 }
                 timeMeasurement = {
@@ -185,12 +192,14 @@ export class Solvers
             destroy: () =>
             {
                 particlesBuffer.destroy();
+                materialsBuffer.destroy();
                 settingsBuffer.destroy();
                 gridBuffer.destroy();
                 prefixSumBuffer.destroy();
                 positionChangeBuffer.destroy();
             },
             particlesBuffer: particlesBuffer,
+            materialsBuffer: materialsBuffer,
             settingsBuffer: settingsBuffer,
             gridBuffer: gridBuffer,
             prefixSumBuffer: () => prefixSum.buffer,

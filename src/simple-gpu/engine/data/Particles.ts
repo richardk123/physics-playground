@@ -69,7 +69,7 @@ class ParticleBufferHolder
                 settings: EngineSettings)
     {
         const maxParticleBufferSize = settings.maxParticleCount * 4 * OFFSET;
-        this.buffer = engine.createBuffer("current-position", maxParticleBufferSize, "storage");
+        this.buffer = engine.createBuffer("particles", maxParticleBufferSize, "storage");
     }
 
 }

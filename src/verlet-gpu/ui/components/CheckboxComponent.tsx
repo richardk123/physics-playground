@@ -10,10 +10,16 @@ interface Props
 
 export const CheckboxComponent = (props: Props) =>
 {
+    const [value, setValue] = useState(props.value);
+
     return <Box component="form"sx={{'& > :not(style)': { m: 1, width: '25ch' },}}>
         <Checkbox
-            checked={props.value}
-            onChange={e => props.setValue(e.target.checked)}
+            defaultChecked={value}
+            onChange={e =>
+            {
+                props.setValue(e.target.checked)
+                setValue(e.target.checked);
+            }}
         />
     </Box>
 }
