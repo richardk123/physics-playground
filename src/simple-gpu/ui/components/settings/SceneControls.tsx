@@ -1,26 +1,14 @@
 import {Autocomplete, TextField} from "@mui/material";
-import {createScene1} from "../scene/Scene1";
-import {createScene2} from "../scene/Scene2";
 import {Button} from "@material-tailwind/react";
 import {useState} from "react";
 import {Engine} from "../../../engine/Engine";
-import {createSmallScene} from "../scene/SmallScene";
+import {createScenes, Scene} from "../scene/Scenes";
 
-interface Scene
-{
-    label: string,
-    create: () => Promise<Engine>;
-}
 export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCanvasElement, engine: Engine, onChangeEngine: (engine: Engine) => void}) =>
 {
     const [scene, setScene] = useState<Scene | undefined>(undefined);
     const [running, setRunning] = useState(true);
-
-    const scenes: Scene[] = [
-        { label: 'Mass scene', create: () => createScene1(canvas)},
-        { label: 'Multiple Colors scene', create: () => createScene2(canvas)},
-        { label: 'Small scene', create: () => createSmallScene(canvas)},
-    ];
+    const scenes = createScenes(canvas);
 
     const onChange = async (event: React.SyntheticEvent<Element, Event>, scene: Scene | null) =>
     {

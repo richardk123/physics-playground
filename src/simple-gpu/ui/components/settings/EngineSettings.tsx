@@ -5,10 +5,10 @@ import React, {useEffect, useState} from "react";
 import {TimeMeasurements} from "./TimeMeasurements";
 import {SceneControls} from "./SceneControls";
 import {Engine} from "../../../engine/Engine";
-import {createScene1} from "../scene/Scene1";
 import {EditableSettings} from "./EditableSettings";
 import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 import {MaterialControls} from "./MaterialControls";
+import {createSimpleScene} from "../scene/SimpleScene";
 
 export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
 {
@@ -16,7 +16,7 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
 
     useEffect(() =>
     {
-        createScene1(canvas)
+        createSimpleScene(canvas)
             .then(async engine =>
             {
                 console.log("init first scene");

@@ -14,7 +14,7 @@ export class Colors
 
     static blue = (): Color =>
     {
-        return {r: 25, g: 25, b: 255}
+        return {r: 25, g: 25, b: 175}
     }
 
     static pink = (): Color =>
