@@ -15,18 +15,22 @@ export const SliderComponent = (props: Props) =>
 
     useEffect(() =>
     {
-        props.setValue(value);
-    }, [value]);
+        setValue(props.value);
+    }, [props]);
 
     return <Box component="form"sx={{'& > :not(style)': { m: 1, width: '25ch' },}}>
         <Slider
-            defaultValue={value}
+            value={value}
             valueLabelDisplay="auto"
             step={props.step || (props.maxVal - props.minVal) / 500}
             marks
             min={props.minVal}
             max={props.maxVal}
-            onChange={(e, v) => setValue(Number(v))}
+            onChange={(e, v) =>
+            {
+                props.setValue(Number(v));
+                setValue(Number(v));
+            }}
         />
     </Box>
 }

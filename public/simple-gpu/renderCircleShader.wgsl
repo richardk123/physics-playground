@@ -18,6 +18,7 @@ struct Particle
     density: f32,
     mass: f32,
     color: vec3<f32>,
+    materialIndex: u32,
 }
 
 struct VertexOutput {

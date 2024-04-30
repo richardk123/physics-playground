@@ -6,7 +6,12 @@ import {Color} from "./Color";
 const OFFSET = 12;
 export class Particles
 {
-    public data: Float32Array;
+    // position vec2<f32>
+    // previousPosition vec2<f32>
+    // velocity vec2<f32>
+    // density f32
+    // material index
+    public data: ArrayBuffer;
     public count: number;
     // data has been changed, buffer needs to be written
     public dataChanged: boolean = true;
@@ -14,16 +19,12 @@ export class Particles
     private constructor(data: ArrayBuffer,
                         count: number)
     {
-        this.data = new Float32Array(data);
+        this.data = data;
         this.count = count;
     }
 
     static create(maxParticleCount: number)
     {
-        // position vec2<f32>
-        // previousPosition vec2<f32>
-        // velocity vec2<f32>
-        // density f32
         const arraySize = maxParticleCount * 4 * OFFSET;
         const data = new ArrayBuffer(arraySize);
         return new Particles(data, 0);
@@ -35,26 +36,29 @@ export class Particles
         return new Particles(data, count);
     }
 
-    public addPoint(x: number, y: number, mass: number, color: Color)
+    public addPoint(x: number, y: number, mass: number, color: Color, materialIndex: number)
     {
         const index = this.count;
+        const floatData = new Float32Array(this.data);
+        const intData = new Int32Array(this.data);
         // current pos
-        this.data[index * OFFSET + 0] = x;
-        this.data[index * OFFSET + 1] = y;
+        floatData[index * OFFSET + 0] = x;
+        floatData[index * OFFSET + 1] = y;
         // previous pos
-        this.data[index * OFFSET + 2] = x;
-        this.data[index * OFFSET + 3] = y;
+        floatData[index * OFFSET + 2] = x;
+        floatData[index * OFFSET + 3] = y;
         // velocity
-        this.data[index * OFFSET + 4] = 0;
-        this.data[index * OFFSET + 5] = 0;
+        floatData[index * OFFSET + 4] = 0;
+        floatData[index * OFFSET + 5] = 0;
         // density
-        this.data[index * OFFSET + 6] = 0;
+        floatData[index * OFFSET + 6] = 0;
         // mass
-        this.data[index * OFFSET + 7] = mass;
+        floatData[index * OFFSET + 7] = mass;
         // color
-        this.data[index * OFFSET + 8] = color.r / 255;
-        this.data[index * OFFSET + 9] = color.g / 255;
-        this.data[index * OFFSET + 10] = color.b / 255;
+        floatData[index * OFFSET + 8] = color.r / 255;
+        floatData[index * OFFSET + 9] = color.g / 255;
+        floatData[index * OFFSET + 10] = color.b / 255;
+        intData[index * OFFSET + 11] = materialIndex;
 
         this.count += 1;
         this.dataChanged = true;
@@ -138,23 +142,34 @@ export class ParticlesBuffer
     {
         const size = this.particles.count * 4 * OFFSET;
 
-        const sourceData = new Float32Array(await this.getSwapped().buffer.readBuffer(size));
-        const data = new Float32Array(await this.getCurrent().buffer.readBuffer(size));
+        const sourceData = await this.getSwapped().buffer.readBuffer(size);
+        const data = await this.getCurrent().buffer.readBuffer(size);
 
-        const aggregateParticleData = (array: Float32Array) => {
-            return array.reduce((acc: number[][], curr: number, index: number, array: Float32Array) => {
+        const aggregateParticleData = (floatArray: Float32Array, intArray: Int32Array) => {
+            return floatArray.reduce((acc: number[][], curr: number, index: number, array: Float32Array) => {
                 if (index % OFFSET === 0) {
-                    acc.push([array[index + 0], array[index + 1], array[index + 2], array[index + 3], array[index + 4], array[index + 5], array[index + 6], array[index + 7], array[index + 8], array[index + 9], array[index + 10]]);
+                    acc.push([
+                        array[index + 0], array[index + 1], array[index + 2],
+                        array[index + 3], array[index + 4], array[index + 5],
+                        array[index + 6], array[index + 7], array[index + 8],
+                        array[index + 9], array[index + 10], intArray[index + 11]]);
                 }
                 return acc;
             }, []);
         }
 
-        const mapPair = (array: number[], index: number) =>
+        const stringifyParticle = (array: number[], index: number) =>
         {
             if (array.every(v => v !== undefined))
             {
-                return `i: ${index}: { cur:[${array[0].toFixed(2)}, ${array[1].toFixed(2)}], pre:[${array[2].toFixed(2)}, ${array[3].toFixed(2)}], vel:[${array[4].toFixed(2)}, ${array[5].toFixed(2)}], density:[${array[6].toFixed(2)}], mass:[${array[7].toFixed(2)}], r:[${array[8].toFixed(2)}], g:[${array[9].toFixed(2)}], b:[${array[10].toFixed(2)}] }`;
+                const posCur = `cur:[${array[0].toFixed(2)}, ${array[1].toFixed(2)}]`;
+                const posPrev = `pre:[${array[2].toFixed(2)}, ${array[3].toFixed(2)}]`;
+                const vel = `vel:[${array[4].toFixed(2)}, ${array[5].toFixed(2)}]`;
+                const density = `density:[${array[6].toFixed(2)}]`;
+                const mass = `mass:[${array[7].toFixed(2)}]`;
+                const color = `color: [r: ${array[8].toFixed(2)}], g:[${array[9].toFixed(2)}], b:[${array[10].toFixed(2)}]`;
+                const materialIndex = `material:[${array[11]}]`;
+                return `i: ${index}: { ${posCur}, ${posPrev}, ${vel}, ${density}, ${mass}, ${color}, ${materialIndex}`;
             }
             else
             {
@@ -164,8 +179,12 @@ export class ParticlesBuffer
         // already swapped
         // console.log(`source pos cur: ${aggregateParticleData(targetPositionCurrentData).map(mapPair).join(", ")}`);
 
-        console.log(`particles: \n ${aggregateParticleData(data).map(mapPair).join("\n ")}`);
-        console.log(`particles swapped: \n ${aggregateParticleData(sourceData).map(mapPair).join("\n ")}`);
+        const dataFloat = new Float32Array(data);
+        const dataInt = new Int32Array(data);
+        console.log(`particles: \n ${aggregateParticleData(dataFloat, dataInt).map(stringifyParticle).join("\n ")}`);
+        const sourceDataFloat = new Float32Array(sourceData);
+        const sourceDataInt = new Int32Array(data);
+        console.log(`particles swapped: \n ${aggregateParticleData(sourceDataFloat, sourceDataInt).map(stringifyParticle).join("\n ")}`);
     }
 
     public destroy()

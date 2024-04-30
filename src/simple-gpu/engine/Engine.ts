@@ -54,7 +54,8 @@ export class Engine
     public createRectangle(bottomLeftX: number, bottomLeftY: number,
                            width: number, height: number,
                            mass: number,
-                           color: Color)
+                           color: Color,
+                           materialIndex: number)
     {
         for (let y = 0; y < height; y++)
         {
@@ -62,7 +63,7 @@ export class Engine
             {
                 const nx = bottomLeftX + x * 1.1;
                 const ny = bottomLeftY + y * 1.1;
-                this.addPoint(nx, ny, mass, color);
+                this.addPoint(nx, ny, mass, color, materialIndex);
             }
         }
     }
@@ -70,7 +71,8 @@ export class Engine
     public createRectangleRandom(bottomLeftX: number, bottomLeftY: number,
                                  width: number, height: number,
                                  mass: number,
-                                 color: Color)
+                                 color: Color,
+                                 materialIndex: number)
     {
         const shrink = 0.5;
         for (let y = 0; y < height; y++)
@@ -79,14 +81,14 @@ export class Engine
             {
                 const nx = bottomLeftX  * shrink+ (x * shrink) + (Math.random() * 0.01);
                 const ny = bottomLeftY * shrink + (y * shrink) + (Math.random() * 0.01);
-                this.addPoint(nx, ny, mass, color);
+                this.addPoint(nx, ny, mass, color, materialIndex);
             }
         }
     }
 
-    public addPoint(x: number, y: number, mass: number, color: Color)
+    public addPoint(x: number, y: number, mass: number, color: Color, materialIndex: number)
     {
-        this.solver.particlesBuffer.particles.addPoint(x, y, mass, color);
+        this.solver.particlesBuffer.particles.addPoint(x, y, mass, color, materialIndex);
     }
 
     // return material index

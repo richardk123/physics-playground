@@ -2,7 +2,7 @@ import {Buffer} from "../common/Buffer";
 import {GPUEngine} from "../common/GPUEngine";
 import {EngineSettings} from "./EngineSettings";
 
-const OFFSET = 4;
+const OFFSET = 3;
 
 export interface Material
 {
@@ -55,7 +55,8 @@ export class Materials
 
     public addMaterial(material: Material)
     {
-        return this.materials.push(material);
+        const arrayLen = this.materials.push(material);
+        return arrayLen - 1;
     }
 
     public serializeMaterials(maxMaterialCount: number)
@@ -66,9 +67,7 @@ export class Materials
             data[i * OFFSET + 0] = m.targetDensity;
             data[i * OFFSET + 1] = m.pressureMultiplier;
             data[i * OFFSET + 2] = m.smoothingRadius;
-            data[i * OFFSET + 3] = 0;
-        })
-
+        });
         return data;
     }
 }

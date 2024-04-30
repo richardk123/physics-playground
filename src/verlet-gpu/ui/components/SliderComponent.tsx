@@ -26,7 +26,11 @@ export const SliderComponent = (props: Props) =>
             marks
             min={props.minVal}
             max={props.maxVal}
-            onChange={(e, v) => setValue(Number(v))}
+            onChange={(e, v) =>
+            {
+                props.setValue(Number(v));
+                setValue(Number(v));
+            }}
         />
     </Box>
 }

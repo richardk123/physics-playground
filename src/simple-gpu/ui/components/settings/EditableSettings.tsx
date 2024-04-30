@@ -1,8 +1,8 @@
-import {BoxTitle} from "../../../../verlet-gpu/ui/components/BoxTitle";
-import {SliderComponent} from "../../../../verlet-gpu/ui/components/SliderComponent";
 import React from "react";
 import {Engine} from "../../../engine/Engine";
-import {CheckboxComponent} from "../../../../verlet-gpu/ui/components/CheckboxComponent";
+import {CheckboxComponent} from "../common/CheckboxComponent";
+import {SliderComponent} from "../common/SliderComponent";
+import {BoxTitle} from "../common/BoxTitle";
 
 export const EditableSettings = ({engine}: {engine: Engine}) =>
 {

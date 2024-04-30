@@ -2,8 +2,8 @@ import {Engine} from "../../../engine/Engine";
 import React, {useEffect, useState} from "react";
 import {SolverTimeMeasurement} from "../../../engine/Solver";
 import {timer} from "rxjs";
-import {BoxTitle} from "../../../../verlet-gpu/ui/components/BoxTitle";
-import {CheckboxComponent} from "../../../../verlet-gpu/ui/components/CheckboxComponent";
+import {BoxTitle} from "../common/BoxTitle";
+import {CheckboxComponent} from "../common/CheckboxComponent";
 
 export const TimeMeasurements = ({engine}: {engine: Engine}) =>
 {

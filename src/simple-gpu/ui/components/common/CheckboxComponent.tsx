@@ -12,9 +12,14 @@ export const CheckboxComponent = (props: Props) =>
 {
     const [value, setValue] = useState(props.value);
 
+    useEffect(() =>
+    {
+        setValue(props.value);
+    }, [props]);
+
     return <Box component="form"sx={{'& > :not(style)': { m: 1, width: '25ch' },}}>
         <Checkbox
-            defaultChecked={value}
+            checked={value}
             onChange={e =>
             {
                 props.setValue(e.target.checked);

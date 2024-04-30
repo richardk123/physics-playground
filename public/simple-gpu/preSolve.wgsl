@@ -18,6 +18,7 @@ struct Particle
     density: f32,
     mass: f32,
     color: vec3<f32>,
+    materialIndex: u32,
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;

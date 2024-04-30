@@ -105,6 +105,7 @@ export class Solvers
             .addBuffer(() => particlesBuffer.getCurrent().buffer, "storage")
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
+            .addBuffer(() => materialsBuffer.buffer, "read-only-storage")
             .build();
 
         const densitySolve = await engine.createComputeShader("densitySolve")
@@ -113,6 +114,7 @@ export class Solvers
             .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .addBuffer(() => gridBuffer.cellParticleCountBuffer, "read-only-storage")
             .addBuffer(() => positionChangeBuffer.buffer, "storage")
+            .addBuffer(() => materialsBuffer.buffer, "read-only-storage")
             .build();
 
         const boundingBox = await engine.createComputeShader("boundingBox")
@@ -163,14 +165,14 @@ export class Solvers
 
                     if (settingsBuffer.settings.debug)
                     {
-                        await particlesBuffer.loadFromGpu();
+                        // await particlesBuffer.loadFromGpu();
                         await settingsBuffer.loadFromGpu();
                         await gridBuffer.loadFromGpu();
                         await materialsBuffer.loadFromGpu();
 
                         // await prefixSum.printGPUData();
-                        // await particlesBuffer.printParticlesFromGpu();
                         // console.log(settingsBuffer.gpuData);
+                        await particlesBuffer.printParticlesFromGpu();
                         await materialsBuffer.printMaterialsFromGpu();
                     }
                 }

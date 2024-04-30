@@ -4,6 +4,7 @@ import {createScene2} from "../scene/Scene2";
 import {Button} from "@material-tailwind/react";
 import {useState} from "react";
 import {Engine} from "../../../engine/Engine";
+import {createSmallScene} from "../scene/SmallScene";
 
 interface Scene
 {
@@ -16,8 +17,9 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
     const [running, setRunning] = useState(true);
 
     const scenes: Scene[] = [
-        { label: 'Scene 1', create: () => createScene1(canvas)},
-        { label: 'Scene 2', create: () => createScene2(canvas)},
+        { label: 'Mass scene', create: () => createScene1(canvas)},
+        { label: 'Multiple Colors scene', create: () => createScene2(canvas)},
+        { label: 'Small scene', create: () => createSmallScene(canvas)},
     ];
 
     const onChange = async (event: React.SyntheticEvent<Element, Event>, scene: Scene | null) =>

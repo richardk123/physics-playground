@@ -11,6 +11,7 @@ export const DensityDebugRenderer = ({engine}: {engine: Engine}) =>
         if (engine)
         {
             const particles = engine.solver.particlesBuffer.gpuParticles;
+            const particleData = new Float32Array(particles.data);
             const settings = engine.solver.settingsBuffer.settings;
             const camera = engine.renderer.cameraBuffer.camera;
             const transform = new Transformer(camera, canvas);
@@ -48,9 +49,9 @@ export const DensityDebugRenderer = ({engine}: {engine: Engine}) =>
             // render particles
             for (let i = 0; i < particles.count; i++)
             {
-                const x = particles.data[i * 8 + 0];
-                const y = particles.data[i * 8 + 1];
-                const density = particles.data[i * 8 + 6];
+                const x = particleData[i * 8 + 0];
+                const y = particleData[i * 8 + 1];
+                const density = particleData[i * 8 + 6];
 
                 const tPos = transform.toClipSpace().position(x, y);
                 const tSize = transform.toClipSpace().size(1);

@@ -1,10 +1,10 @@
 import {Engine} from "../../../engine/Engine";
 import {Material} from "../../../engine/data/Material";
-import {SliderComponent} from "../../../../verlet-gpu/ui/components/SliderComponent";
 import React from "react";
 import {BoxTitle} from "../common/BoxTitle";
 import {Typography} from "@mui/material";
 import {Card} from "@material-tailwind/react";
+import {SliderComponent} from "../common/SliderComponent";
 
 export const MaterialControls = ({engine}: {engine: Engine}) =>
 {
@@ -18,21 +18,21 @@ export const MaterialControls = ({engine}: {engine: Engine}) =>
                     <BoxTitle label="Pressure multiplier">
                         <SliderComponent value={material.pressureMultiplier}
                                          setValue={val => material.pressureMultiplier = val}
-                                         minVal={0}
+                                         minVal={1}
                                          maxVal={100}
                                          step={1}/>
                     </BoxTitle>
                     <BoxTitle label="Target density">
                         <SliderComponent value={material.targetDensity}
                                          setValue={val => material.targetDensity = val}
-                                         minVal={0}
+                                         minVal={1}
                                          maxVal={5}
                                          step={0.05}/>
                     </BoxTitle>
                     <BoxTitle label="Smoothing radius">
                         <SliderComponent value={material.smoothingRadius}
                                          setValue={val => material.smoothingRadius = val}
-                                         minVal={0}
+                                         minVal={1}
                                          maxVal={3}
                                          step={0.05}/>
                     </BoxTitle>

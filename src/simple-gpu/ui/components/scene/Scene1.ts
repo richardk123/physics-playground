@@ -3,7 +3,6 @@ import {Vec2d} from "../../../engine/data/Vec2d";
 import {Camera} from "../../../engine/data/Camera";
 import {Engine} from "../../../engine/Engine";
 import {Colors} from "../../../engine/data/Color";
-import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 
 export const createScene1 = async (canvas: HTMLCanvasElement) =>
 {
@@ -34,18 +33,20 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
     const engine = await Engine.create(canvas, settings, camera);
 
     const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
-    const m2 = engine.addMaterial({targetDensity: 3.0, smoothingRadius: 1.3, pressureMultiplier: 10});
+    const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
     const height = fullWidth / 4;
 
     engine.createRectangleRandom(0, 0,
         fullWidth, height,
-        2, Colors.blue())
+        2, Colors.blue(),
+        m1);
 
     engine.createRectangleRandom(0, height,
         fullWidth, height,
-        1, Colors.green())
+        1, Colors.green(),
+        m2);
 
     // registerScrolling(canvas, camera);
     // registerMoving(canvas, camera);
