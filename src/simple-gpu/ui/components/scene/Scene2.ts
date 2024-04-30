@@ -32,8 +32,8 @@ export const createScene2 = async (canvas: HTMLCanvasElement) =>
 
     const engine = await Engine.create(canvas, settings, camera);
 
-    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
-    const m2 = engine.addMaterial({targetDensity: 3.0, smoothingRadius: 1.3, pressureMultiplier: 10});
+    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.25, pressureMultiplier: 40});
+    const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.1, pressureMultiplier: 10});
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
     engine.createRectangleRandom(0, 10, 50, fullWidth / 2, 1, Colors.blue(), m1);

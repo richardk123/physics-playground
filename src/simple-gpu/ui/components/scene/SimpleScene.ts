@@ -15,7 +15,7 @@ export const createSimpleScene = async (canvas: HTMLCanvasElement) =>
         gridSizeX: count,
         subStepCount: 8,
         deltaTime: 1 / 60,
-        cellSize: 1.3 / Math.sqrt(2),
+        cellSize: 1.3,
         gravity: {x: 0, y: -10},
         debug: false,
         performance: false,

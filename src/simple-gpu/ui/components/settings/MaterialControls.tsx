@@ -32,7 +32,7 @@ export const MaterialControls = ({engine}: {engine: Engine}) =>
                     <BoxTitle label="Smoothing radius">
                         <SliderComponent value={material.smoothingRadius}
                                          setValue={val => material.smoothingRadius = val}
-                                         minVal={1}
+                                         minVal={1.1}
                                          maxVal={3}
                                          step={0.05}/>
                     </BoxTitle>

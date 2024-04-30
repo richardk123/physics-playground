@@ -15,7 +15,7 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
         gridSizeX: count,
         subStepCount: 8,
         deltaTime: 1 / 60,
-        cellSize: 1.3 / Math.sqrt(2),
+        cellSize: 1.2,
         gravity: {x: 0, y: -10},
         debug: false,
         performance: false,
@@ -32,11 +32,11 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
 
     const engine = await Engine.create(canvas, settings, camera);
 
-    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
-    const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 40});
+    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.6, pressureMultiplier: 100});
+    const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 30});
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
-    const height = fullWidth / 4;
+    const height = fullWidth / 8;
 
     engine.createRectangleRandom(0, 0,
         fullWidth, height,
