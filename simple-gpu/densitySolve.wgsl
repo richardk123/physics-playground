@@ -1,7 +1,4 @@
 const PI: f32 = 3.14159265359;
-const TARGET_DENSITY: f32 = 5.0;
-const PRESSURE_MULTIPLIER: f32 = 40;
-const SMOOTHING_RADIUS: f32 = 1.3;
 
 struct Settings
 {
@@ -23,6 +20,14 @@ struct Particle
     density: f32,
     mass: f32,
     color: vec3<f32>,
+    materialIndex: u32,
+}
+
+struct Material
+{
+    targetDensity: f32,
+    pressureMultiplier: f32,
+    smoothingRadius: f32,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
@@ -31,27 +36,27 @@ fn getGridID(p: vec2<f32>) -> u32 {
   return (settings.gridSizeX * y) + x;
 }
 
-fn smoothingKernelDerivative(distance: f32) -> f32
+fn smoothingKernelDerivative(distance: f32, smoothingRadius: f32) -> f32
 {
-    let scale = 12 / (pow(SMOOTHING_RADIUS, 4) * PI);
-    let distanceError = min(distance - SMOOTHING_RADIUS, 0);
+    let scale = 12 / (pow(smoothingRadius, 4) * PI);
+    let distanceError = min(distance - smoothingRadius, 0);
     return distanceError * scale;
 }
 
-fn convertDensityToPressure(density: f32) -> f32
+fn convertDensityToPressure(density: f32, targetDensity: f32, pressureMultiplier: f32) -> f32
 {
-    let densityError = density - TARGET_DENSITY;
-    return densityError * PRESSURE_MULTIPLIER;
+    let densityError = density - targetDensity;
+    return densityError * pressureMultiplier;
 }
 
-fn calculateSharedPressure(densityA: f32, densityB: f32) -> f32
+fn calculateSharedPressure(densityA: f32, densityB: f32, targetDensity: f32, pressureMultiplier: f32) -> f32
 {
-    let pressureA = convertDensityToPressure(densityA);
-    let pressureB = convertDensityToPressure(densityB);
+    let pressureA = convertDensityToPressure(densityA, targetDensity, pressureMultiplier);
+    let pressureB = convertDensityToPressure(densityB, targetDensity, pressureMultiplier);
     return (pressureA + pressureB) / 2;
 }
 
-fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
+fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIndex: u32)
 {
     let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
     let t1 = i32(gridId) - i32(settings.gridSizeX);
@@ -85,10 +90,10 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
             }
 
             let direction = normalize(diff);
-            let slope = smoothingKernelDerivative(dist);
+            let slope = smoothingKernelDerivative(dist, material.smoothingRadius);
             let densityA = particle.density;
             let densityB = anotherParticle.density;
-            let sharedPressure = calculateSharedPressure(densityA, densityB);
+            let sharedPressure = calculateSharedPressure(densityA, densityB, material.targetDensity, material.pressureMultiplier);
 
             if (densityB == 0.0)
             {
@@ -107,6 +112,7 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
 @group(0) @binding(2) var<storage, read> prefixSum : array<u32>;
 @group(0) @binding(3) var<storage, read> cellParticleCount : array<u32>;
 @group(0) @binding(4) var<storage, read_write> positionChange : array<vec2<f32>>;
+@group(0) @binding(5) var<storage, read> materials : array<Material>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
@@ -117,6 +123,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     }
 
     let particle = particles[id.x];
+    let material = materials[particle.materialIndex];
     let gridId = getGridID(particle.positionCurrent);
-    updateDensity(gridId, particle, id.x);
+    updateDensity(gridId, particle, material, id.x);
 }

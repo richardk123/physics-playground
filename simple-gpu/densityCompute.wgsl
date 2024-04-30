@@ -1,5 +1,4 @@
 const PI: f32 = 3.14159265359;
-const SMOOTHING_RADIUS: f32 = 1.3;
 
 struct Settings
 {
@@ -21,6 +20,14 @@ struct Particle
     density: f32,
     mass: f32,
     color: vec3<f32>,
+    materialIndex: u32,
+}
+
+struct Material
+{
+    targetDensity: f32,
+    pressureMultiplier: f32,
+    smoothingRadius: f32,
 }
 
 fn getGridID(p: vec2<f32>) -> u32 {
@@ -29,13 +36,13 @@ fn getGridID(p: vec2<f32>) -> u32 {
   return (settings.gridSizeX * y) + x;
 }
 
-fn smoothingKernel(distance: f32) -> f32
+fn smoothingKernel(distance: f32, smoothingRadius: f32) -> f32
 {
-    let volume = (PI * pow(SMOOTHING_RADIUS, 4)) / 6;
-    return ((SMOOTHING_RADIUS - distance) * (SMOOTHING_RADIUS - distance)) / volume;
+    let volume = (PI * pow(smoothingRadius, 4)) / 6;
+    return ((smoothingRadius - distance) * (smoothingRadius - distance)) / volume;
 }
 
-fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
+fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIndex: u32)
 {
     let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
     let t1 = i32(gridId) - i32(settings.gridSizeX);
@@ -60,9 +67,9 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
         {
             let anotherParticle = particles[i];
             let dist = distance(particle.positionCurrent, anotherParticle.positionCurrent);
-            if (dist < SMOOTHING_RADIUS)
+            if (dist < material.smoothingRadius)
             {
-                let influence = smoothingKernel(dist);
+                let influence = smoothingKernel(dist, material.smoothingRadius);
                 densityChange += influence * particle.mass;
 
                 // collor mixing
@@ -79,6 +86,7 @@ fn updateDensity(gridId: u32, particle: Particle, particleIndex: u32)
 @group(0) @binding(1) var<storage, read_write> particles: array<Particle>;
 @group(0) @binding(2) var<storage, read> prefixSum : array<u32>;
 @group(0) @binding(3) var<storage, read> cellParticleCount : array<u32>;
+@group(0) @binding(4) var<storage, read> materials : array<Material>;
 @compute
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
@@ -89,6 +97,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     }
 
     let particle = particles[id.x];
+    let material = materials[particle.materialIndex];
     let gridId = getGridID(particle.positionCurrent);
-    updateDensity(gridId, particle, id.x);
+    updateDensity(gridId, particle, material, id.x);
 }
