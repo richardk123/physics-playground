@@ -81,24 +81,33 @@ fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIn
         {
             let anotherParticle = particles[anotherParticleIndex];
 
-            let diff = anotherParticle.positionCurrent - particle.positionCurrent;
-            let dist = length(diff);
-
-            if (dist == 0.0)
-            {
-                continue;
-            }
-
-            let direction = normalize(diff);
-            let slope = smoothingKernelDerivative(dist, material.smoothingRadius);
             let densityA = particle.density;
             let densityB = anotherParticle.density;
-            let sharedPressure = calculateSharedPressure(densityA, densityB, material.targetDensity, material.pressureMultiplier);
 
             if (densityB == 0.0)
             {
                 continue;
             }
+
+            let diff = anotherParticle.positionCurrent - particle.positionCurrent;
+            let dist = length(diff);
+
+            if (particleIndex == anotherParticleIndex)
+            {
+                continue;
+            }
+
+            // hacky solution :D but it prevents particles to overlap
+            if (dist == 0.0)
+            {
+                moveVec = vec2<f32>(0.1, 0.1);
+                continue;
+            }
+
+            let direction = normalize(diff);
+            let slope = smoothingKernelDerivative(dist, material.smoothingRadius);
+
+            let sharedPressure = calculateSharedPressure(densityA, densityB, material.targetDensity, material.pressureMultiplier);
 
             moveVec += direction * ((sharedPressure * slope) / densityB);
         }
