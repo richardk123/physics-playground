@@ -27,6 +27,7 @@ export const ReadOnlySettings = ({engine}: {engine: Engine}) =>
     return <div className="w-full h-full">
         <p>Particle count: {particleCount}</p>
         <p>Grid size: {`[${settings?.gridSizeX}, ${settings?.gridSizeY}]`}</p>
+        <p>Cell size: {settings?.cellSize}</p>
         <p>Delta time: {settings?.deltaTime.toFixed(5)}</p>
         <p>Gravity {`[${settings?.gravity.x.toFixed(2)}, ${settings?.gravity.y.toFixed(2)}]`}</p>
         <p>Translation: {`[${camera?.translation.x.toFixed(2)}, ${camera?.translation.y.toFixed(2)}]`}</p>
