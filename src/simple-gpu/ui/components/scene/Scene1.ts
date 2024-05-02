@@ -36,7 +36,7 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
     const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 30});
 
     const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
-    const height = fullWidth / 8;
+    const height = fullWidth / 10;
 
     engine.createRectangleRandom(0, 0,
         fullWidth, height,

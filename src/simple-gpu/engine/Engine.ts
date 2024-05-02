@@ -57,12 +57,13 @@ export class Engine
                            color: Color,
                            materialIndex: number)
     {
+        const shrink = 0.5;
         for (let y = 0; y < height; y++)
         {
             for (let x = 0; x < width; x++)
             {
-                const nx = bottomLeftX + x * 1.1;
-                const ny = bottomLeftY + y * 1.1;
+                const nx = bottomLeftX  * shrink+ (x * shrink);
+                const ny = bottomLeftY * shrink + (y * shrink);
                 this.addPoint(nx, ny, mass, color, materialIndex);
             }
         }
