@@ -40,11 +40,14 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
         camera.view *
         camera.model * vec4<f32>(0.0, vertexPos.x, vertexPos.y, 1.0);
 
-    let densityMultiplier = 2 / particle.density;
-    let colorMultiplier = clamp((length(particle.velocity * densityMultiplier)) / 25 / densityMultiplier, 1.0, 2.0);
+    let densityMultiplier = 3 / particle.density;
+    let speed = max(length(particle.velocity), 20.0) / 60;
+    let colorMultiplier = speed * densityMultiplier;
+
+    out.color = particles[instanceIndex].color * colorMultiplier;
     out.transformedPos = transformedPos;
     out.localSpace = TRIANGLE[vertexIndex];
-    out.color = particles[instanceIndex].color * colorMultiplier;
+
     return out;
 }
 
