@@ -42,7 +42,7 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
 
     let densityMultiplier = 3 / particle.density;
     let speed = max(length(particle.velocity), 20.0) / 60;
-    let colorMultiplier = speed * densityMultiplier;
+    let colorMultiplier = min(speed * densityMultiplier, 1.2);
 
     out.color = particles[instanceIndex].color * colorMultiplier;
     out.transformedPos = transformedPos;
