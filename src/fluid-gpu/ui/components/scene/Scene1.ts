@@ -4,16 +4,16 @@ import {Camera} from "../../../engine/data/Camera";
 import {Engine} from "../../../engine/Engine";
 import {Colors} from "../../../engine/data/Color";
 
-export const createSimpleScene = async (canvas: HTMLCanvasElement) =>
+export const createScene1 = async (canvas: HTMLCanvasElement) =>
 {
     const count = 256;
 
     const settings: EngineSettings = {
-        maxParticleCount: 400000,
+        maxParticleCount: 1000000,
         maxMaterialCount: 100,
         gridSizeY: count,
         gridSizeX: count,
-        subStepCount: 6,
+        subStepCount: 8,
         deltaTime: 1 / 60,
         cellSize: 1.2,
         gravity: {x: 0, y: -10},
@@ -21,24 +21,32 @@ export const createSimpleScene = async (canvas: HTMLCanvasElement) =>
         performance: false,
     }
     const translation: Vec2d = {
-        x: (settings.gridSizeX / 2) * 0.9,
-        y: (settings.gridSizeY / 2) * 0.9
+        x: 155.15,
+        y: 109.89
     }
     const camera: Camera = {
-        zoom: 0.38718,
+        zoom: 0.25770,
         translation: translation,
         rotation: 0,
     }
 
     const engine = await Engine.create(canvas, settings, camera);
 
-    const m1 = engine.addMaterial({targetDensity: 2.0, smoothingRadius: 1.8, pressureMultiplier: 100});
+    const m1 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.6, pressureMultiplier: 100});
+    const m2 = engine.addMaterial({targetDensity: 5.0, smoothingRadius: 1.3, pressureMultiplier: 30});
 
-    const width = Math.floor((settings.cellSize * count) / 0.5);
-    const height = width / 4;
+    const fullWidth = Math.floor((settings.cellSize * count) / 0.5);
+    const height = fullWidth / 10;
 
     engine.createRectangleRandom(0, 0,
-        width, height, 1, Colors.blue(), m1);
+        fullWidth, height,
+        2, Colors.blue(),
+        m1);
+
+    engine.createRectangleRandom(0, height,
+        fullWidth, height,
+        1, Colors.green(),
+        m2);
 
     console.log("scene1 created");
 

@@ -3,6 +3,7 @@ import {createScene2} from "./Scene2";
 import {createSmallScene} from "./SmallScene";
 import {Engine} from "../../../engine/Engine";
 import {createSimpleScene} from "./SimpleScene";
+import {createLettersScene} from "./LettersScene";
 
 export interface Scene
 {
@@ -13,6 +14,7 @@ export interface Scene
 export const createScenes = (canvas: HTMLCanvasElement): Scene[] =>
 {
     return [
+        { label: 'Letters scene', create: () => createLettersScene(canvas)},
         { label: 'Simple scene', create: () => createSimpleScene(canvas)},
         { label: 'Two materials scene', create: () => createScene1(canvas)},
         { label: 'Multiple Colors scene', create: () => createScene2(canvas)},

@@ -8,15 +8,16 @@ import {Engine} from "../../../engine/Engine";
 import {EditableSettings} from "./EditableSettings";
 import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 import {MaterialControls} from "./MaterialControls";
-import {createSimpleScene} from "../scene/SimpleScene";
+import {createScenes} from "../scene/Scenes";
 
 export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
 {
     const [engine, setEngine] = useState<Engine | undefined>(undefined);
+    const scenes = createScenes(canvas);
 
     useEffect(() =>
     {
-        createSimpleScene(canvas)
+        scenes[0].create()
             .then(async engine =>
             {
                 console.log("init first scene");

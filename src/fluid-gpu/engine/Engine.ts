@@ -55,9 +55,9 @@ export class Engine
                            width: number, height: number,
                            mass: number,
                            color: Color,
-                           materialIndex: number)
+                           materialIndex: number,
+                           shrink = 0.5)
     {
-        const shrink = 0.5;
         for (let y = 0; y < height; y++)
         {
             for (let x = 0; x < width; x++)
@@ -73,9 +73,9 @@ export class Engine
                                  width: number, height: number,
                                  mass: number,
                                  color: Color,
-                                 materialIndex: number)
+                                 materialIndex: number,
+                                 shrink = 0.5)
     {
-        const shrink = 0.5;
         for (let y = 0; y < height; y++)
         {
             for (let x = 0; x < width; x++)

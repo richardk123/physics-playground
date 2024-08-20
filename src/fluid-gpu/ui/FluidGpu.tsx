@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {EngineSettings} from "./components/settings/EngineSettings";
 
-export const SimpleGpu = () =>
+export const FluidGpu = () =>
 {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [canvasLoaded, setCanvasLoaded] = useState(false);
