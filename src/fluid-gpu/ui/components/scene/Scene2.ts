@@ -19,6 +19,8 @@ export const createScene2 = async (canvas: HTMLCanvasElement) =>
         gravity: {x: 0, y: -10},
         debug: false,
         performance: false,
+        solveDensity: true,
+        solveCollisions: false,
     }
 
     const translation: Vec2d = {

@@ -14,8 +14,8 @@ export interface Scene
 export const createScenes = (canvas: HTMLCanvasElement): Scene[] =>
 {
     return [
-        { label: 'Letters scene', create: () => createLettersScene(canvas)},
         { label: 'Simple scene', create: () => createSimpleScene(canvas)},
+        { label: 'Letters scene', create: () => createLettersScene(canvas)},
         { label: 'Two materials scene', create: () => createScene1(canvas)},
         { label: 'Multiple Colors scene', create: () => createScene2(canvas)},
         { label: 'Small scene', create: () => createSmallScene(canvas)}

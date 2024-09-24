@@ -17,6 +17,8 @@ export interface EngineSettings
     gravity: Vec2d;
     debug: boolean; // debug to ui or console
     performance: boolean; // measure performance
+    solveDensity: boolean;
+    solveCollisions: boolean;
 }
 
 export interface SettingsGpuData
