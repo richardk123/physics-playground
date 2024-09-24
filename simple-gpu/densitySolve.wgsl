@@ -56,6 +56,22 @@ fn calculateSharedPressure(densityA: f32, densityB: f32, targetDensity: f32, pre
     return (pressureA + pressureB) / 2;
 }
 
+// Global state for the PRNG, private to each shader invocation
+var<private> randState: u32 = 123456789;  // Initial seed (can be any value)
+
+// Constants for the LCG
+const A: u32 = 1664525;
+const C: u32 = 1013904223;
+const M: u32 = 0xFFFFFFFF;  // 2^32 - 1 (since we're using a 32-bit number)
+
+fn rand() -> f32 {
+    // Linear Congruential Generator (LCG) formula
+    randState = (A * randState + C) % M;
+
+    // Normalize the result to a float between 0 and 1
+    return 0.5 - (f32(randState) / f32(M));
+}
+
 fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIndex: u32)
 {
     let gridSize = settings.gridSizeX * settings.gridSizeY - 1;
@@ -79,12 +95,17 @@ fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIn
 
         for (var anotherParticleIndex = particleStartId; anotherParticleIndex < particleEndId; anotherParticleIndex++)
         {
+            if (particleIndex == anotherParticleIndex)
+            {
+                continue;
+            }
+
             let anotherParticle = particles[anotherParticleIndex];
 
             let densityA = particle.density;
             let densityB = anotherParticle.density;
 
-            if (densityB == 0.0)
+            if (densityB <= 0.0)
             {
                 continue;
             }
@@ -92,15 +113,11 @@ fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIn
             let diff = anotherParticle.positionCurrent - particle.positionCurrent;
             let dist = length(diff);
 
-            if (particleIndex == anotherParticleIndex)
-            {
-                continue;
-            }
-
             // hacky solution :D but it prevents particles to overlap
             if (dist == 0.0)
             {
-                moveVec = vec2<f32>(0.1, 0.1);
+                randState = anotherParticleIndex;
+                moveVec += vec2<f32>(0.01 * rand(), 0.01 * rand());
                 continue;
             }
 
@@ -112,8 +129,9 @@ fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIn
             moveVec += direction * ((sharedPressure * slope) / densityB);
         }
     }
-
-    positionChange[particleIndex] = moveVec * settings.dt;
+    const reduceConst = 0.1;
+    let reduceSpeed = clamp((moveVec * settings.dt), vec2(-reduceConst, -reduceConst), vec2(reduceConst, reduceConst));
+    positionChange[particleIndex] = reduceSpeed;
 }
 
 @group(0) @binding(0) var<uniform> settings: Settings;

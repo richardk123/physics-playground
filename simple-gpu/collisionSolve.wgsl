@@ -66,8 +66,9 @@ fn updateParticle(gridId: u32, p: vec2<f32>, particleIndex: u32)
             }
         }
     }
-
-    positionChange[particleIndex] = moveVec;
+    const reduceConst = 0.1;
+    let reduceSpeed = clamp(moveVec, vec2(-reduceConst, -reduceConst), vec2(reduceConst, reduceConst));
+    positionChange[particleIndex] = reduceSpeed;
 }
 
 
