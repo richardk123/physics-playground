@@ -37,11 +37,8 @@ export const createSimpleScene = async (canvas: HTMLCanvasElement) =>
 
     const m1 = engine.addMaterial({targetDensity: 2.0, smoothingRadius: 1.8, pressureMultiplier: 100});
 
-    const width = Math.floor((settings.cellSize * count) / 0.5);
-    const height = width / 4;
-
     engine.createRectangleRandom(0, 0,
-        width, height, 1, Colors.blue(), m1);
+        250, 250, 1, Colors.blue(), m1, 0.7);
 
     console.log("scene1 created");
 
