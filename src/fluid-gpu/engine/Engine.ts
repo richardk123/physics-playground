@@ -46,7 +46,7 @@ export class Engine
         const solver = await Solvers.create(engine, particlesBuffer, materialBuffer, settingsBuffer,
             gridBuffer, prefixSumBuffer, positionChangeBuffer);
 
-        const renderer = await RendererCircle.create(engine, camera, particlesBuffer);
+        const renderer = await RendererCircle.create(engine, camera, particlesBuffer, materialBuffer);
         return new Engine(engine, solver, renderer);
     }
 

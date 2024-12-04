@@ -7,6 +7,7 @@ import {VisualizationXPDB} from "./xpdb/VisualizationXPDB";
 import {VisualizationXPDB2} from "./xpbd-02/VisualizationXPDB2";
 import {VisualizationFluidSim} from "./fluid-sim/VisualizationFluidSim";
 import {FluidGpu} from "./fluid-gpu/ui/FluidGpu";
+import {NBodyGPU} from "./n-body-gpu/ui/NBodyGPU";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/xpdb2" element={<VisualizationXPDB2 />} />
             <Route path="/fluid-gpu" element={<FluidGpu />} />
             <Route path="/fluid-sim" element={<VisualizationFluidSim />} />
+            <Route path="/n-body-gpu" element={<NBodyGPU />} />
           </Route>
         </Routes>
       </HashRouter>

@@ -21,6 +21,13 @@ struct Particle
     materialIndex: u32,
 }
 
+struct Material
+{
+    targetDensity: f32,
+    pressureMultiplier: f32,
+    smoothingRadius: f32,
+}
+
 struct VertexOutput {
     @builtin(position) transformedPos: vec4<f32>,
     @location(0) localSpace: vec2<f32>,
@@ -29,6 +36,7 @@ struct VertexOutput {
 
 @group(0) @binding(0) var<uniform> camera: Camera;
 @group(0) @binding(1) var<storage, read> particles: array<Particle>;
+@group(0) @binding(2) var<storage, read> materials : array<Material>;
 @vertex
 fn vs(@builtin(vertex_index) vertexIndex : u32,
       @builtin(instance_index) instanceIndex: u32) -> VertexOutput
@@ -40,11 +48,16 @@ fn vs(@builtin(vertex_index) vertexIndex : u32,
         camera.view *
         camera.model * vec4<f32>(0.0, vertexPos.x, vertexPos.y, 1.0);
 
+    let material = materials[particle.materialIndex];
+//    let surfaceMultiplier = max(0.1 / (material.targetDensity - particle.density), 0.5);
+    let density = clamp(material.targetDensity - particle.density, 0, material.targetDensity);
+    let lowDensity = density * 10;
+
     let densityMultiplier = 3 / particle.density;
     let speed = max(length(particle.velocity), 20.0) / 60;
     let colorMultiplier = min(speed * densityMultiplier, 1.2);
 
-    out.color = particles[instanceIndex].color * colorMultiplier;
+    out.color = (particles[instanceIndex].color * lowDensity + colorMultiplier);
     out.transformedPos = transformedPos;
     out.localSpace = TRIANGLE[vertexIndex];
 

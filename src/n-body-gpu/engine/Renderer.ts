@@ -1,32 +1,32 @@
-import {GPUEngine, GPUMeasurement} from "../common/GPUEngine";
-import {Camera, CameraBuffer} from "../data/Camera";
-import {ParticlesBuffer} from "../data/Particles";
-import {Renderer} from "./Renderer";
-import {MaterialsBuffer} from "../data/Material";
+import {GPUEngine, GPUMeasurement} from "./common/GPUEngine";
+import {GridBuffer} from "./data/Grid";
 
-export class RendererCircle implements Renderer
+export interface Renderer
+{
+    render(): void;
+    cpuTime: () => number;
+    gpuTime: () => number;
+    destroy: () => void;
+}
+
+
+export class GridRenderer implements Renderer
 {
     private engine: GPUEngine;
 
-    private particlesBuffer: ParticlesBuffer;
-    public cameraBuffer: CameraBuffer;
+    private gridBuffer: GridBuffer;
 
     private pipeline: GPURenderPipeline;
     private bindGroup: GPUBindGroup;
     private cpuMsPerFrame = 0;
     private gpuMeasurement: GPUMeasurement;
-    private materialsBuffer: MaterialsBuffer;
 
     private constructor(engine: GPUEngine,
                         shaderCode: string,
-                        camera: Camera,
-                        particlesBuffer: ParticlesBuffer,
-                        materialsBuffer: MaterialsBuffer)
+                        gridBuffer: GridBuffer)
     {
         this.engine = engine;
-        this.cameraBuffer = new CameraBuffer(engine, camera);
-        this.particlesBuffer = particlesBuffer;
-        this.materialsBuffer = materialsBuffer;
+        this.gridBuffer = gridBuffer;
 
         const device = engine.device;
         const presentationFormat = engine.presentationFormat;
@@ -37,21 +37,7 @@ export class RendererCircle implements Renderer
             entries: [
                 {
                     binding: 0,
-                    visibility: GPUShaderStage.VERTEX,
-                    buffer: {
-                        type: "uniform",
-                    }
-                },
-                {
-                    binding: 1,
-                    visibility: GPUShaderStage.VERTEX,
-                    buffer: {
-                        type: "read-only-storage",
-                    }
-                },
-                {
-                    binding: 2,
-                    visibility: GPUShaderStage.VERTEX,
+                    visibility: GPUShaderStage.FRAGMENT,
                     buffer: {
                         type: "read-only-storage",
                     }
@@ -85,9 +71,7 @@ export class RendererCircle implements Renderer
             label: 'triangle bind group',
             layout: bindGroupLayout,
             entries: [
-                { binding: 0, resource: { buffer: this.cameraBuffer.buffer.buffer }},
-                { binding: 1, resource: { buffer: particlesBuffer.getCurrent().buffer.buffer }},
-                { binding: 2, resource: { buffer: materialsBuffer.buffer.buffer }},
+                { binding: 0, resource: { buffer: this.gridBuffer.buffer.buffer }},
             ],
         });
 
@@ -96,14 +80,12 @@ export class RendererCircle implements Renderer
     }
 
     static async create(engine: GPUEngine,
-                        camera: Camera,
-                        particlesBuffer: ParticlesBuffer,
-                        materialsBuffer: MaterialsBuffer)
+                        gridBuffer: GridBuffer)
     {
-        const shaderCode = await (fetch('/physics-playground/simple-gpu/renderCircleShader.wgsl')
+        const shaderCode = await (fetch('/physics-playground/n-body/renderer.wgsl')
             .then((r) => r.text()));
 
-        return new RendererCircle(engine, shaderCode, camera, particlesBuffer, materialsBuffer);
+        return new GridRenderer(engine, shaderCode, gridBuffer);
     }
 
 
@@ -115,8 +97,6 @@ export class RendererCircle implements Renderer
         const context = this.engine.context;
         const pipeline = this.pipeline;
         const bindGroup = this.bindGroup;
-        // camera matrices
-        this.cameraBuffer.writeBuffer();
 
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
         const textureView : GPUTextureView = context.getCurrentTexture().createView();
@@ -131,20 +111,20 @@ export class RendererCircle implements Renderer
         });
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
-        renderpass.draw(3, this.particlesBuffer.particles.count);
+        renderpass.draw(6); // 2 triangles for a full-screen quad
         renderpass.end();
 
-        if (this.engine.settings.performance)
-        {
-            this.gpuMeasurement.copy(commandEncoder);
-        }
+        // if (this.engine.settings.performance)
+        // {
+        //     this.gpuMeasurement.copy(commandEncoder);
+        // }
 
         device.queue.submit([commandEncoder.finish()]);
 
-        if (this.engine.settings.performance)
-        {
-            this.gpuMeasurement.read(commandEncoder);
-        }
+        // if (this.engine.settings.performance)
+        // {
+        //     this.gpuMeasurement.read(commandEncoder);
+        // }
 
         this.cpuMsPerFrame = performance.now() - now;
     }
@@ -161,6 +141,5 @@ export class RendererCircle implements Renderer
 
     public destroy(): void
     {
-        this.cameraBuffer.destroy();
     }
 }

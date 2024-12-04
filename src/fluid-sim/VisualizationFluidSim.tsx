@@ -5,8 +5,6 @@ import p5Types from "p5";
 import {Renderers} from "./engine/Renderer";
 import {ParticleFormations} from "./engine/entitity/ParticleFormation";
 import {SettingsSidebar} from "./SettingsSidebar";
-import {createScene1} from "./engine/scene/Scene1";
-import {createScene2} from "./engine/scene/Scene2";
 import {mouseMove$} from "./engine/utils/CanvasUtils";
 import {Colors} from "./engine/entitity/Color";
 
