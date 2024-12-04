@@ -4,6 +4,6 @@
 fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     // apply gravity
-    particles[id.x].x += 1;
-    particles[id.x].y += 1;
+//    particles[id.x].x += 1;
+//    particles[id.x].y += 1;
 }

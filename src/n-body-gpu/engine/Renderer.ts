@@ -1,5 +1,6 @@
 import {GPUEngine, GPUMeasurement} from "./common/GPUEngine";
 import {GridBuffer} from "./data/Grid";
+import {Camera, CameraBuffer} from "./data/Camera";
 
 export interface Renderer
 {
@@ -7,6 +8,7 @@ export interface Renderer
     cpuTime: () => number;
     gpuTime: () => number;
     destroy: () => void;
+    getCamera: () => Camera;
 }
 
 
@@ -15,6 +17,7 @@ export class GridRenderer implements Renderer
     private engine: GPUEngine;
 
     private gridBuffer: GridBuffer;
+    private cameraBuffer: CameraBuffer;
 
     private pipeline: GPURenderPipeline;
     private bindGroup: GPUBindGroup;
@@ -23,10 +26,12 @@ export class GridRenderer implements Renderer
 
     private constructor(engine: GPUEngine,
                         shaderCode: string,
-                        gridBuffer: GridBuffer)
+                        gridBuffer: GridBuffer,
+                        cameraBuffer: CameraBuffer)
     {
         this.engine = engine;
         this.gridBuffer = gridBuffer;
+        this.cameraBuffer = cameraBuffer;
 
         const device = engine.device;
         const presentationFormat = engine.presentationFormat;
@@ -40,6 +45,13 @@ export class GridRenderer implements Renderer
                     visibility: GPUShaderStage.FRAGMENT,
                     buffer: {
                         type: "read-only-storage",
+                    }
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    buffer: {
+                        type: "uniform",
                     }
                 },
             ] as GPUBindGroupLayoutEntry[]
@@ -72,6 +84,7 @@ export class GridRenderer implements Renderer
             layout: bindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: this.gridBuffer.buffer.buffer }},
+                { binding: 1, resource: { buffer: this.cameraBuffer.buffer.buffer }},
             ],
         });
 
@@ -80,12 +93,14 @@ export class GridRenderer implements Renderer
     }
 
     static async create(engine: GPUEngine,
-                        gridBuffer: GridBuffer)
+                        gridBuffer: GridBuffer,
+                        camera: Camera)
     {
         const shaderCode = await (fetch('/physics-playground/n-body/renderer.wgsl')
             .then((r) => r.text()));
 
-        return new GridRenderer(engine, shaderCode, gridBuffer);
+        const cameraBuffer = new CameraBuffer(engine, camera);
+        return new GridRenderer(engine, shaderCode, gridBuffer, cameraBuffer);
     }
 
 
@@ -97,6 +112,9 @@ export class GridRenderer implements Renderer
         const context = this.engine.context;
         const pipeline = this.pipeline;
         const bindGroup = this.bindGroup;
+
+        // update camera position
+        this.cameraBuffer.writeBuffer();
 
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
         const textureView : GPUTextureView = context.getCurrentTexture().createView();
@@ -137,6 +155,11 @@ export class GridRenderer implements Renderer
     public gpuTime(): number
     {
         return this.gpuMeasurement.gpuTime;
+    }
+
+    public getCamera(): Camera
+    {
+        return this.cameraBuffer.camera;
     }
 
     public destroy(): void

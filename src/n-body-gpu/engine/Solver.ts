@@ -12,6 +12,7 @@ export interface Solver
     simulate: () => Promise<void>;
     destroy: () => void;
     timeMeasurement: () => SolverTimeMeasurement;
+    getParticleCount: () => number;
 }
 
 export class Solvers
@@ -54,6 +55,7 @@ export class Solvers
                 particlesBuffer.destroy();
             },
             timeMeasurement: () => timeMeasurement,
+            getParticleCount: () => particles.data.length,
         };
     }
 }

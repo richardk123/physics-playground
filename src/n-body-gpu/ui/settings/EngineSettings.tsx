@@ -5,6 +5,8 @@ import {TimeMeasurements} from "./TimeMeasurements";
 import {SceneControls} from "./SceneControls";
 import {Engine} from "../../engine/Engine";
 import {createScenes} from "../../scene/Scenes";
+import {ReadOnlySettings} from "./ReadOnlySettings";
+import {registerMoving, registerScrolling} from "../utils/CanvasUtils";
 
 export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
 {
@@ -22,14 +24,35 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
             })
     },[canvas]);
 
+    useEffect(() =>
+    {
+        if (engine)
+        {
+            console.log("subscribing scrolling and moving");
+
+            const camera = engine.getCamera();
+            const s1 = registerScrolling(canvas, camera);
+            const s2 = registerMoving(canvas, camera);
+            return () =>
+            {
+                console.log("unsubscribing scrolling and moving");
+                s1.unsubscribe();
+                s2.unsubscribe();
+            }
+        }
+    }, [canvas, engine])
+
     if (engine)
     {
         return <Card className="w-full h-full">
             <AccordionComponent expanded={true} label="Select scene">
                 <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine}/>
             </AccordionComponent>
-            <AccordionComponent expanded={false} label="Performance">
+            <AccordionComponent expanded={true} label="Performance">
                 <TimeMeasurements engine={engine} />
+            </AccordionComponent>
+            <AccordionComponent expanded={true} label="Performance">
+                <ReadOnlySettings engine={engine} />
             </AccordionComponent>
         </Card>
     }

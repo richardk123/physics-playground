@@ -3,6 +3,7 @@ import {Particles} from "./data/Particles";
 import {Solver, Solvers} from "./Solver";
 import {GridRenderer, Renderer} from "./Renderer";
 import {GridBuffer} from "./data/Grid";
+import {Camera} from "./data/Camera";
 
 export class Engine
 {
@@ -20,13 +21,14 @@ export class Engine
     }
 
     static async create(canvas: HTMLCanvasElement,
-                        particles: Particles)
+                        particles: Particles,
+                        camera: Camera)
     {
         const engine = await GPUEngine.create(canvas);
 
         const gridBuffer = new GridBuffer(engine);
         const solver = await Solvers.create(engine, particles, gridBuffer);
-        const renderer = await GridRenderer.create(engine, gridBuffer)
+        const renderer = await GridRenderer.create(engine, gridBuffer, camera);
 
         return new Engine(engine, solver, renderer);
     }
@@ -60,11 +62,6 @@ export class Engine
         }
     }
 
-    public isRunning(): boolean
-    {
-        return this.running;
-    }
-
     private waitForCondition(condition: () => boolean): Promise<void>
     {
         return new Promise<void>((resolve) => {
@@ -79,6 +76,14 @@ export class Engine
 
     public timeMeasurement() {
         return this.solver.timeMeasurement();
+    }
+
+    public getCamera() {
+        return this.renderer.getCamera();
+    }
+
+    public getParticleCount() {
+        return this.solver.getParticleCount();
     }
 
     public async destroy()
