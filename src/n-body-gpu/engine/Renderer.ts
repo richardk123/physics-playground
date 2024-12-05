@@ -112,9 +112,15 @@ export class GridRenderer implements Renderer
         const context = this.engine.context;
         const pipeline = this.pipeline;
         const bindGroup = this.bindGroup;
+        const canvas = this.engine.canvas;
+
+        // Lookup the size the browser is displaying the canvas in CSS pixels.
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.min(rect.width, device.limits.maxTextureDimension2D));
+        canvas.height = Math.max(1, Math.min(rect.height, device.limits.maxTextureDimension2D));
 
         // update camera position
-        this.cameraBuffer.writeBuffer();
+        this.cameraBuffer.writeBuffer(canvas);
 
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
         const textureView : GPUTextureView = context.getCurrentTexture().createView();
@@ -127,6 +133,7 @@ export class GridRenderer implements Renderer
             }] as GPURenderPassColorAttachment[],
             ...this.gpuMeasurement.writesDescriptor()
         });
+
         renderpass.setPipeline(pipeline);
         renderpass.setBindGroup(0, bindGroup)
         renderpass.draw(6); // 2 triangles for a full-screen quad

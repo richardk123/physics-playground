@@ -11,6 +11,7 @@ struct Camera
 {
     transform: vec2<f32>,
     zoom: f32,
+    canvas: vec2<f32>,
 }
 
 
@@ -19,8 +20,8 @@ struct Camera
 @fragment
 fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     let gridSize = 2048u;
-    let gx = i32((fragCoord.x + camera.transform.x) * camera.zoom);
-    let gy = i32((fragCoord.y + camera.transform.y) * camera.zoom);
+    let gx = i32((fragCoord.x * camera.zoom) + camera.transform.x);
+    let gy = i32((fragCoord.y * camera.zoom) + camera.transform.y);
 
     // Clamp coordinates to the grid bounds
     if (gx < 0 || gy < 0 || gx >= i32(gridSize) || gy >= i32(gridSize)) {
@@ -32,6 +33,6 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     let value = grid[index];
 
     // Map value to intensity for visualization
-    let intensity = f32(value) / 10;
+    let intensity = f32(value) / 1;
     return vec4<f32>(intensity, intensity, intensity, 1.0);
 }

@@ -15,16 +15,19 @@ export class CameraBuffer {
     constructor(engine: GPUEngine,
                 camera: Camera)
     {
-        this.buffer = engine.createBuffer("grid", 4 * 4, "uniform");
+        this.buffer = engine.createBuffer("grid", 8 * 4, "uniform");
         this.camera = camera;
     }
 
-    public writeBuffer()
+    public writeBuffer(canvas: HTMLCanvasElement)
     {
-        const data = new Float32Array(3);
+        const data = new Float32Array(8);
         data[0] = this.camera.x;
         data[1] = this.camera.y;
         data[2] = this.camera.zoom;
+        data[4] = canvas.width;
+        data[5] = canvas.height;
+
         this.buffer.writeBuffer(data)
     }
 

@@ -43,8 +43,8 @@ export class Solvers
             simulate: async (): Promise<void> =>
             {
                 const start = performance.now();
-                gridClear.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE / 256));
-                gridUpdate.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE / 256));
+                gridClear.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
+                gridUpdate.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
                 particleSolve.dispatch(false, Math.ceil(particles.data.length / 256));
                 timeMeasurement = {
                     cpuTime: performance.now() - start,

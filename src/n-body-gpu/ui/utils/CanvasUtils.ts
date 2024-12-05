@@ -40,11 +40,11 @@ export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera): Subsc
     return dragAndDrop$(canvas, cameraTranslation, 0)
         .subscribe((val) =>
         {
-            const moveX =  val.position[0] - val.endPosition[0];
-            const moveY =  val.endPosition[1] - val.position[1];
+            const moveX =  (val.position[0] - val.endPosition[0]) * camera.zoom;
+            const moveY =  (val.position[1] - val.endPosition[1]) * camera.zoom;
 
             camera.x = val.originalPosition.x + moveX;
-            camera.y = val.originalPosition.y - moveY;
+            camera.y = val.originalPosition.y + moveY;
         });
 }
 
