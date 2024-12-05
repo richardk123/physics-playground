@@ -1,6 +1,7 @@
 import {GPUEngine} from "./common/GPUEngine";
 import {Particles, ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
+import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
 
 export interface SolverTimeMeasurement
 {
@@ -24,6 +25,7 @@ export class Solvers
         }
 
         const particlesBuffer = new ParticlesBuffer(engine, particles);
+        const prefixSumBuffer = new PrefixSumBuffer(engine);
 
         const gridClear = await engine.createComputeShader("gridClear")
             .addBuffer(() => gridBuffer.buffer, "storage")
@@ -33,6 +35,8 @@ export class Solvers
             .addBuffer(() => particlesBuffer.buffer, "read-only-storage")
             .addBuffer(() => gridBuffer.buffer, "storage")
             .build();
+
+        const prefixSum = await PrefixSumComputeShader.create(engine, prefixSumBuffer);
 
         const particleSolve = await engine.createComputeShader("particleSolve")
             .addBuffer(() => particlesBuffer.buffer, "storage")
@@ -46,6 +50,7 @@ export class Solvers
                 gridClear.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
                 gridUpdate.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
                 particleSolve.dispatch(false, Math.ceil(particles.data.length / 256));
+                prefixSum.dispatch(gridBuffer);
                 timeMeasurement = {
                     cpuTime: performance.now() - start,
                 }
