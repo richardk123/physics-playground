@@ -40,6 +40,8 @@ export class Solvers
 
         const particleSolve = await engine.createComputeShader("particleSolve")
             .addBuffer(() => particlesBuffer.buffer, "storage")
+            .addBuffer(() => gridBuffer.buffer, "read-only-storage")
+            .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
             .build();
 
 

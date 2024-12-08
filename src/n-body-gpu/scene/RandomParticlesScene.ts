@@ -5,8 +5,8 @@ import {Camera} from "../engine/data/Camera";
 export const randomParticlesScene = async (canvas: HTMLCanvasElement) => {
     const particles = new Particles();
 
-    const centerX = 550; // Center of the circle
-    const centerY = 550; // Center of the circle
+    const centerX = 1024; // Center of the circle
+    const centerY = 1024; // Center of the circle
     const radius = 550;  // Radius of the circle
     const totalParticles = 2000000; // Total number of particles
 
@@ -22,7 +22,7 @@ export const randomParticlesScene = async (canvas: HTMLCanvasElement) => {
         particles.addParticle(x, y);
     }
 
-    const camera: Camera = {x: 0, y: 0, zoom: 1.0};
+    const camera: Camera = {x: 400, y: 400, zoom: 1.0};
 
     return await Engine.create(canvas, particles, camera);
 }

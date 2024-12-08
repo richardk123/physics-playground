@@ -4,9 +4,11 @@ import {EngineBuffer} from "../common/EngineBuffer";
 export type Particle = {
     x: number;
     y: number;
+    vx: number;
+    vy: number;
 }
 
-const OFFSET = 2;
+const OFFSET = 4;
 
 export class Particles {
     public data: Particle[];
@@ -16,8 +18,8 @@ export class Particles {
         this.data = [];
     }
 
-    public addParticle(x: number, y: number) {
-        this.data.push({x, y});
+    public addParticle(x: number, y: number, vx?: number, vy?: number) {
+        this.data.push({x, y, vx: vx ?? 0, vy: vy ?? 0});
     }
 
     public serialize()
@@ -27,6 +29,8 @@ export class Particles {
         {
             data[i * OFFSET] = particle.x;
             data[i * OFFSET + 1] = particle.y;
+            data[i * OFFSET + 2] = particle.vx;
+            data[i * OFFSET + 3] = particle.vy;
         });
         return data;
     }

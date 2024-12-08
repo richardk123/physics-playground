@@ -14,7 +14,7 @@ export const fullParticleScene = async (canvas: HTMLCanvasElement) => {
         }
     }
 
-    const camera: Camera = {x: 0, y: 0, zoom: 2};
+    const camera: Camera = {x: -372, y: -36, zoom: 2.2};
 
     return await Engine.create(canvas, particles, camera);
 }

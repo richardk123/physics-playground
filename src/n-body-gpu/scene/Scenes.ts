@@ -11,7 +11,7 @@ export interface Scene
 export const createScenes = (canvas: HTMLCanvasElement): Scene[] =>
 {
     return [
-        { label: 'Full scene', create: () => fullParticleScene(canvas)},
         { label: 'Random particle', create: () => randomParticlesScene(canvas)},
+        { label: 'Full scene', create: () => fullParticleScene(canvas)},
     ];
 };
