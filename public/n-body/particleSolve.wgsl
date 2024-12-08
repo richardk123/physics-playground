@@ -33,7 +33,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     acceleration = acceleration + getAccelerationForLod(6, id.x);
 
     // sum up velocity
-    particles[id.x].velocity = particles[id.x].velocity + (acceleration * 0.001);
+    particles[id.x].velocity = particles[id.x].velocity + (acceleration * 0.0001);
 
     // update position
     particles[id.x].position = particles[id.x].position + particles[id.x].velocity;
@@ -99,10 +99,9 @@ fn getIntegralSum(x1: i32, y1: i32, x2: i32, y2: i32) -> u32 {
 }
 
 fn getValue(x: i32, y: i32) -> u32 {
-    if (x < 0 || y < 0 || x > GRID_SIZE || y > GRID_SIZE) {
-        return 0;
-    }
-    return prefixSum[y * GRID_SIZE + x];
+    let clampedX = clamp(x, 0, GRID_SIZE);
+    let clampedY = clamp(y, 0, GRID_SIZE);
+    return prefixSum[clampedY * GRID_SIZE + clampedX];
 }
 
 fn intPow(base: i32, exp: i32) -> i32 {
