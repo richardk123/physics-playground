@@ -21,6 +21,35 @@ struct Particle
     materialIndex: u32,
 }
 
+fn resolveObstacles(particlePos: vec2<f32>, forbiddenMin: vec2<f32>, forbiddenMax: vec2<f32>) -> vec2<f32> {
+    // Check if the particle is inside the forbidden rectangle
+    if (particlePos.x >= forbiddenMin.x && particlePos.x <= forbiddenMax.x &&
+        particlePos.y >= forbiddenMin.y && particlePos.y <= forbiddenMax.y) {
+
+        // Calculate the distances to each edge of the rectangle
+        let distToLeft = particlePos.x - forbiddenMin.x;
+        let distToRight = forbiddenMax.x - particlePos.x;
+        let distToBottom = particlePos.y - forbiddenMin.y;
+        let distToTop = forbiddenMax.y - particlePos.y;
+
+        // Find the closest edge and snap the particle to it
+        let minDist = min(distToLeft, min(distToRight, min(distToBottom, distToTop)));
+
+        if (minDist == distToLeft) {
+            return vec2(forbiddenMin.x, particlePos.y);
+        } else if (minDist == distToRight) {
+            return vec2(forbiddenMax.x, particlePos.y);
+        } else if (minDist == distToBottom) {
+            return vec2(particlePos.x, forbiddenMin.y);
+        } else {
+            return vec2(particlePos.x, forbiddenMax.y);
+        }
+    }
+
+    // Return original position if not inside forbidden rectangle
+    return particlePos;
+}
+
 @group(0) @binding(0) var<uniform> settings: Settings;
 @group(0) @binding(1) var<storage, read_write> particles: array<Particle>;
 @compute
@@ -42,36 +71,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
         particles[id.x].positionCurrent += normal * max(mouseDist, 0.3) * settings.dt;
     }
 
-//TODO: fix
-//    // Forbidden rectangle (0, 0, 100, 200)
-//    let forbiddenMinX: f32 = 200.0;
-//    let forbiddenMinY: f32 = 10.0;
-//    let forbiddenMaxX: f32 = 250.0;
-//    let forbiddenMaxY: f32 = 100.0;
-//
-//    // Check if the particle is inside the forbidden rectangle
-//    if (particles[id.x].positionCurrent.x >= forbiddenMinX && particles[id.x].positionCurrent.x <= forbiddenMaxX &&
-//        particles[id.x].positionCurrent.y >= forbiddenMinY && particles[id.x].positionCurrent.y <= forbiddenMaxY)
-//    {
-//        // Calculate the distances to each edge of the rectangle
-//        let distToLeft: f32 = particles[id.x].positionCurrent.x - forbiddenMinX - 1;
-//        let distToRight: f32 = forbiddenMaxX - particles[id.x].positionCurrent.x + 1;
-//        let distToBottom: f32 = particles[id.x].positionCurrent.y - forbiddenMinY - 1;
-//        let distToTop: f32 = forbiddenMaxY - particles[id.x].positionCurrent.y + 1;
-//
-//        // Find the minimum distance to the closest edge and move the particle accordingly
-//        if (distToLeft <= distToRight && distToLeft <= distToBottom && distToLeft <= distToTop) {
-//            // Closest to the left edge
-//            particles[id.x].positionCurrent.x = forbiddenMinX;
-//        } else if (distToRight <= distToLeft && distToRight <= distToBottom && distToRight <= distToTop) {
-//            // Closest to the right edge
-//            particles[id.x].positionCurrent.x = forbiddenMaxX;
-//        } else if (distToBottom <= distToLeft && distToBottom <= distToRight && distToBottom <= distToTop) {
-//            // Closest to the bottom edge
-//            particles[id.x].positionCurrent.y = forbiddenMinY;
-//        } else if (distToTop <= distToLeft && distToTop <= distToRight && distToTop <= distToBottom) {
-//            // Closest to the top edge
-//            particles[id.x].positionCurrent.y = forbiddenMaxY;
-//        }
-//    }
+    // obstacles
+//    particles[id.x].positionCurrent = resolveObstacles(particles[id.x].positionCurrent, vec2(200.0, 10.0), vec2(250.0, 100.0));
+
 }

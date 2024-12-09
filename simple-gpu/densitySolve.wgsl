@@ -56,17 +56,14 @@ fn calculateSharedPressure(densityA: f32, densityB: f32, targetDensity: f32, pre
     return (pressureA + pressureB) / 2;
 }
 
-// Global state for the PRNG, private to each shader invocation
-var<private> randState: u32 = 123456789;  // Initial seed (can be any value)
-
 // Constants for the LCG
 const A: u32 = 1664525;
 const C: u32 = 1013904223;
 const M: u32 = 0xFFFFFFFF;  // 2^32 - 1 (since we're using a 32-bit number)
 
-fn rand() -> f32 {
+fn rand(seed: u32) -> f32 {
     // Linear Congruential Generator (LCG) formula
-    randState = (A * randState + C) % M;
+    let randState = (A * seed + C) % M;
 
     // Normalize the result to a float between 0 and 1
     return 0.5 - (f32(randState) / f32(M));
@@ -116,8 +113,7 @@ fn updateDensity(gridId: u32, particle: Particle, material: Material, particleIn
             // hacky solution :D but it prevents particles to overlap
             if (dist == 0.0)
             {
-                randState = anotherParticleIndex;
-                moveVec += vec2<f32>(0.01 * rand(), 0.01 * rand());
+                moveVec += vec2<f32>(0.01 * rand(anotherParticleIndex), 0.01 * rand(particleIndex));
                 continue;
             }
 
