@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from "react";
 import {timer} from "rxjs";
-import {Camera} from "../../engine/data/Camera";
 import {Engine} from "../../engine/Engine";
+import {EngineSettings} from "../../engine/data/EngineSettings";
 
 export const ReadOnlySettings = ({engine}: {engine: Engine}) =>
 {
     const [increment, setIncrement] = useState(0);
     const [particleCount, setParticleCount] = useState(0);
-    const [camera, setCamera] = useState<Camera | undefined>();
+    const [settings, setSettings] = useState<EngineSettings | undefined>();
 
     useEffect(() =>
     {
         const sub = timer(100).subscribe(() =>
         {
             setParticleCount(engine.getParticleCount());
-            setCamera(engine.getCamera());
+            setSettings(engine.getSettings());
             setIncrement(increment + 1);
         });
 
@@ -23,7 +23,7 @@ export const ReadOnlySettings = ({engine}: {engine: Engine}) =>
 
     return <div className="w-full h-full">
         <p>Particle count: {particleCount}</p>
-        <p>Translation: {`[${camera?.x.toFixed(2)}, ${camera?.y.toFixed(2)}]`}</p>
-        <p>Zoom: {camera?.zoom.toFixed(5)}</p>
+        <p>Translation: {`[${settings?.cameraX.toFixed(2)}, ${settings?.cameraY.toFixed(2)}]`}</p>
+        <p>Zoom: {settings?.zoom.toFixed(5)}</p>
     </div>
 }

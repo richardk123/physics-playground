@@ -1,7 +1,8 @@
 import {GPUEngine} from "./common/GPUEngine";
 import {Particles, ParticlesBuffer} from "./data/Particles";
 import {GridBuffer} from "./data/Grid";
-import {PrefixSumBuffer, PrefixSumComputeShader} from "./data/PrefixSum";
+import {PrefixSum2dBuffer, PrefixSum2dComputeShader} from "./data/PrefixSum2d";
+import {EngineSettingsBuffer} from "./data/EngineSettings";
 
 export interface SolverTimeMeasurement
 {
@@ -18,14 +19,17 @@ export interface Solver
 
 export class Solvers
 {
-    public static async create(engine: GPUEngine, particles: Particles, gridBuffer: GridBuffer): Promise<Solver>
+    public static async create(engine: GPUEngine,
+                               particles: Particles,
+                               gridBuffer: GridBuffer,
+                               prefixSum2dBuffer: PrefixSum2dBuffer,
+                               settingsBuffer: EngineSettingsBuffer): Promise<Solver>
     {
         let timeMeasurement: SolverTimeMeasurement = {
             cpuTime: 0,
         }
 
         const particlesBuffer = new ParticlesBuffer(engine, particles);
-        const prefixSumBuffer = new PrefixSumBuffer(engine);
 
         const gridClear = await engine.createComputeShader("gridClear")
             .addBuffer(() => gridBuffer.buffer, "storage")
@@ -36,30 +40,46 @@ export class Solvers
             .addBuffer(() => gridBuffer.buffer, "storage")
             .build();
 
-        const prefixSum = await PrefixSumComputeShader.create(engine, prefixSumBuffer);
+        const prefixSum2d = await PrefixSum2dComputeShader.create(engine, prefixSum2dBuffer, settingsBuffer);
 
         const particleSolve = await engine.createComputeShader("particleSolve")
             .addBuffer(() => particlesBuffer.buffer, "storage")
             .addBuffer(() => gridBuffer.buffer, "read-only-storage")
-            .addBuffer(() => prefixSumBuffer.getCurrent(), "read-only-storage")
+            .addBuffer(() => prefixSum2dBuffer.buffer, "read-only-storage")
             .build();
 
 
         return {
             simulate: async (): Promise<void> =>
             {
+                settingsBuffer.writeBuffer();
+
+                const measurePerformance= settingsBuffer.settings.performance;
+                const debug= settingsBuffer.settings.debug;
+                const gridSize = settingsBuffer.settings.gridSizeX * settingsBuffer.settings.gridSizeY;
+
                 const start = performance.now();
-                gridClear.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
-                gridUpdate.dispatch(false, Math.ceil(GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE / 256));
-                particleSolve.dispatch(false, Math.ceil(particles.data.length / 256));
-                prefixSum.dispatch(gridBuffer);
+                gridClear.dispatch(measurePerformance, Math.ceil(gridSize / 256));
+                gridUpdate.dispatch(measurePerformance, Math.ceil(gridSize / 256));
+                particleSolve.dispatch(measurePerformance, Math.ceil(particles.data.length / 256));
+                prefixSum2d.dispatch(measurePerformance, gridBuffer, settingsBuffer.settings);
+
+
+                if (debug) {
+                    await prefixSum2d.printGPUData();
+                    await settingsBuffer.printGPUData();
+                }
+
                 timeMeasurement = {
                     cpuTime: performance.now() - start,
                 }
             },
             destroy: () =>
             {
+                gridBuffer.destroy();
+                prefixSum2dBuffer.destroy();
                 particlesBuffer.destroy();
+                settingsBuffer.destroy();
             },
             timeMeasurement: () => timeMeasurement,
             getParticleCount: () => particles.data.length,

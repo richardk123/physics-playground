@@ -30,9 +30,9 @@ export const EngineSettings = ({canvas}: {canvas: HTMLCanvasElement}) =>
         {
             console.log("subscribing scrolling and moving");
 
-            const camera = engine.getCamera();
-            const s1 = registerScrolling(canvas, camera);
-            const s2 = registerMoving(canvas, camera);
+            const settings = engine.getSettings();
+            const s1 = registerScrolling(canvas, settings);
+            const s2 = registerMoving(canvas, settings);
             return () =>
             {
                 console.log("unsubscribing scrolling and moving");

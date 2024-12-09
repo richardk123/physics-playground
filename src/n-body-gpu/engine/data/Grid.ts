@@ -1,14 +1,16 @@
 import {EngineBuffer} from "../common/EngineBuffer";
 import {GPUEngine} from "../common/GPUEngine";
+import {EngineSettings} from "./EngineSettings";
 
 export class GridBuffer
 {
     public buffer: EngineBuffer;
-    public static GRID_SIZE = 2048;
+    private readonly numberOfCells: number;
 
-    constructor(engine: GPUEngine)
+    constructor(engine: GPUEngine, settings: EngineSettings)
     {
-        this.buffer = engine.createBuffer("grid", GridBuffer.GRID_SIZE * GridBuffer.GRID_SIZE * 4, "storage");
+        this.numberOfCells = settings.gridSizeY * settings.gridSizeX;
+        this.buffer = engine.createBuffer("grid", this.numberOfCells * 4, "storage");
     }
 
     public destroy()

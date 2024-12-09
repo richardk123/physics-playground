@@ -12,6 +12,7 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
     const [solverMeasurement, setSolverMeasurement] = useState<SolverTimeMeasurement | undefined>(undefined);
     const [cpuRenderMsPerFrame, setCpuRenderMsPerFrame] = useState(0);
     const [gpuRenderMsPerFrame, setGpuRenderMsPerFrame] = useState(0);
+    const settings = engine.getSettings();
 
     useEffect(() =>
     {
@@ -38,8 +39,12 @@ export const TimeMeasurements = ({engine}: {engine: Engine}) =>
 
     return <div className="w-full h-full">
         <BoxTitle label="Measurements enabled">
-            {/*<CheckboxComponent value={settings.performance}*/}
-            {/*                   setValue={e => settings.performance = e} />*/}
+            <CheckboxComponent value={settings.performance}
+                               setValue={e => settings.performance = e} />
+        </BoxTitle>
+        <BoxTitle label="Debug enabled">
+            <CheckboxComponent value={settings.debug}
+                               setValue={e => settings.debug = e} />
         </BoxTitle>
         <p>CPU Render: {cpuRenderMsPerFrame.toFixed(2)}ms</p>
         <p>GPU Render: {(gpuRenderMsPerFrame / 1000).toFixed(2)}µs</p>

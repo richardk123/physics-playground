@@ -7,25 +7,25 @@ fn vs(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32> {
     return vec4<f32>(positions[vertexIndex], 0.0, 1.0);
 }
 
-struct Camera
+struct EngineSettings
 {
     transform: vec2<f32>,
     zoom: f32,
-    canvas: vec2<f32>,
+    gridSize: vec2<u32>,
 }
 
-
 @group(0) @binding(0) var<storage, read> grid: array<u32>;
-@group(0) @binding(1) var<uniform> camera: Camera;
+@group(0) @binding(1) var<uniform> settings: EngineSettings;
+@group(0) @binding(2) var<storage, read> prefixSum : array<u32>;
 @fragment
 fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
-    let gridSize = 2048u;
-    let gx = i32((fragCoord.x * camera.zoom) + camera.transform.x);
-    let gy = i32((fragCoord.y * camera.zoom) + camera.transform.y);
+    let gx = i32((fragCoord.x * settings.zoom) + settings.transform.x);
+    let gy = i32((fragCoord.y * settings.zoom) + settings.transform.y);
+    let gridSize = settings.gridSize.x * settings.gridSize.y;
 
     // Clamp coordinates to the grid bounds
     if (gx < 0 || gy < 0 || gx >= i32(gridSize) || gy >= i32(gridSize)) {
-        return vec4<f32>(0.0, 0.0, 0.0, 1.0);
+        return vec4<f32>(1.0, 0.0, 1.0, 1.0);
     }
 
     // Read value from grid buffer
@@ -33,10 +33,13 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     let value = grid[index];
 
     // Map value to intensity for visualization
-//    let intensity = f32(value) / 1;
-//    return vec4<f32>(intensity, intensity, intensity, 1.0);
-
-    return mapValueToColor(value, 25);
+    let val = f32(value) / 1;
+    let prefixSum = f32(prefixSum[index]) / 3;
+    let integralSum = f32(getIntegralSum(gx, gy, gx, gy, gridSize)) / 30;
+//    let intensity = f32(getIntegralSum(u32(gx) - 1u, u32(gy) - 1u, u32(gx) + 1u, u32(gy) + 1u)) / 3;
+    return vec4<f32>(integralSum, 0, val, 1.0);
+//
+//    return mapValueToColor(value, 3);
 }
 
 fn mapValueToColor(value: u32, maxValue: i32) -> vec4<f32> {
@@ -49,4 +52,19 @@ fn mapValueToColor(value: u32, maxValue: i32) -> vec4<f32> {
     let blue = smoothstep(0.0, 0.5, normalizedValue);
 
     return vec4<f32>(red, green, blue, 1.0);
+}
+
+
+// integral sum formula
+fn getIntegralSum(x1: i32, y1: i32, x2: i32, y2: i32, gridSize: u32) -> u32 {
+    return getValue(x2, y2, gridSize)
+         - getValue(x1 - 1, y2, gridSize)
+         - getValue(x2, y1 - 1, gridSize)
+         + getValue(x1 - 1, y1 - 1, gridSize);
+}
+
+fn getValue(x: i32, y: i32, gridSize: u32) -> u32 {
+//    let clampedX = u32(clamp(x, 0, i32(GRID_SIZE)));
+//    let clampedY = u32(clamp(y, 0, i32(GRID_SIZE)));
+    return prefixSum[u32(y) * gridSize + u32(x)];
 }

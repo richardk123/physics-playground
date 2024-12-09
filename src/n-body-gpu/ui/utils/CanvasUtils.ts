@@ -11,8 +11,8 @@ import {
     timer
 } from "rxjs";
 import {vec2} from "gl-matrix";
-import {Camera} from "../../engine/data/Camera";
 import {Vec2d} from "../../../fluid-gpu/engine/data/Vec2d";
+import {EngineSettings} from "../../engine/data/EngineSettings";
 
 const transformEvent = (e: Event, canvas: HTMLCanvasElement) =>
 {
@@ -20,31 +20,31 @@ const transformEvent = (e: Event, canvas: HTMLCanvasElement) =>
     return vec2.fromValues(me.x - canvas.offsetLeft, me.y - canvas.offsetTop);
 }
 
-export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
+export const registerScrolling = (canvas: HTMLCanvasElement, settings: EngineSettings): Subscription =>
 {
     return scroll$(canvas)
         .subscribe(e =>
         {
             const deltaZoom = (e.deltaY * 0.01);
-            camera.zoom +=  camera.zoom * deltaZoom;
+            settings.zoom +=  settings.zoom * deltaZoom;
         });
 }
 
-export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
+export const registerMoving = (canvas: HTMLCanvasElement, settings: EngineSettings): Subscription =>
 {
     const cameraTranslation = () =>
     {
-        return {x: camera.x, y: camera.y};
+        return {x: settings.cameraX, y: settings.cameraY};
     }
 
     return dragAndDrop$(canvas, cameraTranslation, 0)
         .subscribe((val) =>
         {
-            const moveX =  (val.position[0] - val.endPosition[0]) * camera.zoom;
-            const moveY =  (val.position[1] - val.endPosition[1]) * camera.zoom;
+            const moveX =  (val.position[0] - val.endPosition[0]) * settings.zoom;
+            const moveY =  (val.position[1] - val.endPosition[1]) * settings.zoom;
 
-            camera.x = val.originalPosition.x + moveX;
-            camera.y = val.originalPosition.y + moveY;
+            settings.cameraX = val.originalPosition.x + moveX;
+            settings.cameraY = val.originalPosition.y + moveY;
         });
 }
 

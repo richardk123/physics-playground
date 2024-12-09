@@ -1,6 +1,6 @@
 import {Engine} from "../engine/Engine";
 import {Particles} from "../engine/data/Particles";
-import {Camera} from "../engine/data/Camera";
+import {EngineSettings} from "../engine/data/EngineSettings";
 
 export const randomParticlesScene = async (canvas: HTMLCanvasElement) => {
     const particles = new Particles();
@@ -8,7 +8,7 @@ export const randomParticlesScene = async (canvas: HTMLCanvasElement) => {
     const centerX = 1024; // Center of the circle
     const centerY = 1024; // Center of the circle
     const radius = 550;  // Radius of the circle
-    const totalParticles = 2000000; // Total number of particles
+    const totalParticles = 200000; // Total number of particles
 
     for (let i = 0; i < totalParticles; i++) {
         // Generate a random angle and radius
@@ -22,7 +22,7 @@ export const randomParticlesScene = async (canvas: HTMLCanvasElement) => {
         particles.addParticle(x, y);
     }
 
-    const camera: Camera = {x: 400, y: 400, zoom: 1.0};
+    const settings: EngineSettings = {cameraX: 400, cameraY: 400, zoom: 1.0, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
 
-    return await Engine.create(canvas, particles, camera);
+    return await Engine.create(canvas, particles, settings);
 }

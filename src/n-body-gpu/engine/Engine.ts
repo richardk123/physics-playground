@@ -3,34 +3,40 @@ import {Particles} from "./data/Particles";
 import {Solver, Solvers} from "./Solver";
 import {GridRenderer, Renderer} from "./Renderer";
 import {GridBuffer} from "./data/Grid";
-import {Camera} from "./data/Camera";
+import {PrefixSum2dBuffer} from "./data/PrefixSum2d";
+import {EngineSettings, EngineSettingsBuffer} from "./data/EngineSettings";
 
 export class Engine
 {
     private readonly engine: GPUEngine;
     private readonly solver: Solver;
     private readonly renderer: Renderer;
+    private readonly settings: EngineSettings;
     private running = false;
     private executing = false;
 
-    constructor(engine: GPUEngine, solver: Solver, renderer: Renderer)
+    constructor(engine: GPUEngine, solver: Solver, renderer: Renderer, settings: EngineSettings)
     {
         this.engine = engine;
         this.solver = solver;
         this.renderer = renderer;
+        this.settings = settings;
     }
 
     static async create(canvas: HTMLCanvasElement,
                         particles: Particles,
-                        camera: Camera)
+                        settings: EngineSettings)
     {
         const engine = await GPUEngine.create(canvas);
 
-        const gridBuffer = new GridBuffer(engine);
-        const solver = await Solvers.create(engine, particles, gridBuffer);
-        const renderer = await GridRenderer.create(engine, gridBuffer, camera);
+        const gridBuffer = new GridBuffer(engine, settings);
+        const prefixSum2dBuffer = new PrefixSum2dBuffer(engine, settings);
+        const engineSettingsBuffer = new EngineSettingsBuffer(engine, settings);
 
-        return new Engine(engine, solver, renderer);
+        const solver = await Solvers.create(engine, particles, gridBuffer, prefixSum2dBuffer, engineSettingsBuffer);
+        const renderer = await GridRenderer.create(engine, gridBuffer, engineSettingsBuffer, prefixSum2dBuffer);
+
+        return new Engine(engine, solver, renderer, settings);
     }
 
     public stop()
@@ -78,8 +84,8 @@ export class Engine
         return this.solver.timeMeasurement();
     }
 
-    public getCamera() {
-        return this.renderer.getCamera();
+    public getSettings() {
+        return this.settings;
     }
 
     public getParticleCount() {
