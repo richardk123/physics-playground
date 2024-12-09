@@ -24,21 +24,19 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
 
     // Clamp coordinates to the grid bounds
     if (gx < 0 || gy < 0 || gx >= i32(settings.gridSize.x) || gy >= i32(settings.gridSize.y)) {
-        return vec4<f32>(1.0, 0.0, 1.0, 1.0);
+        return vec4<f32>(0.2, 0.2, 0.2, 1.0);
     }
 
     // Read value from grid buffer
     let index = u32(gy) * settings.gridSize.x + u32(gx);
     let value = grid[index];
 
-    // Map value to intensity for visualization
+//    // Map value to intensity for visualization
     let val = f32(value) / 1;
-    let prefixSum = f32(prefixSum[index]) / 3;
-    let integralSum = f32(getIntegralSum(gx, gy, gx, gy, settings.gridSize.x)) / 30;
-//    let intensity = f32(getIntegralSum(u32(gx) - 1u, u32(gy) - 1u, u32(gx) + 1u, u32(gy) + 1u)) / 3;
-    return vec4<f32>(0.0, 0.0, val, 1.0);
-//
-//    return mapValueToColor(value, 3);
+    let intensity = f32(getIntegralSum(gx - 1, gy - 1, gx + 1, gy + 1)) / 2;
+    return vec4<f32>(intensity, val, 0.2, 1.0);
+
+//    return mapValueToColor(value, 1);
 }
 
 fn mapValueToColor(value: u32, maxValue: i32) -> vec4<f32> {
@@ -53,17 +51,22 @@ fn mapValueToColor(value: u32, maxValue: i32) -> vec4<f32> {
     return vec4<f32>(red, green, blue, 1.0);
 }
 
-
-// integral sum formula
-fn getIntegralSum(x1: i32, y1: i32, x2: i32, y2: i32, gridSize: u32) -> u32 {
-    return getValue(x2, y2, gridSize)
-         - getValue(x1 - 1, y2, gridSize)
-         - getValue(x2, y1 - 1, gridSize)
-         + getValue(x1 - 1, y1 - 1, gridSize);
+fn getValue(x: i32, y: i32) -> u32 {
+    if (x < 0) {
+        return 0;
+    }
+    if (y < 0) {
+        return 0;
+    }
+    let clampedX = u32(clamp(x, 0, i32(settings.gridSize.x) - 1));
+    let clampedY = u32(clamp(y, 0, i32(settings.gridSize.y) - 1));
+    return prefixSum[u32(clampedY) * settings.gridSize.x + u32(clampedX)];
 }
 
-fn getValue(x: i32, y: i32, gridSize: u32) -> u32 {
-//    let clampedX = u32(clamp(x, 0, i32(GRID_SIZE)));
-//    let clampedY = u32(clamp(y, 0, i32(GRID_SIZE)));
-    return prefixSum[u32(y) * gridSize + u32(x)];
+// integral sum formula
+fn getIntegralSum(x1: i32, y1: i32, x2: i32, y2: i32) -> u32 {
+    return getValue(x2, y2)
+         - getValue(x1 - 1, y2)
+         - getValue(x2, y1 - 1)
+         + getValue(x1 - 1, y1 - 1);
 }

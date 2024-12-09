@@ -13,7 +13,7 @@ export const debugScene = async (canvas: HTMLCanvasElement) => {
 
     console.log(particles);
 
-    const settings: EngineSettings = {cameraX: 1, cameraY: 1, zoom: 1, gridSizeX: 5, gridSizeY: 4, performance: false, debug: false};
+    const settings: EngineSettings = {cameraX: 0, cameraY: 0, zoom: 0.025, gridSizeX: 5, gridSizeY: 4, performance: false, debug: false};
 
     return await Engine.create(canvas, particles, settings);
 }

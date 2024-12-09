@@ -47,6 +47,7 @@ export class Solvers
             .addBuffer(() => particlesBuffer.buffer, "storage")
             .addBuffer(() => gridBuffer.buffer, "read-only-storage")
             .addBuffer(() => prefixSum2dBuffer.buffer, "read-only-storage")
+            .addBuffer(() => settingsBuffer.buffer, "uniform")
             .build();
 
         return {
@@ -68,6 +69,7 @@ export class Solvers
                 if (debug) {
                     await gridBuffer.printGPUData();
                     await prefixSum2d.printGPUData();
+                    await particlesBuffer.printGPUData();
                     await settingsBuffer.printGPUData();
                 }
 

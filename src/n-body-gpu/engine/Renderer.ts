@@ -17,7 +17,7 @@ export class GridRenderer implements Renderer
     private engine: GPUEngine;
 
     private gridBuffer: GridBuffer;
-    private engineSettingsBuffer: EngineSettingsBuffer;
+    private settingsBuffer: EngineSettingsBuffer;
     private prefixSum2dBuffer: PrefixSum2dBuffer;
 
     private pipeline: GPURenderPipeline;
@@ -28,12 +28,12 @@ export class GridRenderer implements Renderer
     private constructor(engine: GPUEngine,
                         shaderCode: string,
                         gridBuffer: GridBuffer,
-                        engineSettingsBuffer: EngineSettingsBuffer,
+                        settingsBuffer: EngineSettingsBuffer,
                         prefixSum2dBuffer: PrefixSum2dBuffer)
     {
         this.engine = engine;
         this.gridBuffer = gridBuffer;
-        this.engineSettingsBuffer = engineSettingsBuffer;
+        this.settingsBuffer = settingsBuffer;
         this.prefixSum2dBuffer = prefixSum2dBuffer;
 
         const device = engine.device;
@@ -94,7 +94,7 @@ export class GridRenderer implements Renderer
             layout: bindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: this.gridBuffer.buffer.buffer }},
-                { binding: 1, resource: { buffer: this.engineSettingsBuffer.buffer.buffer }},
+                { binding: 1, resource: { buffer: this.settingsBuffer.buffer.buffer }},
                 { binding: 2, resource: { buffer: this.prefixSum2dBuffer.buffer.buffer }},
             ],
         });
@@ -105,13 +105,13 @@ export class GridRenderer implements Renderer
 
     static async create(engine: GPUEngine,
                         gridBuffer: GridBuffer,
-                        engineSettingsBuffer: EngineSettingsBuffer,
+                        settingsBuffer: EngineSettingsBuffer,
                         prefixSumBuffer2d: PrefixSum2dBuffer)
     {
         const shaderCode = await (fetch('/physics-playground/n-body/renderer.wgsl')
             .then((r) => r.text()));
 
-        return new GridRenderer(engine, shaderCode, gridBuffer, engineSettingsBuffer, prefixSumBuffer2d);
+        return new GridRenderer(engine, shaderCode, gridBuffer, settingsBuffer, prefixSumBuffer2d);
     }
 
 
@@ -129,6 +129,8 @@ export class GridRenderer implements Renderer
         const rect = canvas.getBoundingClientRect();
         canvas.width = Math.max(1, Math.min(rect.width, device.limits.maxTextureDimension2D));
         canvas.height = Math.max(1, Math.min(rect.height, device.limits.maxTextureDimension2D));
+
+        this.settingsBuffer.writeBuffer();
 
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
         const textureView : GPUTextureView = context.getCurrentTexture().createView();

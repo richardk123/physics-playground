@@ -38,11 +38,35 @@ export class Particles {
 
 export class ParticlesBuffer {
     public buffer: EngineBuffer;
+    private readonly particles: Particles;
 
     constructor(engine: GPUEngine, particles: Particles)
     {
+        this.particles = particles;
         this.buffer = engine.createBuffer("particles", particles.data.length * 4 * OFFSET, "storage");
         this.buffer.writeBuffer(particles.serialize());
+    }
+
+    public async printGPUData()
+    {
+        const gpuData = await this.loadGpuData();
+        console.log(gpuData);
+
+        const getVal = (pIndex: number, propIndex: number) => {
+            const dataIndex = pIndex * OFFSET;
+            return gpuData[dataIndex + propIndex].toFixed(4);
+        }
+
+        console.log(`Particles: `);
+        for (let pIndex = 0; pIndex < this.particles.data.length; pIndex++) {
+            console.log(`${pIndex}: pos: [${getVal(pIndex, 0)}, ${getVal(pIndex, 1)}] vel: [${getVal(pIndex, 2)}, ${getVal(pIndex, 3)}]`);
+        }
+        console.log(`]`);
+    }
+
+    private async loadGpuData()
+    {
+        return new Float32Array(await this.buffer.readBuffer());
     }
 
     public destroy()
