@@ -130,9 +130,6 @@ export class GridRenderer implements Renderer
         canvas.width = Math.max(1, Math.min(rect.width, device.limits.maxTextureDimension2D));
         canvas.height = Math.max(1, Math.min(rect.height, device.limits.maxTextureDimension2D));
 
-        // update camera position
-        this.engineSettingsBuffer.writeBuffer();
-
         const commandEncoder : GPUCommandEncoder = device.createCommandEncoder();
         const textureView : GPUTextureView = context.getCurrentTexture().createView();
         const renderpass : GPURenderPassEncoder = commandEncoder.beginRenderPass({

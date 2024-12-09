@@ -38,6 +38,7 @@ export class Solvers
         const gridUpdate = await engine.createComputeShader("gridUpdate")
             .addBuffer(() => particlesBuffer.buffer, "read-only-storage")
             .addBuffer(() => gridBuffer.buffer, "storage")
+            .addBuffer(() => settingsBuffer.buffer, "uniform")
             .build();
 
         const prefixSum2d = await PrefixSum2dComputeShader.create(engine, prefixSum2dBuffer, settingsBuffer);
@@ -48,7 +49,6 @@ export class Solvers
             .addBuffer(() => prefixSum2dBuffer.buffer, "read-only-storage")
             .build();
 
-
         return {
             simulate: async (): Promise<void> =>
             {
@@ -57,15 +57,16 @@ export class Solvers
                 const measurePerformance= settingsBuffer.settings.performance;
                 const debug= settingsBuffer.settings.debug;
                 const gridSize = settingsBuffer.settings.gridSizeX * settingsBuffer.settings.gridSizeY;
+                const particleCount = particles.data.length;
 
                 const start = performance.now();
                 gridClear.dispatch(measurePerformance, Math.ceil(gridSize / 256));
-                gridUpdate.dispatch(measurePerformance, Math.ceil(gridSize / 256));
-                particleSolve.dispatch(measurePerformance, Math.ceil(particles.data.length / 256));
+                gridUpdate.dispatch(measurePerformance, Math.ceil(particleCount / 256));
                 prefixSum2d.dispatch(measurePerformance, gridBuffer, settingsBuffer.settings);
-
+                particleSolve.dispatch(measurePerformance, Math.ceil(particles.data.length / 256));
 
                 if (debug) {
+                    await gridBuffer.printGPUData();
                     await prefixSum2d.printGPUData();
                     await settingsBuffer.printGPUData();
                 }

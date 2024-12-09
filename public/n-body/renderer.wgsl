@@ -21,23 +21,22 @@ struct EngineSettings
 fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     let gx = i32((fragCoord.x * settings.zoom) + settings.transform.x);
     let gy = i32((fragCoord.y * settings.zoom) + settings.transform.y);
-    let gridSize = settings.gridSize.x * settings.gridSize.y;
 
     // Clamp coordinates to the grid bounds
-    if (gx < 0 || gy < 0 || gx >= i32(gridSize) || gy >= i32(gridSize)) {
+    if (gx < 0 || gy < 0 || gx >= i32(settings.gridSize.x) || gy >= i32(settings.gridSize.y)) {
         return vec4<f32>(1.0, 0.0, 1.0, 1.0);
     }
 
     // Read value from grid buffer
-    let index = u32(gy) * gridSize + u32(gx);
+    let index = u32(gy) * settings.gridSize.x + u32(gx);
     let value = grid[index];
 
     // Map value to intensity for visualization
     let val = f32(value) / 1;
     let prefixSum = f32(prefixSum[index]) / 3;
-    let integralSum = f32(getIntegralSum(gx, gy, gx, gy, gridSize)) / 30;
+    let integralSum = f32(getIntegralSum(gx, gy, gx, gy, settings.gridSize.x)) / 30;
 //    let intensity = f32(getIntegralSum(u32(gx) - 1u, u32(gy) - 1u, u32(gx) + 1u, u32(gy) + 1u)) / 3;
-    return vec4<f32>(integralSum, 0, val, 1.0);
+    return vec4<f32>(0.0, 0.0, val, 1.0);
 //
 //    return mapValueToColor(value, 3);
 }

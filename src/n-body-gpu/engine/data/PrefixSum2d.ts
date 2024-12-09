@@ -7,24 +7,36 @@ import {EngineSettings, EngineSettingsBuffer} from "./EngineSettings";
 export class PrefixSum2dBuffer
 {
     public buffer: EngineBuffer;
-    public gpuData: Uint32Array;
+    private readonly settings: EngineSettings;
 
     constructor(engine: GPUEngine, settings: EngineSettings)
     {
+        this.settings = settings;
         const gridSize = settings.gridSizeX * settings.gridSizeY;
-        this.buffer = engine.createBuffer("grid", gridSize * 4, "storage");
-        this.gpuData = new Uint32Array(gridSize);
+        this.buffer = engine.createBuffer("prefixSumBuffer", gridSize * 4, "storage");
     }
 
-    public async printGPU()
+    public async printGPUData()
     {
-        await this.loadGpuData();
-        console.log(`prefixSum indexes [${this.gpuData.map((c, i) => i).join(", ")}]`);
+        const gpuData = await this.loadGpuData();
+        console.log(`prefixSum2d [`);
+
+        for (let y = 0; y < this.settings.gridSizeY; y++)
+        {
+            let row = '';
+            for (let x = 0; x < this.settings.gridSizeX; x++)
+            {
+                const index = y * this.settings.gridSizeX + x;
+                row += " " + gpuData[index];
+            }
+            console.log(y + ": " + row);
+        }
+        console.log(`]`);
     }
 
     private async loadGpuData()
     {
-        this.gpuData = new Uint32Array(await this.buffer.readBuffer());
+        return new Uint32Array(await this.buffer.readBuffer());
     }
 
     public destroy()
@@ -52,7 +64,6 @@ export class PrefixSum2dComputeShader
                         buffer: PrefixSum2dBuffer,
                         settingsBuffer: EngineSettingsBuffer)
     {
-
         const prefixSum2dHorizontal = await engine.createComputeShader("prefixSum2dHorizontal")
             .addBuffer(() => buffer.buffer, "storage")
             .addBuffer(() => settingsBuffer.buffer, "uniform")
@@ -68,7 +79,7 @@ export class PrefixSum2dComputeShader
 
     public async printGPUData()
     {
-        await this.buffer.printGPU();
+        await this.buffer.printGPUData();
     }
 
     public dispatch(measurePerformance: boolean, gridBuffer: GridBuffer, settings: EngineSettings)
@@ -77,7 +88,7 @@ export class PrefixSum2dComputeShader
         // copy grid to prefixSumBuffer
         this.buffer.buffer.copyFrom(gridBuffer.buffer, numberOfCells * 4);
 
-        this.prefixSum2dVertical.dispatch(measurePerformance, Math.ceil((settings.gridSizeX - 1) / 256));
-        this.prefixSum2dHorizontal.dispatch(measurePerformance, Math.ceil((settings.gridSizeY - 1) / 256));
+        this.prefixSum2dHorizontal.dispatch(measurePerformance, Math.ceil((settings.gridSizeX - 1) / 256));
+        this.prefixSum2dVertical.dispatch(measurePerformance, Math.ceil((settings.gridSizeY - 1) / 256));
     }
 }

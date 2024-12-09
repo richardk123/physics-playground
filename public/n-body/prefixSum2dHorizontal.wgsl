@@ -11,13 +11,13 @@ struct EngineSettings
 @workgroup_size(256)
 fn main(@builtin(global_invocation_id) id : vec3<u32>)
 {
-    let gridSize = settings.gridSize.x * settings.gridSize.y;
+    let y = id.x;
 
-    if (id.x + 1 >= gridSize) {
+    if (y + 1 > settings.gridSize.y) {
         return;
     }
-    for (var row:u32 = 0; row < gridSize; row++) {
-        let index = row * gridSize + id.x + 1;
+    for (var x: u32 = 0; x < settings.gridSize.x - 1; x++) {
+        let index = y * settings.gridSize.x + x + 1;
         prefixSum[index] = prefixSum[index] + prefixSum[index - 1];
     }
 }
