@@ -32,23 +32,26 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     let value = grid[index];
 
 //    // Map value to intensity for visualization
-    let val = f32(value) / 1;
-    let intensity = f32(getIntegralSum(gx - 1, gy - 1, gx + 1, gy + 1)) / 2;
-    return vec4<f32>(intensity, val, 0.2, 1.0);
+//    let val = f32(value) / 1;
+//    let intensity = f32(getIntegralSum(gx - 1, gy - 1, gx + 1, gy + 1)) / 2;
+//    return vec4<f32>(intensity, val, 0.2, 1.0);
 
-//    return mapValueToColor(value, 1);
+    return mapValueToColor(value);
 }
 
-fn mapValueToColor(value: u32, maxValue: i32) -> vec4<f32> {
-    let normalizedValue = clamp(f32(value) / f32(maxValue), 0.0, 1.0);
+fn mapValueToColor(value: u32) -> vec4<f32> {
+    // Normalize the value to a float for gradient calculations
+    let v = f32(value);
 
-    // Map normalized value to a gradient:
-    // 0.0 -> Blue, 0.5 -> Green, 1.0 -> Red
-    let red = smoothstep(0.9, 1.0, normalizedValue);
-    let green = smoothstep(0.25, 0.75, normalizedValue);
-    let blue = smoothstep(0.0, 0.5, normalizedValue);
+    // If value is 0, return black
+    if value == 0u {
+        return vec4<f32>(0.0, 0.0, 0.0, 1.0);
+    }
 
-    return vec4<f32>(red, green, blue, 1.0);
+    let tRed = v / 5;
+    let tGreen = (v - 5.0) / 5.0; // Normalize to range [0, 1]
+    let tWhite = (v - 10.0) / 10.0; // Normalize to range [0, 1]
+    return vec4<f32>(tRed, 0.5 + tGreen, 0.7 + tWhite, 1.0); // Red to white
 }
 
 fn getValue(x: i32, y: i32) -> u32 {
