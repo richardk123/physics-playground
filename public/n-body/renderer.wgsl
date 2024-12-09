@@ -48,10 +48,10 @@ fn mapValueToColor(value: u32) -> vec4<f32> {
         return vec4<f32>(0.0, 0.0, 0.0, 1.0);
     }
 
-    let tRed = v / 5;
-    let tGreen = (v - 5.0) / 5.0; // Normalize to range [0, 1]
-    let tWhite = (v - 10.0) / 10.0; // Normalize to range [0, 1]
-    return vec4<f32>(tRed, 0.5 + tGreen, 0.7 + tWhite, 1.0); // Red to white
+    let tRed = v / 10;
+    let tGreen = (v - 15.0) / 15.0; // Normalize to range [0, 1]
+    let tWhite = (v - 30.0) / 30.0; // Normalize to range [0, 1]
+    return vec4<f32>(0.1 + tRed, 0.5 + tGreen, 0.8 + tWhite, 1.0); // Red to white
 }
 
 fn getValue(x: i32, y: i32) -> u32 {

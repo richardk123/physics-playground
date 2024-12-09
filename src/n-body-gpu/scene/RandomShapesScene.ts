@@ -8,14 +8,18 @@ export const randomShapesScene = async (canvas: HTMLCanvasElement) => {
     const canvasWidth = 1024; // Width of the scene
     const canvasHeight = 1024; // Height of the scene
     const totalShapes = 100; // Number of small blob shapes
-    const particlesPerBlob = 5000; // Number of particles per blob
+    const particlesPerBlob = 15000; // Number of particles per blob
     const blobRadius = 200; // Approximate radius of each blob
-    const totalGasParticles = 200000; // Number of gas particles
+    const totalGasParticles = 20000; // Number of gas particles
 
     // Generate small blob shapes
     for (let i = 0; i < totalShapes; i++) {
         const centerX = Math.random() * canvasWidth;
         const centerY = Math.random() * canvasHeight;
+
+        const speedCoef = 3;
+        const velocityX = (Math.random() - 0.5) * speedCoef;
+        const velocityY = (Math.random() - 0.5) * speedCoef;
 
         for (let j = 0; j < particlesPerBlob; j++) {
             // Generate particles within a circular blob
@@ -24,9 +28,6 @@ export const randomShapesScene = async (canvas: HTMLCanvasElement) => {
 
             const x = centerX + distance * Math.cos(angle);
             const y = centerY + distance * Math.sin(angle);
-
-            const velocityX = (Math.random() - 0.5) * 0.1;
-            const velocityY = (Math.random() - 0.5) * 0.1;
 
             particles.addParticle(x, y, velocityX, velocityY);
         }
@@ -37,18 +38,15 @@ export const randomShapesScene = async (canvas: HTMLCanvasElement) => {
         const x = Math.random() * canvasWidth;
         const y = Math.random() * canvasHeight;
 
-        const velocityX = 0; // Gas particles are stationary
-        const velocityY = 0;
-
-        particles.addParticle(x, y, velocityX, velocityY); // Add semi-transparent gas
+        particles.addParticle(x, y); // Add semi-transparent gas
     }
 
     const settings: EngineSettings = {
         cameraX: 0,
         cameraY: 0,
         zoom: 1.0,
-        gridSizeX: canvasWidth + 500,
-        gridSizeY: canvasHeight + 500,
+        gridSizeX: canvasWidth + 100,
+        gridSizeY: canvasHeight + 100,
         performance: false,
         debug: false
     };

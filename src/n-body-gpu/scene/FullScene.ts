@@ -1,6 +1,5 @@
 import {Engine} from "../engine/Engine";
 import {Particles} from "../engine/data/Particles";
-import {GridBuffer} from "../engine/data/Grid";
 import {EngineSettings} from "../engine/data/EngineSettings";
 
 export const fullParticleScene = async (canvas: HTMLCanvasElement) => {

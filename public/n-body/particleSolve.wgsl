@@ -1,8 +1,15 @@
-const LEFT = vec2<i32>(-1, 0);
-const RIGHT = vec2<i32>(1, 0);
-const TOP = vec2<i32>(0, 1);
-const BOTTOM = vec2<i32>(0, -1);
-const G = 6.67e-5;
+const LEFT = vec2<f32>(-1.0, 0.0);
+const RIGHT = vec2<f32>(1.0, 0.0);
+
+const TOP = vec2<f32>(0.0, 1.0);
+const TOP_LEFT = vec2<f32>(-1.0, 1.0);
+const TOP_RIGHT = vec2<f32>(1.0, 1.0);
+
+const BOTTOM = vec2<f32>(0.0, -1.0);
+const BOTTOM_LEFT = vec2<f32>(-1.0, -1.0);
+const BOTTOM_RIGHT = vec2<f32>(1.0, -1.0);
+
+const G = 6.67e-1;
 
 struct EngineSettings
 {
@@ -27,9 +34,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     let index = id.x;
 
-    if (index > arrayLength(&particles)) {
-        return;
-    }
+//    if (index > arrayLength(&particles)) {
+//        return;
+//    }
 
     var acceleration = vec2<f32>(0.0, 0.0);
     // calculate gravity acceleration for different LOD's
@@ -54,17 +61,21 @@ fn getAccelerationForLod(lod: i32, pIndex: u32) -> vec2<f32> {
     sum = sum + getAccelerationForDirection(LEFT, lod, pIndex);
     sum = sum + getAccelerationForDirection(RIGHT, lod, pIndex);
     sum = sum + getAccelerationForDirection(TOP, lod, pIndex);
+    sum = sum + getAccelerationForDirection(TOP_LEFT, lod, pIndex);
+    sum = sum + getAccelerationForDirection(TOP_RIGHT, lod, pIndex);
     sum = sum + getAccelerationForDirection(BOTTOM, lod, pIndex);
+    sum = sum + getAccelerationForDirection(BOTTOM_LEFT, lod, pIndex);
+    sum = sum + getAccelerationForDirection(BOTTOM_RIGHT, lod, pIndex);
 
     return sum;
 }
 
-fn getAccelerationForDirection(direction: vec2<i32>, lod: i32, pIndex: u32) -> vec2<f32> {
+fn getAccelerationForDirection(direction: vec2<f32>, lod: i32, pIndex: u32) -> vec2<f32> {
     let particle = particles[pIndex];
     // length of square used for integral sum
     let squareSideLen = intPow(3, lod);
     // middle point of the square
-    let midPoint = (direction * squareSideLen) + vec2<i32>(i32(particle.position.x), i32(particle.position.y));
+    let midPoint = particle.position + (direction * f32(squareSideLen));
     // corners of the square
     let corners = calculateCorners(midPoint, squareSideLen);
 
@@ -74,18 +85,15 @@ fn getAccelerationForDirection(direction: vec2<i32>, lod: i32, pIndex: u32) -> v
         corners.bottomRight.x,
         corners.bottomRight.y);
 
-    return calculateGravitationalForce(particle.position, vec2<f32>(f32(midPoint.x), f32(midPoint.y)), f32(mass));
+    return calculateGravitationalForce(particle.position, midPoint, f32(mass));
 }
 
 fn calculateGravitationalForce(p1: vec2<f32>, p2: vec2<f32>, mass: f32) -> vec2<f32> {
     let direction = p2 - p1; // Direction from p1 to p2
-    let distance = length(direction); // Avoid division by zero
-    if (abs(distance) < 1e-4) {
-        return vec2<f32>(0.0, 0.0);
-    }
-    let magnitude = mass / distance * distance; // Gravitational force magnitude
+    let distanceSq = max(length(direction), 1e-10); // Avoid division by zero
+    let magnitude = mass / (distanceSq * distanceSq); // Gravitational force magnitude
     let normalizedDirection = normalize(direction); // Unit vector for direction
-    return normalizedDirection * magnitude * G; // Force vector
+    return normalizedDirection * magnitude * G;
 }
 
 struct Corners {
@@ -93,11 +101,13 @@ struct Corners {
     bottomRight: vec2<i32>,
 };
 
-fn calculateCorners(midPoint: vec2<i32>, sideLength: i32) -> Corners {
+fn calculateCorners(midPoint: vec2<f32>, sideLength: i32) -> Corners {
     let halfLength = sideLength / 2;
+//    let modulo = vec2<i32>(sideLength % 2, sideLength % 2);
+    let mid = vec2<i32>(i32(midPoint.x), i32(midPoint.y));
     return Corners(
-        midPoint - vec2<i32>(halfLength, halfLength),
-        midPoint + vec2<i32>(halfLength, halfLength)
+        mid - vec2<i32>(halfLength, halfLength),
+        mid + vec2<i32>(halfLength, halfLength)
     );
 }
 
