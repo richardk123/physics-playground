@@ -51,8 +51,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     // sum up velocity
     particles[id.x].velocity = particles[id.x].velocity + (acceleration * 0.01);
 
-    // drag
-    particles[id.x].velocity = particles[id.x].velocity;
     // update position
     particles[id.x].position = particles[id.x].position + particles[id.x].velocity;
 }
