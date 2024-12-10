@@ -16,10 +16,10 @@ export const createScenes = (canvas: HTMLCanvasElement): Scene[] =>
 {
     return [
         { label: 'Random shapes', create: () => randomShapesScene(canvas)},
-        { label: 'Two stars', create: () => twoStarsScene(canvas)},
+        { label: 'Debug scene', create: () => debugScene(canvas)},
         { label: 'One star', create: () => oneStarScene(canvas)},
+        { label: 'Two stars', create: () => twoStarsScene(canvas)},
         { label: 'Full scene', create: () => fullParticleScene(canvas)},
         { label: 'Two particles', create: () => twoParticlesScene(canvas)},
-        { label: 'Debug scene', create: () => debugScene(canvas)},
     ];
 };

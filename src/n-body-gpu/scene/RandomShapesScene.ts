@@ -8,7 +8,7 @@ export const randomShapesScene = async (canvas: HTMLCanvasElement) => {
     const canvasWidth = 1024; // Width of the scene
     const canvasHeight = 1024; // Height of the scene
     const totalShapes = 100; // Number of small blob shapes
-    const particlesPerBlob = 15000; // Number of particles per blob
+    const particlesPerBlob = 10000; // Number of particles per blob
     const blobRadius = 200; // Approximate radius of each blob
     const totalGasParticles = 20000; // Number of gas particles
 

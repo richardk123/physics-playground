@@ -16,8 +16,9 @@ export const twoStarsScene = async (canvas: HTMLCanvasElement) => {
             // Convert polar coordinates to Cartesian coordinates
             const x = centerX + r * Math.cos(angle);
             const y = centerY + r * Math.sin(angle);
-
-            particles.addParticle(x, y);
+            const velocityX = Math.random();
+            const velocityY = Math.random();
+            particles.addParticle(x, y, velocityX, velocityY);
         }
     }
 

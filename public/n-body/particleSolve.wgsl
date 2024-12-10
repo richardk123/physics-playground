@@ -34,9 +34,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
 {
     let index = id.x;
 
-//    if (index > arrayLength(&particles)) {
-//        return;
-//    }
+    if (index > arrayLength(&particles)) {
+        return;
+    }
 
     var acceleration = vec2<f32>(0.0, 0.0);
     // calculate gravity acceleration for different LOD's
@@ -51,6 +51,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     // sum up velocity
     particles[id.x].velocity = particles[id.x].velocity + (acceleration * 0.01);
 
+    // drag
+    particles[id.x].velocity = particles[id.x].velocity;
     // update position
     particles[id.x].position = particles[id.x].position + particles[id.x].velocity;
 }
@@ -85,13 +87,17 @@ fn getAccelerationForDirection(direction: vec2<f32>, lod: i32, pIndex: u32) -> v
         corners.bottomRight.x,
         corners.bottomRight.y);
 
+    if (mass == 0u) {
+        return vec2<f32>(0.0, 0.0);
+    }
+
     return calculateGravitationalForce(particle.position, midPoint, f32(mass));
 }
 
 fn calculateGravitationalForce(p1: vec2<f32>, p2: vec2<f32>, mass: f32) -> vec2<f32> {
     let direction = p2 - p1; // Direction from p1 to p2
-    let distanceSq = max(length(direction), 1e-10); // Avoid division by zero
-    let magnitude = mass / (distanceSq * distanceSq); // Gravitational force magnitude
+    let distance = max(length(direction), 1e-6); // Avoid division by zero
+    let magnitude = (1 + mass) / (distance * distance); // Gravitational force magnitude
     let normalizedDirection = normalize(direction); // Unit vector for direction
     return normalizedDirection * magnitude * G;
 }

@@ -5,8 +5,8 @@ import {EngineSettings} from "../engine/data/EngineSettings";
 export const oneStarScene = async (canvas: HTMLCanvasElement) => {
     const particles = new Particles();
 
-    const centerX = 1024; // Center of the circle
-    const centerY = 1024; // Center of the circle
+    const centerX = 500; // Center of the circle
+    const centerY = 500; // Center of the circle
     const radius = 500;  // Radius of the circle
     const totalParticles = 200000; // Total number of particles
 
@@ -22,7 +22,7 @@ export const oneStarScene = async (canvas: HTMLCanvasElement) => {
         particles.addParticle(x, y, Math.random() * 0.1, Math.random() * 0.1);
     }
 
-    const settings: EngineSettings = {cameraX: 512, cameraY: 512, zoom: 1.0, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
+    const settings: EngineSettings = {cameraX: -10, cameraY: -10, zoom: 1.0, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
 
     return await Engine.create(canvas, particles, settings);
 }

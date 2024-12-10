@@ -50,7 +50,6 @@ export class ParticlesBuffer {
     public async printGPUData()
     {
         const gpuData = await this.loadGpuData();
-        console.log(gpuData);
 
         const getVal = (pIndex: number, propIndex: number) => {
             const dataIndex = pIndex * OFFSET;
