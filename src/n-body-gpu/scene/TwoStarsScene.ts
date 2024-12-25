@@ -44,28 +44,40 @@ export const twoStarsScene = async (canvas: HTMLCanvasElement) => {
         }
     };
 
-    const createTwoStars = (
-        centerX1: number, centerY1: number, radius1: number,
-        centerX2: number, centerY2: number, radius2: number,
-        orbitSpeed: number
-    ): void => {
-        // Calculate the middle point between the stars
-        const middlePoint = {
-            x: (centerX1 + centerX2) / 2,
-            y: (centerY1 + centerY2) / 2,
-        };
-
-        // Create the first star
-        createStar(centerX1, centerY1, radius1, middlePoint.x, middlePoint.y, orbitSpeed);
-
-        // Create the second star
-        createStar(centerX2, centerY2, radius2, middlePoint.x, middlePoint.y, orbitSpeed);
+    type StarConfig = {
+        centerX: number;
+        centerY: number;
+        radius: number;
     };
 
-    createTwoStars(
-        600, 200, 200,
-        600, 500, 200,
-        2.5);
+    const createNStars = (stars: StarConfig[], orbitSpeed: number): void => {
+
+        // Calculate the middle point between all stars
+        const middlePoint = stars.reduce(
+            (acc, star) => ({
+                x: acc.x + star.centerX,
+                y: acc.y + star.centerY,
+            }),
+            { x: 0, y: 0 }
+        );
+
+        middlePoint.x /= stars.length;
+        middlePoint.y /= stars.length;
+
+        // Create each star with the calculated middle point as the orbit center
+        stars.forEach((star) => {
+            createStar(star.centerX, star.centerY, star.radius, middlePoint.x, middlePoint.y, orbitSpeed);
+        });
+    };
+
+    createNStars(
+        [
+            {centerX: 800, centerY: 200, radius: 140},
+            {centerX: 700, centerY: 500, radius: 140},
+            {centerX: 400, centerY: 600, radius: 140},
+            {centerX: 700, centerY: 800, radius: 140}
+        ],
+        2.3);
 
     const settings: EngineSettings = {cameraX: 0, cameraY: 0, zoom: 1.0, gridSizeX: 1280, gridSizeY: 1280, performance: false, debug: false};
 

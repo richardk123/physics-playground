@@ -16,8 +16,8 @@ export const createScenes = (canvas: HTMLCanvasElement): Scene[] =>
 {
     return [
         { label: 'Two stars', create: () => twoStarsScene(canvas)},
-        { label: 'Random shapes', create: () => randomShapesScene(canvas)},
         { label: 'One star', create: () => oneStarScene(canvas)},
+        { label: 'Random shapes', create: () => randomShapesScene(canvas)},
         { label: 'Full scene', create: () => fullParticleScene(canvas)},
         { label: 'Two particles', create: () => twoParticlesScene(canvas)},
         { label: 'Debug scene', create: () => debugScene(canvas)},

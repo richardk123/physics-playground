@@ -48,6 +48,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>)
     acceleration = acceleration + getAccelerationForLod(5, id.x);
     acceleration = acceleration + getAccelerationForLod(6, id.x);
 
+
     // sum up velocity
     particles[id.x].velocity = particles[id.x].velocity + (acceleration * 0.01);
 
