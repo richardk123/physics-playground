@@ -45,7 +45,7 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
                 let neighborValue = grid[neighborIndex];
 
                 // Convert neighbor value to color and accumulate
-                colorSum += mapValueToColor(neighborValue).rgb;
+                colorSum += valueToColor(neighborValue, 10).rgb;
                 sampleCount += 1;
             }
         }
@@ -63,18 +63,30 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(finalColor, 1.0);
 }
 
-fn mapValueToColor(value: u32) -> vec4<f32> {
-    let maxValue: f32 = 20.0; // Define the maximum value
-    let normalizedValue: f32 = f32(value) / maxValue; // Normalize the value between 0 and 1
+fn valueToColor(value: u32, maxValue: u32) -> vec4<f32> {
+    // Convert u32 to normalized f32 in the range [0.0, 1.0]
+    let v = clamp(f32(value) / f32(maxValue), 0.0, 1.0);
 
-    // Apply a gentler logarithmic transformation
-    let adjustedValue: f32 = log2(1.0 + normalizedValue * 7.0) / log2(8.0); // Scale and normalize
+    // Define color ranges with alpha set to 1.0
+    let blue = vec4<f32>(0.0, 0.0, 1.0, 1.0);  // Blue
+    let red = vec4<f32>(1.0, 0.0, 0.0, 1.0);   // Red
+    let yellow = vec4<f32>(1.0, 1.0, 0.0, 1.0); // Yellow
+    let white = vec4<f32>(1.0, 1.0, 1.0, 1.0); // White
 
-    // Calculate RGB values based on the adjusted value
-    let r: f32 = clamp(adjustedValue * 1.0 - 0.5, 0.0, 1.0);
-    let g: f32 = clamp(adjustedValue * 1.0 - 0.2, 0.0, 1.0);
-    let b: f32 = clamp(adjustedValue * 2.0 - 0.0, 0.0, 1.0);
-
-    // Return the color as a vec4 with an alpha value of 1.0
-    return vec4<f32>(r, g, b, 1.0);
+    // Interpolation thresholds
+    if v < 0.01 {
+        return vec4<f32>(0.0, 0.0, 0.0, 0.0);
+    } else if v < 0.33 {
+        // Interpolate between blue and red
+        let t = v / 0.53;
+        return mix(blue, red, t);
+    } else if v < 0.66 {
+        // Interpolate between red and yellow
+        let t = (v - 0.33) / 0.33;
+        return mix(red, yellow, t);
+    } else {
+        // Interpolate between yellow and white
+        let t = (v - 0.66) / 0.34;
+        return mix(yellow, white, t);
+    }
 }
