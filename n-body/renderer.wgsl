@@ -85,11 +85,11 @@ fn valueToColor(value: u32, maxValue: u32) -> vec4<f32> {
         return mix(blue, red, t);
     } else if v < 0.75 {
         // Interpolate between red and yellow
-        let t = (v - 0.5) / 0.25;
+        let t = (v - 0.6) / 0.25;
         return mix(red, yellow, t);
     } else {
         // Interpolate between yellow and white
-        let t = (v - 0.75) / 0.25;
+        let t = (v - 0.8) / 0.25;
         return mix(yellow, white, t);
     }
 }
