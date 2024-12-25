@@ -96,7 +96,7 @@ fn getAccelerationForDirection(direction: vec2<f32>, lod: i32, pIndex: u32) -> v
 fn calculateGravitationalForce(p1: vec2<f32>, p2: vec2<f32>, mass: f32) -> vec2<f32> {
     let direction = p2 - p1; // Direction from p1 to p2
     let distance = max(length(direction), 1e-6); // Avoid division by zero
-    let magnitude = (1 + mass) / (distance * distance); // Gravitational force magnitude
+    let magnitude = mass / (distance * distance); // Gravitational force magnitude
     let normalizedDirection = normalize(direction); // Unit vector for direction
     return normalizedDirection * magnitude * G;
 }

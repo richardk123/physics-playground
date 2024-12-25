@@ -4,7 +4,7 @@ import {EngineSettings} from "../engine/data/EngineSettings";
 
 export const twoStarsScene = async (canvas: HTMLCanvasElement) => {
     const particles = new Particles();
-    const totalParticles = 400000; // Total number of particles
+    const totalParticles = 450000; // Total number of particles
 
     const createStar = (
         centerX: number, centerY: number,
