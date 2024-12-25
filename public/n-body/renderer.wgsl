@@ -45,7 +45,7 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
                 let neighborValue = grid[neighborIndex];
 
                 // Convert neighbor value to color and accumulate
-                colorSum += valueToColor(neighborValue, 20).rgb;
+                colorSum += valueToColor(neighborValue, 40).rgb;
                 sampleCount += 1;
             }
         }
@@ -75,7 +75,9 @@ fn valueToColor(value: u32, maxValue: u32) -> vec4<f32> {
     let white = vec4<f32>(1.0, 1.0, 1.0, 1.0); // White
 
     // Interpolation thresholds
-    if v < 0.25 {
+    if (v == 0.0) {
+        return vec4<f32>(0.0, 0.0, 0.0, 0.0);
+    } else if v < 0.25 {
         // Interpolate between black and blue
         let t = 0.1 + v / 0.25;
         return mix(black, blue, t);
@@ -85,11 +87,11 @@ fn valueToColor(value: u32, maxValue: u32) -> vec4<f32> {
         return mix(blue, red, t);
     } else if v < 0.75 {
         // Interpolate between red and yellow
-        let t = (v - 0.6) / 0.25;
+        let t = (v - 0.75) / 0.25;
         return mix(red, yellow, t);
     } else {
         // Interpolate between yellow and white
-        let t = (v - 0.8) / 0.25;
+        let t = (v - 0.80) / 0.25;
         return mix(yellow, white, t);
     }
 }
