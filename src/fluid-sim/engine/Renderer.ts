@@ -57,8 +57,8 @@ export class Renderers {
             const bottomLeft = transform.toScreen(WORLD_MIN_X - POINT_DIAMETER / 2, WORLD_MIN_Y - POINT_DIAMETER / 2);
             const bottomRight = transform.toScreen(WORLD_MAX_X + POINT_DIAMETER / 2, WORLD_MIN_Y - POINT_DIAMETER / 2);
 
-            p5.strokeWeight(1);
-            p5.stroke(255, 25, 25);
+            p5.strokeWeight(2);
+            p5.stroke(255, 255, 255, 20);
 
             p5.line(topLeft.x, topLeft.y, topRight.x, topRight.y);
             p5.line(bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y);

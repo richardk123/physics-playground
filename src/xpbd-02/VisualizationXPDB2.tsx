@@ -69,8 +69,8 @@ export const VisualizationXPDB2 = () => {
         renderer.render(p5);
     }
 
-    return <div className="flex h-full w-full">
-        <div className="flex-1 flex flex-col overflow-hidden">
+    return <div className="flex h-full w-full justify-center">
+        <div className="flex flex-col overflow-hidden" style={{ width: '900px' }}>
             <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 h-full w-full">
                 <P5Renderer render={render} setup={setup} />
             </main>

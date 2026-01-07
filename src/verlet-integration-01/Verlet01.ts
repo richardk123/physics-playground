@@ -3,7 +3,7 @@ import p5Types from "p5";
 
 export const OBJECT_RADIUS = 10;
 export const GRAVITY = vec2.fromValues(0, 40);
-const CONSTRAINT_CENTER = vec2.fromValues(800, 430);
+const CONSTRAINT_CENTER = vec2.fromValues(450, 430);
 const CONSTRAINS_RADIUS = 400;
 const SUB_STEP_COUNT = 8;
 const DT = 60 / 1000;
@@ -115,6 +115,4 @@ const render = (p5: p5Types, objects: VerletObject[]) => {
         const object = objects[i];
         p5.ellipse(object.position[0], object.position[1], OBJECT_RADIUS * 2);
     }
-
-
 }
