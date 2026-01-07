@@ -1,18 +1,17 @@
-import {P5Renderer} from "../components/P5Renderer";
+import { P5Renderer } from "../components/P5Renderer";
 import React from "react";
-import {Engines} from "./engine/Engine";
+import { Engines } from "./engine/Engine";
 import p5Types from "p5";
-import {Renderers} from "./engine/Renderer";
-import {ParticleFormations} from "./engine/entitity/ParticleFormation";
-import {SettingsSidebar} from "./SettingsSidebar";
-import {vec2} from "gl-matrix";
-import {delay, fromEvent} from "rxjs";
-import {drag$, shoot$} from "./engine/utils/CanvasUtils";
-import {Colors} from "./engine/entitity/Color";
-import {createScene1} from "./engine/scene/Scene1";
+import { Renderers } from "./engine/Renderer";
+import { ParticleFormations } from "./engine/entitity/ParticleFormation";
+import { SettingsSidebar } from "./SettingsSidebar";
+import { vec2 } from "gl-matrix";
+import { delay, fromEvent } from "rxjs";
+import { drag$, shoot$ } from "./engine/utils/CanvasUtils";
+import { Colors } from "./engine/entitity/Color";
+import { createScene1 } from "./engine/scene/Scene1";
 
-export const VisualizationXPDB2 = () =>
-{
+export const VisualizationXPDB2 = () => {
     const engine = Engines.create();
     const renderer = Renderers.create(engine);
     const bodies = new ParticleFormations(engine);
@@ -23,10 +22,8 @@ export const VisualizationXPDB2 = () =>
     createScene1(engine, bodies);
 
 
-    const registerShooting = (canvas: HTMLCanvasElement) =>
-    {
-        shoot$(canvas).subscribe(downUp =>
-        {
+    const registerShooting = (canvas: HTMLCanvasElement) => {
+        shoot$(canvas).subscribe(downUp => {
             const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
             const angle = -Math.atan2(downUp[1][1] - downUp[0][1], downUp[1][0] - downUp[0][0]);
             const distance = vec2.len(direction);
@@ -43,11 +40,9 @@ export const VisualizationXPDB2 = () =>
         });
 
         drag$(canvas, 0)
-            .subscribe((val) =>
-            {
+            .subscribe((val) => {
                 renderer.addCustomRender({
-                    render: (p5) =>
-                    {
+                    render: (p5) => {
                         p5.strokeWeight(3)
                         p5.stroke(0, 0, 200);
                         p5.fill(0, 0, 200);
@@ -59,28 +54,25 @@ export const VisualizationXPDB2 = () =>
 
         fromEvent(canvas, 'mouseup')
             .pipe(delay(1000))
-            .subscribe(() =>
-            {
+            .subscribe(() => {
                 renderer.removeCustomRenderer("mouse-drag-arrow");
             })
     }
 
-    const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
-    {
+    const setup = (p5: p5Types, canvas: HTMLCanvasElement) => {
         renderer.render(p5);
         registerShooting(canvas);
     }
 
-    const render = (p5: p5Types) =>
-    {
+    const render = (p5: p5Types) => {
         engine.simulate(1 / 60);
         renderer.render(p5);
     }
 
-    return <div className="flex h-full bg-gray-200">
+    return <div className="flex h-full w-full">
         <div className="flex-1 flex flex-col overflow-hidden">
             <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 h-full w-full">
-                <P5Renderer render={render} setup={setup}/>
+                <P5Renderer render={render} setup={setup} />
             </main>
         </div>
         <div className="w-64 text-white">

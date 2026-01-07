@@ -10,26 +10,24 @@ import {
     takeUntil,
     timer
 } from "rxjs";
-import {vec2} from "gl-matrix";
-import {Vec2d} from "../../../engine/data/Vec2d";
-import {Camera} from "../../../engine/data/Camera";
-import {Transformer} from "../../../engine/common/Transformer";
+import { vec2 } from "gl-matrix";
+import { Vec2d } from "../../../engine/data/Vec2d";
+import { Camera } from "../../../engine/data/Camera";
+import { Transformer } from "../../../engine/common/Transformer";
 
-const transformEvent = (e: Event, canvas: HTMLCanvasElement) =>
-{
+const transformEvent = (e: Event, canvas: HTMLCanvasElement) => {
     const me = e as MouseEvent;
-    return vec2.fromValues(me.x - canvas.offsetLeft, me.y - canvas.offsetTop);
+    const rect = canvas.getBoundingClientRect();
+    return vec2.fromValues(me.clientX - rect.left, me.clientY - rect.top);
 }
 
-export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
-{
+export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera): Subscription => {
     return scroll$(canvas)
-        .subscribe(e =>
-        {
+        .subscribe(e => {
             const transform = new Transformer(camera, canvas);
             const deltaZoom = (e.deltaY * 0.01);
             const pCurrent = transform.toWorldSpace().position(e.mouse[0], e.mouse[1]);
-            camera.zoom +=  camera.zoom * deltaZoom;
+            camera.zoom += camera.zoom * deltaZoom;
             const pZoomed = transform.toWorldSpace().position(e.mouse[0], e.mouse[1]);
 
             camera.translation.x += pCurrent.x - pZoomed.x;
@@ -37,44 +35,38 @@ export const registerScrolling = (canvas: HTMLCanvasElement, camera: Camera): Su
         });
 }
 
-export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera): Subscription =>
-{
-    const cameraTranslation = () =>
-    {
-        return {x: camera.translation.x, y: camera.translation.y};
+export const registerMoving = (canvas: HTMLCanvasElement, camera: Camera): Subscription => {
+    const cameraTranslation = () => {
+        return { x: camera.translation.x, y: camera.translation.y };
     }
 
     return dragAndDrop$(canvas, cameraTranslation, 0)
-        .subscribe((val) =>
-        {
+        .subscribe((val) => {
             const transform = new Transformer(camera, canvas);
 
-            const moveX =  val.position[0] - val.endPosition[0];
-            const moveY =  val.endPosition[1] - val.position[1];
+            const moveX = val.position[0] - val.endPosition[0];
+            const moveY = val.endPosition[1] - val.position[1];
 
             camera.translation.x = val.originalPosition.x + transform.toWorldSpace().size(moveX);
             camera.translation.y = val.originalPosition.y + transform.toWorldSpace().size(moveY);
         });
 }
 
-export const scroll$ = (canvas: HTMLCanvasElement) =>
-{
+export const scroll$ = (canvas: HTMLCanvasElement) => {
     return fromEvent<WheelEvent>(canvas, 'wheel').pipe(
-        map(event =>
-        {
+        map(event => {
             event.preventDefault();
             event.stopPropagation();
-            return {deltaY: event.deltaY, mouse: transformEvent(event, canvas)};
+            return { deltaY: event.deltaY, mouse: transformEvent(event, canvas) };
         })
     );
 }
 
-export const dragAndDrop$ = (canvas: HTMLCanvasElement, originalVal: () => Vec2d, button = 0) =>
-{
+export const dragAndDrop$ = (canvas: HTMLCanvasElement, originalVal: () => Vec2d, button = 0) => {
     const mouseDown$ = fromEvent(canvas, 'mousedown')
         .pipe(
             filter(e => (e as MouseEvent).button === button),
-            map(e => ({downPos: transformEvent(e, canvas), originalVal: originalVal()})));
+            map(e => ({ downPos: transformEvent(e, canvas), originalVal: originalVal() })));
 
     const mouseUp$ = fromEvent(canvas, 'mouseup')
         .pipe(filter(e => (e as MouseEvent).button === button));
@@ -95,18 +87,17 @@ export const dragAndDrop$ = (canvas: HTMLCanvasElement, originalVal: () => Vec2d
 
     return mouseDown$
         .pipe(
-            switchMap(downValues =>
-            {
+            switchMap(downValues => {
                 return drag$.pipe(
                     filter(movePos => movePos !== null),
-                    map(movePos =>  movePos!),
-                    map(movePos =>
-                        {
-                            return {
-                                originalPosition: downValues.originalVal,
-                                position: vec2.clone(downValues.downPos),
-                                endPosition: vec2.clone(movePos)};
-                        }
+                    map(movePos => movePos!),
+                    map(movePos => {
+                        return {
+                            originalPosition: downValues.originalVal,
+                            position: vec2.clone(downValues.downPos),
+                            endPosition: vec2.clone(movePos)
+                        };
+                    }
                     ))
             }),
             takeUntil(mouseUp$),

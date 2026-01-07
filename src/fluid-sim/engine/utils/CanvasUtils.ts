@@ -4,16 +4,15 @@ import {
     map, repeat, startWith, switchMap, takeUntil, timer,
     zip
 } from "rxjs";
-import {vec2} from "gl-matrix";
+import { vec2 } from "gl-matrix";
 
-const transformEvent = (e: Event, canvas: HTMLCanvasElement) =>
-{
+const transformEvent = (e: Event, canvas: HTMLCanvasElement) => {
     const me = e as MouseEvent;
-    return vec2.fromValues(me.x - canvas.offsetLeft, me.y - canvas.offsetTop);
+    const rect = canvas.getBoundingClientRect();
+    return vec2.fromValues(me.clientX - rect.left, me.clientY - rect.top);
 }
 
-export const mouseMove$ =  (canvas: HTMLCanvasElement) =>
-{
+export const mouseMove$ = (canvas: HTMLCanvasElement) => {
     return fromEvent(canvas, 'mousemove')
         .pipe(map(e => transformEvent(e, canvas)));
 }

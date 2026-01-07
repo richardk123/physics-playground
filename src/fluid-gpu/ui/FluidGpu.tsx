@@ -1,13 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {EngineSettings} from "./components/settings/EngineSettings";
+import React, { useEffect, useState } from "react";
+import { EngineSettings } from "./components/settings/EngineSettings";
 
-export const FluidGpu = () =>
-{
+export const FluidGpu = () => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
     const [canvasLoaded, setCanvasLoaded] = useState(false);
 
-    useEffect( () =>
-    {
+    useEffect(() => {
         setCanvasLoaded(canvasRef.current !== null);
     }, []);
 
@@ -29,7 +27,7 @@ export const FluidGpu = () =>
     // </div>;
 
     return (
-        <div className="flex h-full bg-gray-200">
+        <div className="flex h-full w-full">
             <div className="flex-1 flex flex-col h-full">
                 <div className="flex h-full">
                     <canvas id="simple-gpu-canvas" className="w-full h-full" ref={canvasRef} width={1980} height={1080}></canvas>

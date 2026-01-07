@@ -3,10 +3,23 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles.css';
 import reportWebVitals from './reportWebVitals';
-import {createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 const darkTheme = createTheme({
-    spacing: 1
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#06b6d4', // Cyan 500
+    },
+    background: {
+      default: 'transparent',
+      paper: '#1e293b',
+    }
+  },
+  spacing: 1,
+  typography: {
+    fontFamily: 'Inter, sans-serif',
+  }
 });
 
 const root = ReactDOM.createRoot(
@@ -14,10 +27,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   // <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <App />
-    </ThemeProvider>
+  <ThemeProvider theme={darkTheme}>
+    <CssBaseline />
+    <App />
+  </ThemeProvider>
   // </React.StrictMode>
 );
 

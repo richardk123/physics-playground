@@ -1,15 +1,14 @@
-import {P5Renderer} from "../components/P5Renderer";
+import { P5Renderer } from "../components/P5Renderer";
 import React from "react";
-import {Engines} from "./engine/Engine";
+import { Engines } from "./engine/Engine";
 import p5Types from "p5";
-import {Renderers} from "./engine/Renderer";
-import {ParticleFormations} from "./engine/entitity/ParticleFormation";
-import {SettingsSidebar} from "./SettingsSidebar";
-import {mouseMove$} from "./engine/utils/CanvasUtils";
-import {Colors} from "./engine/entitity/Color";
+import { Renderers } from "./engine/Renderer";
+import { ParticleFormations } from "./engine/entitity/ParticleFormation";
+import { SettingsSidebar } from "./SettingsSidebar";
+import { mouseMove$ } from "./engine/utils/CanvasUtils";
+import { Colors } from "./engine/entitity/Color";
 
-export const VisualizationFluidSim = () =>
-{
+export const VisualizationFluidSim = () => {
     const engine = Engines.create();
     const renderer = Renderers.create(engine);
     const bodies = new ParticleFormations(engine);
@@ -28,26 +27,23 @@ export const VisualizationFluidSim = () =>
 
     const collisionCircle = bodies.collisionCircle(1000, 1000, 10);
 
-    const setup = (p5: p5Types, canvas: HTMLCanvasElement) =>
-    {
+    const setup = (p5: p5Types, canvas: HTMLCanvasElement) => {
         renderer.render(p5);
-        mouseMove$(canvas).subscribe(position =>
-        {
+        mouseMove$(canvas).subscribe(position => {
             const simPos = renderer.transform().toSimulation(position[0], position[1]);
             collisionCircle.setPosition(simPos.x, simPos.y);
         })
     }
 
-    const render = (p5: p5Types) =>
-    {
+    const render = (p5: p5Types) => {
         engine.simulate(1 / 60);
         renderer.render(p5);
     }
 
-    return <div className="flex h-full bg-gray-200">
+    return <div className="flex h-full w-full">
         <div className="flex-1 flex flex-col overflow-hidden">
             <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 h-full w-full">
-                <P5Renderer render={render} setup={setup}/>
+                <P5Renderer render={render} setup={setup} />
             </main>
         </div>
         <div className="w-64 text-white">

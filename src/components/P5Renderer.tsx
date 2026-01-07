@@ -1,34 +1,29 @@
 import Sketch from "react-p5";
 import p5Types from "p5";
-import {useState} from "react";
+import { useState } from "react";
 
-interface Props
-{
+interface Props {
     render: (p5: p5Types, canvas: HTMLCanvasElement) => void;
     setup: (p5: p5Types, canvas: HTMLCanvasElement) => void;
 }
 
-export const P5Renderer = (props: Props) =>
-{
+export const P5Renderer = (props: Props) => {
     const [parent, setParent] = useState<Element>();
     const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
-    const setup = (p5: p5Types, canvasParentRef: Element) =>
-    {
+    const setup = (p5: p5Types, canvasParentRef: Element) => {
         setParent(canvasParentRef);
         p5.createCanvas(10, 10).parent(canvasParentRef);
         const c = canvasParentRef.querySelector('canvas');
         setCanvas(c);
         props.setup(p5, c!);
-        c!.oncontextmenu = e =>
-        {
+        c!.oncontextmenu = e => {
             e.preventDefault();
             e.stopPropagation();
         }
     };
 
-    const resizeToFit = (p5: p5Types) =>
-    {
+    const resizeToFit = (p5: p5Types) => {
         const parentWidth = parent!.clientWidth;
         const parentHeight = parent!.clientHeight;
 
@@ -38,7 +33,7 @@ export const P5Renderer = (props: Props) =>
 
     const draw = (p5: p5Types) => {
         resizeToFit(p5);
-        p5.background(255);
+        p5.clear(0, 0, 0, 0);
         props.render(p5, canvas!);
     };
 
