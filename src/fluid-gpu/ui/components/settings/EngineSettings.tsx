@@ -15,12 +15,29 @@ export const EngineSettings = ({ canvas }: { canvas: HTMLCanvasElement }) => {
     const scenes = createScenes(canvas);
 
     useEffect(() => {
+        let activeEngine: Engine | undefined;
+        let isMounted = true;
+
         scenes[0].create()
             .then(async engine => {
+                if (!isMounted) {
+                    console.log("Engine created after unmount, destroying...");
+                    engine.destroy();
+                    return;
+                }
                 console.log("init first scene");
+                activeEngine = engine;
                 setEngine(engine);
                 await engine.startLoop();
             })
+
+        return () => {
+            isMounted = false;
+            if (activeEngine) {
+                console.log("Unmounting EngineSettings, destroying engine...");
+                activeEngine.destroy();
+            }
+        }
     }, [canvas]);
 
     useEffect(() => {

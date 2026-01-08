@@ -11,12 +11,21 @@ import {
     switchMap,
     takeUntil,
     throttleTime, timer,
+    Subscription
 } from "rxjs";
+import { useEffect, useMemo, useRef } from "react";
 
 export const VerletIntegration01 = () => {
-    const engine = createEngine();
-    let arrowStart: vec2 | null = null;
-    let arrowEnd: vec2 | null = null;
+    const engine = useMemo(() => createEngine(), []);
+    const arrowStart = useRef<vec2 | null>(null);
+    const arrowEnd = useRef<vec2 | null>(null);
+    const subs = useRef<Subscription>(new Subscription());
+
+    useEffect(() => {
+        return () => {
+            subs.current.unsubscribe();
+        };
+    }, []);
 
     const render = (p5: p5Types) => {
         engine.render(p5);
@@ -46,10 +55,10 @@ export const VerletIntegration01 = () => {
             throttleTime(throtle)
         );
 
-        mouseUp$.subscribe(() => {
-            arrowStart = null;
-            arrowEnd = null;
-        })
+        subs.current.add(mouseUp$.subscribe(() => {
+            arrowStart.current = null;
+            arrowEnd.current = null;
+        }));
 
         return mouseDown$
             .pipe(
@@ -81,26 +90,25 @@ export const VerletIntegration01 = () => {
 
     const emitNewParticlesWithMouse = (canvas: HTMLCanvasElement) => {
 
-        createDrag$(canvas, 0)
+        subs.current.add(createDrag$(canvas, 0)
             .subscribe(v => {
-                arrowStart = vec2.copy(vec2.create(), v.position);
-                arrowEnd = vec2.copy(vec2.create(), v.endPosition);
-            });
+                arrowStart.current = vec2.copy(vec2.create(), v.position);
+                arrowEnd.current = vec2.copy(vec2.create(), v.endPosition);
+            }));
 
-        createDrag$(canvas, 150)
+        subs.current.add(createDrag$(canvas, 150)
             .subscribe(v => {
-
                 const obj = engine.add(vec2.copy(vec2.create(), v.position));
                 engine.setVelocity(obj, v.speed);
-            });
+            }));
     }
 
     const renderArrow = (p5: p5Types) => {
-        if (arrowStart !== null && arrowEnd !== null) {
+        if (arrowStart.current !== null && arrowEnd.current !== null) {
             p5.stroke(255, 50, 50);
             p5.fill(255, 50, 50);
             p5.strokeWeight(10);
-            p5.line(arrowStart[0], arrowStart[1], arrowEnd[0], arrowEnd[1]);
+            p5.line(arrowStart.current[0], arrowStart.current[1], arrowEnd.current[0], arrowEnd.current[1]);
         }
     }
 

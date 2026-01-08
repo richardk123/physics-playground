@@ -1,5 +1,5 @@
 import { P5Renderer } from "../components/P5Renderer";
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Engines } from "./engine/Engine";
 import p5Types from "p5";
 import { Renderers } from "./engine/Renderer";
@@ -7,32 +7,52 @@ import { ParticleFormations } from "./engine/entitity/ParticleFormation";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { mouseMove$ } from "./engine/utils/CanvasUtils";
 import { Colors } from "./engine/entitity/Color";
+import { Subscription } from "rxjs";
 
 export const VisualizationFluidSim = () => {
-    const engine = Engines.create();
-    const renderer = Renderers.create(engine);
-    const bodies = new ParticleFormations(engine);
+    const engine = useMemo(() => Engines.create(), []);
+    const subs = useRef<Subscription>(new Subscription());
 
-    renderer.lookAt(50, 50);
-    renderer.setSimulationWidth(100);
+    // Initialize renderer once
+    const renderer = useMemo(() => {
+        const r = Renderers.create(engine);
+        r.lookAt(50, 50);
+        r.setSimulationWidth(100);
+        return r;
+    }, [engine]);
 
-    // createScene1(engine, bodies);
-    bodies.rectangle(
-        20,
-        20,
-        35,
-        35,
-        1,
-        Colors.blue());
+    const bodies = useMemo(() => new ParticleFormations(engine), [engine]);
 
-    const collisionCircle = bodies.collisionCircle(1000, 1000, 10);
+    // Use a ref to hold the collision circle to access it in setup subscription
+    const collisionCircleRef = useRef<any>(null);
+
+    useEffect(() => {
+        // Initialize Scene
+        bodies.rectangle(
+            20,
+            20,
+            35,
+            35,
+            1,
+            Colors.blue());
+
+        // Create collision circle and store in ref
+        collisionCircleRef.current = bodies.collisionCircle(1000, 1000, 10);
+
+        return () => {
+            subs.current.unsubscribe();
+        }
+    }, [bodies]);
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) => {
         renderer.render(p5);
-        mouseMove$(canvas).subscribe(position => {
-            const simPos = renderer.transform().toSimulation(position[0], position[1]);
-            collisionCircle.setPosition(simPos.x, simPos.y);
-        })
+        const sub = mouseMove$(canvas).subscribe(position => {
+            if (collisionCircleRef.current) {
+                const simPos = renderer.transform().toSimulation(position[0], position[1]);
+                collisionCircleRef.current.setPosition(simPos.x, simPos.y);
+            }
+        });
+        subs.current.add(sub);
     }
 
     const render = (p5: p5Types) => {

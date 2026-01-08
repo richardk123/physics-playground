@@ -11,14 +11,31 @@ import {
     switchMap,
     takeUntil,
     throttleTime, timer,
+    Subscription
 } from "rxjs";
+import { useEffect, useMemo, useRef } from "react";
 import { OBJECT_RADIUS } from "../verlet-integration-01/Verlet01";
 
 export const VerletIntegration02 = () => {
-    const engine = createEngine();
-    let arrowStart: vec2 | null = null;
-    let arrowEnd: vec2 | null = null;
+    const engine = useMemo(() => createEngine(), []);
+    const arrowStart = useRef<vec2 | null>(null);
+    const arrowEnd = useRef<vec2 | null>(null);
+    const subs = useRef<Subscription>(new Subscription());
 
+    useEffect(() => {
+        return () => {
+            subs.current.unsubscribe();
+        };
+    }, []);
+
+    const renderArrow = (p5: p5Types) => {
+        if (arrowStart.current !== null && arrowEnd.current !== null) {
+            p5.stroke(255, 50, 50);
+            p5.fill(255, 50, 50);
+            p5.strokeWeight(10);
+            p5.line(arrowStart.current[0], arrowStart.current[1], arrowEnd.current[0], arrowEnd.current[1]);
+        }
+    }
     const render = (p5: p5Types) => {
         engine.render(p5);
         renderArrow(p5);
@@ -47,10 +64,10 @@ export const VerletIntegration02 = () => {
             throttleTime(throtle)
         );
 
-        mouseUp$.subscribe(() => {
-            arrowStart = null;
-            arrowEnd = null;
-        })
+        subs.current.add(mouseUp$.subscribe(() => {
+            arrowStart.current = null;
+            arrowEnd.current = null;
+        }));
 
         return mouseDown$
             .pipe(
@@ -62,20 +79,19 @@ export const VerletIntegration02 = () => {
                             const velocity = vec2.distance(downPos, movePos);
                             const speedVec = vec2.subtract(vec2.create(), downPos, movePos);
                             vec2.normalize(speedVec, speedVec);
-                            vec2.scale(speedVec, speedVec, 30 + velocity / 10);
+                            vec2.scale(speedVec, speedVec, 20 + velocity / 10);
 
                             return {
                                 speed: speedVec,
-                                position: vec2.clone(downPos),
-                                endPosition: vec2.clone(movePos)
+                                position: vec2.copy(vec2.create(), downPos),
+                                endPosition: vec2.copy(vec2.create(), movePos)
                             };
                         }
                         ))
                 }),
-                // filter(v =>
-                // {
-                //     return vec2.len(v.speed) > 25;
-                // }),
+                filter(v => {
+                    return vec2.len(v.speed) > 25;
+                }),
                 takeUntil(mouseUp$),
                 repeat() // Resubscribe to mouseDown$ after drag is completed
             );
@@ -92,32 +108,23 @@ export const VerletIntegration02 = () => {
 
     const emitNewParticlesWithMouse = (canvas: HTMLCanvasElement) => {
 
-        createDrag$(canvas, 0)
+        subs.current.add(createDrag$(canvas, 0)
             .subscribe(v => {
-                arrowStart = vec2.copy(vec2.create(), v.position);
-                arrowEnd = vec2.copy(vec2.create(), v.endPosition);
-            });
+                arrowStart.current = vec2.copy(vec2.create(), v.position);
+                arrowEnd.current = vec2.copy(vec2.create(), v.endPosition);
+            }));
 
-        createDrag$(canvas, 30)
+        subs.current.add(createDrag$(canvas, 30)
             .subscribe(v => {
                 const numberOfParticles = Math.floor(vec2.len(v.speed) / 15);
 
                 for (let i = 0; i < numberOfParticles; i++) {
                     const offset = ((numberOfParticles - 1) / 2) * OBJECT_RADIUS * 2;
                     const pos2 = createParallelVector(vec2.clone(v.position), v.speed, i * OBJECT_RADIUS * 2 - offset);
-                    const obj1 = engine.add(pos2);
-                    engine.setVelocity(obj1, vec2.clone(v.speed));
+                    const obj = engine.add(pos2);
+                    engine.setVelocity(obj, v.speed);
                 }
-            });
-    }
-
-    const renderArrow = (p5: p5Types) => {
-        if (arrowStart !== null && arrowEnd !== null) {
-            p5.stroke(255, 50, 50);
-            p5.fill(255, 50, 50);
-            p5.strokeWeight(10);
-            p5.line(arrowStart[0], arrowStart[1], arrowEnd[0], arrowEnd[1]);
-        }
+            }));
     }
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) => {

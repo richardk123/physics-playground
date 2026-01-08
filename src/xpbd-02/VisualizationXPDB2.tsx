@@ -1,29 +1,36 @@
 import { P5Renderer } from "../components/P5Renderer";
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Engines } from "./engine/Engine";
 import p5Types from "p5";
 import { Renderers } from "./engine/Renderer";
 import { ParticleFormations } from "./engine/entitity/ParticleFormation";
 import { SettingsSidebar } from "./SettingsSidebar";
 import { vec2 } from "gl-matrix";
-import { delay, fromEvent } from "rxjs";
+import { delay, fromEvent, Subscription } from "rxjs";
 import { drag$, shoot$ } from "./engine/utils/CanvasUtils";
 import { Colors } from "./engine/entitity/Color";
 import { createScene1 } from "./engine/scene/Scene1";
 
 export const VisualizationXPDB2 = () => {
-    const engine = Engines.create();
-    const renderer = Renderers.create(engine);
-    const bodies = new ParticleFormations(engine);
+    const engine = useMemo(() => Engines.create(), []);
+    const renderer = useMemo(() => Renderers.create(engine), [engine]);
+    const bodies = useMemo(() => new ParticleFormations(engine), [engine]);
+    const subs = useRef<Subscription>(new Subscription());
 
-    renderer.lookAt(50, 50);
-    renderer.setSimulationWidth(150);
+    useEffect(() => {
+        renderer.lookAt(50, 50);
+        renderer.setSimulationWidth(150);
 
-    createScene1(engine, bodies);
+        createScene1(engine, bodies);
+
+        return () => {
+            subs.current.unsubscribe();
+        }
+    }, [engine, renderer, bodies]);
 
 
     const registerShooting = (canvas: HTMLCanvasElement) => {
-        shoot$(canvas).subscribe(downUp => {
+        subs.current.add(shoot$(canvas).subscribe(downUp => {
             const direction = vec2.subtract(vec2.create(), downUp[0], downUp[1]);
             const angle = -Math.atan2(downUp[1][1] - downUp[0][1], downUp[1][0] - downUp[0][0]);
             const distance = vec2.len(direction);
@@ -37,9 +44,9 @@ export const VisualizationXPDB2 = () => {
 
             // y must be inversed
             bullet.setVelocity(direction[0], -direction[1]);
-        });
+        }));
 
-        drag$(canvas, 0)
+        subs.current.add(drag$(canvas, 0)
             .subscribe((val) => {
                 renderer.addCustomRender({
                     render: (p5) => {
@@ -50,13 +57,13 @@ export const VisualizationXPDB2 = () => {
                     },
                     name: "mouse-drag-arrow",
                 });
-            });
+            }));
 
-        fromEvent(canvas, 'mouseup')
+        subs.current.add(fromEvent(canvas, 'mouseup')
             .pipe(delay(1000))
             .subscribe(() => {
                 renderer.removeCustomRenderer("mouse-drag-arrow");
-            })
+            }));
     }
 
     const setup = (p5: p5Types, canvas: HTMLCanvasElement) => {
