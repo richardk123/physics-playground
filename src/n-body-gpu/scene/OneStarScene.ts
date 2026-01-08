@@ -48,7 +48,7 @@ export const oneStarScene = async (canvas: HTMLCanvasElement) => {
         particles.addParticle(x, y, vx, vy);
     }
 
-    const settings: EngineSettings = {cameraX: -10, cameraY: -10, zoom: 1.0, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
+    const settings: EngineSettings = {cameraX: -10, cameraY: -10, zoom: 1.34, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
 
     return await Engine.create(canvas, particles, settings);
 }

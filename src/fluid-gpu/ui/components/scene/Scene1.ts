@@ -22,12 +22,13 @@ export const createScene1 = async (canvas: HTMLCanvasElement) =>
         solveDensity: true,
         solveCollisions: false,
     }
+
     const translation: Vec2d = {
-        x: 155.15,
-        y: 109.89
+        x: 150.55,
+        y: 140.59
     }
     const camera: Camera = {
-        zoom: 0.25770,
+        zoom: 0.36133,
         translation: translation,
         rotation: 0,
     }

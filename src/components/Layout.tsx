@@ -5,10 +5,15 @@ import { Outlet } from "react-router-dom";
 export const Layout = () => {
     return (
         <div className="flex h-screen w-full bg-physics-bg overflow-hidden relative selection:bg-physics-primary selection:text-physics-bg">
-            {/* Ambient Background Glow */}
+            {/* Ambient Dynamic Background */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-physics-primary/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-physics-secondary/10 rounded-full blur-[120px]" />
+                {/* Deep Space Gradient Base */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] to-[#1e1b4b]"></div>
+
+                {/* Animated Orbs */}
+                <div className="absolute top-0 left-[-10%] w-[40rem] h-[40rem] bg-physics-primary/20 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob" />
+                <div className="absolute top-[20%] right-[-10%] w-[35rem] h-[35rem] bg-purple-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob animation-delay-2000" />
+                <div className="absolute -bottom-32 left-[20%] w-[45rem] h-[45rem] bg-physics-secondary/20 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-blob animation-delay-4000" />
             </div>
 
             {/* Sidebar */}

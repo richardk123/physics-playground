@@ -44,7 +44,7 @@ export const randomShapesScene = async (canvas: HTMLCanvasElement) => {
     const settings: EngineSettings = {
         cameraX: 0,
         cameraY: 0,
-        zoom: 1.0,
+        zoom: 1.34,
         gridSizeX: canvasWidth + 100,
         gridSizeY: canvasHeight + 100,
         performance: false,

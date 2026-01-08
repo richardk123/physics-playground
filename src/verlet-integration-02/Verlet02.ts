@@ -4,8 +4,8 @@ import { createGrid } from "../common/Grid";
 
 export const OBJECT_RADIUS = 10;
 export const GRAVITY = vec2.fromValues(0, 40);
-const CONSTRAINT_CENTER = vec2.fromValues(450, 430);
-const CONSTRAINS_RADIUS = 400;
+const CONSTRAINT_CENTER = vec2.fromValues(450, 400);
+const CONSTRAINS_RADIUS = 350;
 const SUB_STEP_COUNT = 8;
 const DT = 60 / 1000;
 
@@ -109,13 +109,16 @@ const resolveCollisions = (objects: VerletObject[]) => {
 }
 
 const render = (p5: p5Types, objects: VerletObject[]) => {
-    p5.strokeWeight(1)
-    p5.stroke(30, 41, 59);
-    p5.fill(30, 41, 59, 200);
+    // Constraint (Container)
+    p5.strokeWeight(2);
+    p5.stroke(255, 255, 255, 30); // Low opacity white border
+    p5.fill(0, 0, 0, 0); // Transparent fill
     p5.ellipse(CONSTRAINT_CENTER[0], CONSTRAINT_CENTER[1], CONSTRAINS_RADIUS * 2);
 
-    p5.stroke(255, 255, 255);
-    p5.fill(255, 255, 255);
+    // Particles (No Glow)
+    p5.noStroke();
+    p5.fill(6, 182, 212); // Cyan-500
+
     for (let i = 0; i < objects.length; i++) {
         const object = objects[i];
         p5.ellipse(object.position[0], object.position[1], OBJECT_RADIUS * 2);

@@ -13,12 +13,29 @@ export const EngineSettings = ({ canvas }: { canvas: HTMLCanvasElement }) => {
     const scenes = createScenes(canvas);
 
     useEffect(() => {
+        let activeEngine: Engine | undefined;
+        let isMounted = true;
+
         scenes[0].create()
             .then(async engine => {
+                if (!isMounted) {
+                    console.log("Engine created after unmount, destroying...");
+                    engine.destroy();
+                    return;
+                }
                 console.log("init first scene");
+                activeEngine = engine;
                 setEngine(engine);
                 await engine.startLoop();
             })
+
+        return () => {
+            isMounted = false;
+            if (activeEngine) {
+                console.log("Unmounting EngineSettings, destroying engine...");
+                activeEngine.destroy();
+            }
+        }
     }, [canvas]);
 
     useEffect(() => {
@@ -37,7 +54,7 @@ export const EngineSettings = ({ canvas }: { canvas: HTMLCanvasElement }) => {
     }, [canvas, engine])
 
     if (engine) {
-        return <div className="w-full h-full bg-physics-surface/30 backdrop-blur-xl border-l border-white/5 p-4 text-slate-200 overflow-y-auto">
+        return <div className="w-full h-full bg-physics-surface/30 backdrop-blur-xl border-l border-white/5 p-4 text-slate-200 overflow-y-auto flex flex-col">
             <AccordionComponent expanded={true} label="Select scene">
                 <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine} />
             </AccordionComponent>

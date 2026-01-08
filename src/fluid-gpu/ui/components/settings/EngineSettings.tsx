@@ -56,7 +56,7 @@ export const EngineSettings = ({ canvas }: { canvas: HTMLCanvasElement }) => {
     }, [canvas, engine])
 
     if (engine) {
-        return <div className="w-full h-full bg-physics-surface/30 backdrop-blur-xl border-l border-white/5 p-4 text-slate-200 overflow-y-auto custom-scrollbar">
+        return <div className="w-full h-full bg-physics-surface/30 backdrop-blur-xl border-l border-white/5 p-4 text-slate-200 overflow-y-auto custom-scrollbar flex flex-col">
             <AccordionComponent expanded={true} label="Select scene">
                 <SceneControls canvas={canvas} engine={engine} onChangeEngine={setEngine} />
             </AccordionComponent>

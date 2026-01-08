@@ -1,20 +1,17 @@
-import {Autocomplete, TextField} from "@mui/material";
-import {Button} from "@material-tailwind/react";
-import {useState} from "react";
-import {Engine} from "../../../engine/Engine";
-import {createScenes, Scene} from "../scene/Scenes";
+import { Autocomplete, TextField } from "@mui/material";
+import { Button } from "@material-tailwind/react";
+import { useState } from "react";
+import { Engine } from "../../../engine/Engine";
+import { createScenes, Scene } from "../scene/Scenes";
 
-export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCanvasElement, engine: Engine, onChangeEngine: (engine: Engine) => void}) =>
-{
+export const SceneControls = ({ canvas, engine, onChangeEngine }: { canvas: HTMLCanvasElement, engine: Engine, onChangeEngine: (engine: Engine) => void }) => {
     const [scene, setScene] = useState<Scene | undefined>(undefined);
     const [running, setRunning] = useState(true);
     const scenes = createScenes(canvas);
 
-    const onChange = async (event: React.SyntheticEvent<Element, Event>, scene: Scene | null) =>
-    {
+    const onChange = async (event: React.SyntheticEvent<Element, Event>, scene: Scene | null) => {
         await engine.destroy();
-        if (scene)
-        {
+        if (scene) {
             const newEngine = await scene.create();
             await startStopEngine(running, newEngine);
             setScene(scene);
@@ -22,29 +19,24 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
         }
     }
 
-    const startStopEngine = async (running: boolean, engine: Engine) =>
-    {
+    const startStopEngine = async (running: boolean, engine: Engine) => {
         setRunning(running);
         await engine.startLoop();
-        if (!running)
-        {
+        if (!running) {
             engine.stop();
         }
     }
 
-    const startStop = async () =>
-    {
+    const startStop = async () => {
         startStopEngine(!running, engine);
     }
 
-    const next = async () =>
-    {
+    const next = async () => {
         await engine.next();
         setRunning(false);
     }
 
-    const reload = async () =>
-    {
+    const reload = async () => {
         await engine.destroy();
         const newEngine = scene ? await scene.create() : await scenes[0].create();
         await startStopEngine(running, newEngine);
@@ -55,7 +47,6 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
         <div className="w-full">
             <div className="w-full h-12">
                 <Autocomplete
-                    disablePortal
                     options={scenes}
                     size={"small"}
                     sx={{ width: 255 }}
@@ -71,5 +62,5 @@ export const SceneControls = ({canvas, engine, onChangeEngine}: {canvas: HTMLCan
                 <Button variant="filled" size="md" onClick={reload}>Reload</Button>
             </div>
         </div>
-);
+    );
 }

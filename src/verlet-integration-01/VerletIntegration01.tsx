@@ -116,7 +116,7 @@ export const VerletIntegration01 = () => {
         emitNewParticlesWithMouse(canvas);
     }
 
-    return <div className="flex h-full w-full items-center justify-center bg-gray-900">
+    return <div className="flex h-full w-full items-center justify-center">
         <div className="h-full" style={{ width: '900px' }}>
             <P5Renderer render={render} setup={setup} />
         </div>

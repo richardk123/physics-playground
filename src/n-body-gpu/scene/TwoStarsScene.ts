@@ -79,7 +79,7 @@ export const twoStarsScene = async (canvas: HTMLCanvasElement) => {
         ],
         2.3);
 
-    const settings: EngineSettings = {cameraX: 0, cameraY: 0, zoom: 1.0, gridSizeX: 1280, gridSizeY: 1280, performance: false, debug: false};
+    const settings: EngineSettings = {cameraX: 0, cameraY: 0, zoom: 1.34, gridSizeX: 1280, gridSizeY: 1280, performance: false, debug: false};
 
     return await Engine.create(canvas, particles, settings);
 }

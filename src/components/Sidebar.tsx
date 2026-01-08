@@ -79,21 +79,21 @@ const NavItem = ({ to, label, icon }: { to: string, label: string, icon?: React.
         <NavLink
             to={to}
             className={({ isActive }) =>
-                `group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 
+                `group flex items-center px-3 py-2.5 text-sm font-medium rounded-r-lg border-l-2 transition-all duration-200 
                 ${isActive
-                    ? 'bg-physics-primary/10 text-physics-primary shadow-[0_0_20px_rgba(6,182,212,0.15)] border border-physics-primary/20'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white hover:pl-4'
+                    ? 'border-physics-primary bg-physics-primary/10 text-physics-primary shadow-[0_0_15px_rgba(6,182,212,0.25)]'
+                    : 'border-transparent text-slate-400 hover:bg-white/5 hover:text-white hover:pl-4 hover:shadow-[0_0_10px_rgba(255,255,255,0.05)]'
                 }`
             }
         >
             {({ isActive }) => (
                 <>
-                    <span className={`mr-3 transition-colors ${isActive ? 'text-physics-primary' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                    <span className={`mr-3 transition-colors ${isActive ? 'text-physics-primary drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]' : 'text-slate-500 group-hover:text-slate-300'}`}>
                         {icon ? React.cloneElement(icon as React.ReactElement, { className: "w-5 h-5" }) : null}
                     </span>
                     {label}
                     {isActive && (
-                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-physics-primary shadow-[0_0_8px_currentColor]" />
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-physics-primary shadow-[0_0_8px_currentColor] animate-pulse" />
                     )}
                 </>
             )}

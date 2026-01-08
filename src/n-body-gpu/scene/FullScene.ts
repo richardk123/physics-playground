@@ -13,7 +13,7 @@ export const fullParticleScene = async (canvas: HTMLCanvasElement) => {
         }
     }
 
-    const settings: EngineSettings = {cameraX: -372, cameraY: -36, zoom: 2.2, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
+    const settings: EngineSettings = {cameraX: -372, cameraY: -36, zoom: 1.34, gridSizeX: 2048, gridSizeY: 2048, performance: false, debug: false};
 
     return await Engine.create(canvas, particles, settings);
 }

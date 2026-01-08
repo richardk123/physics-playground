@@ -24,7 +24,7 @@ fn fs(@builtin(position) fragCoord: vec4<f32>) -> @location(0) vec4<f32> {
 
     // Clamp coordinates to the grid bounds
     if (gx < 0 || gy < 0 || gx >= i32(settings.gridSize.x) || gy >= i32(settings.gridSize.y)) {
-        return vec4<f32>(0.2, 0.2, 0.2, 1.0);
+        return vec4<f32>(0.0, 0.0, 0.0, 0.0);
     }
 
     // Define blur radius

@@ -1,18 +1,16 @@
-import {Accordion, AccordionDetails, styled} from "@mui/material";
+import { Accordion, AccordionDetails, styled } from "@mui/material";
 import MuiAccordionSummary, {
     AccordionSummaryProps,
 } from '@mui/material/AccordionSummary';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-interface Props
-{
+interface Props {
     label: string;
     expanded: boolean;
     children?: React.ReactNode;
 }
-export const AccordionComponent = (props: Props) =>
-{
+export const AccordionComponent = (props: Props) => {
 
     const AccordionSummary = styled((props: AccordionSummaryProps) => (
         <MuiAccordionSummary
@@ -26,12 +24,27 @@ export const AccordionComponent = (props: Props) =>
                 : 'rgba(0, 0, 0, .03)',
     }));
 
-    return <Accordion defaultExpanded={props.expanded} disableGutters>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            {props.label}
+    return <Accordion
+        defaultExpanded={props.expanded}
+        disableGutters
+        sx={{
+            borderRadius: '0px',
+            overflow: 'visible', // Allow dropdowns to overflow
+            background: 'transparent',
+            boxShadow: 'none',
+            '&:before': { display: 'none' },
+            '& .MuiAccordionSummary-root': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                minHeight: '48px',
+                paddingLeft: '16px',
+            }
+        }}
+    >
+        <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'rgba(255,255,255,0.7)' }} />}>
+            <span className="text-sm font-semibold tracking-wide text-slate-200">{props.label}</span>
         </AccordionSummary>
-        <AccordionDetails>
-            <div className="p-2">
+        <AccordionDetails sx={{ padding: 0 }}>
+            <div className="p-4 flex flex-col gap-3 bg-transparent">
                 {props.children}
             </div>
         </AccordionDetails>

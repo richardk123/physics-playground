@@ -24,11 +24,11 @@ export const createLettersScene = async (canvas: HTMLCanvasElement) =>
         solveDensity: false
     }
     const translation: Vec2d = {
-        x: 252,
-        y: 171
+        x: 150.55,
+        y: 140.59
     }
     const camera: Camera = {
-        zoom: 0.43385,
+        zoom: 0.36133,
         translation: translation,
         rotation: 0,
     }
